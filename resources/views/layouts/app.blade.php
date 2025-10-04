@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Sistema de Seguridad')</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .btn-task {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .btn-task:hover {
+            color: white;
+            text-decoration: none;
+        }
+        .btn-task i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        
+        /* Responsividad móvil */
+        @media (max-width: 768px) {
+            .btn-task {
+                min-height: 100px;
+                padding: 15px;
+            }
+            .btn-task i {
+                font-size: 1.5rem;
+                margin-bottom: 8px;
+            }
+            .btn-task h5 {
+                font-size: 0.9rem;
+            }
+            .btn-task small {
+                font-size: 0.75rem;
+            }
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .card-body {
+                padding: 1rem;
+            }
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            .btn-group-sm .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .btn-task {
+                min-height: 80px;
+                padding: 10px;
+            }
+            .btn-task i {
+                font-size: 1.25rem;
+                margin-bottom: 5px;
+            }
+            .btn-task h5 {
+                font-size: 0.8rem;
+                margin-bottom: 2px;
+            }
+            .btn-task small {
+                font-size: 0.7rem;
+            }
+            .stats-card .card-body {
+                padding: 1rem 0.5rem;
+            }
+            .stats-card h4 {
+                font-size: 1.5rem;
+            }
+            .stats-card p {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    
+    @stack('styles')
+</head>
+<body>
+    @auth
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ route('dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>Sistema de Seguridad
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard') }}">
+                            <i class="fas fa-home me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('reportes.index') }}">
+                            <i class="fas fa-file-alt me-1"></i>Mis Reportes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dias-trabajados.index') }}">
+                            <i class="fas fa-calendar me-1"></i>Días Trabajados
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog me-1"></i>Administración
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('admin.reportes-diarios') }}">
+                                <i class="fas fa-chart-line me-1"></i>Reportes Diarios
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.calculo-sueldos') }}">
+                                <i class="fas fa-calculator me-1"></i>Cálculo de Sueldos
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>{{ auth()->user()->nombre_completo }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('profile.index') }}">
+                                <i class="fas fa-user-circle me-1"></i>Mi Perfil
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+    @endauth
+
+    <main class="container mt-4">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @yield('content')
+    </main>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="text-muted mb-0">&copy; {{ date('Y') }} Sistema de Seguridad. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- RUT Formatter -->
+    <script src="{{ asset('js/rut-formatter.js') }}"></script>
+    
+    @stack('scripts')
+</body>
+</html>

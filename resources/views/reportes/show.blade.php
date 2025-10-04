@@ -1,0 +1,150 @@
+@extends('layouts.app')
+
+@section('title', 'Detalle del Reporte')
+
+@section('content')
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-file-alt me-2"></i>Detalle del Reporte
+            </h1>
+            <a href="{{ route('reportes.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    {{ $reporte->tarea->nombre }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Estado:</strong>
+                        <span class="badge 
+                            @switch($reporte->estado)
+                                @case('pendiente') bg-warning @break
+                                @case('en_revision') bg-info @break
+                                @case('completado') bg-success @break
+                                @case('rechazado') bg-danger @break
+                                @default bg-secondary
+                            @endswitch
+                        ">
+                            {{ ucfirst(str_replace('_', ' ', $reporte->estado)) }}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Fecha de envío:</strong>
+                        {{ $reporte->created_at->format('d/m/Y H:i') }}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>Datos del reporte:</h6>
+                <div class="row">
+                    @foreach($reporte->datos as $detalleId => $valor)
+                        @php
+                            $detalle = $reporte->tarea->detalles->find($detalleId);
+                        @endphp
+                        @if($detalle)
+                            <div class="col-md-6 mb-3">
+                                <strong>{{ $detalle->campo_nombre }}:</strong>
+                                <p class="mb-0">{{ $valor }}</p>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+                
+                @if($reporte->imagenes && count($reporte->imagenes) > 0)
+                    <hr>
+                    <h6>Imágenes adjuntas:</h6>
+                    <div class="row">
+                        @foreach($reporte->imagenes as $imagen)
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <img src="{{ asset('storage/' . $imagen) }}" 
+                                         class="card-img-top" 
+                                         style="height: 200px; object-fit: cover;"
+                                         alt="Imagen del reporte">
+                                    <div class="card-body p-2">
+                                        <small class="text-muted">
+                                            <a href="{{ asset('storage/' . $imagen) }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-external-link-alt me-1"></i>Ver completa
+                                            </a>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                
+                @if($reporte->comentarios_admin)
+                    <hr>
+                    <h6>Comentarios del administrador:</h6>
+                    <div class="alert alert-info">
+                        <i class="fas fa-comment me-2"></i>
+                        {{ $reporte->comentarios_admin }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-1"></i>Información
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Usuario:</strong><br>
+                    {{ $reporte->user->nombre_completo }}
+                </p>
+                <p class="card-text">
+                    <strong>RUT:</strong><br>
+                    {{ $reporte->user->rut }}
+                </p>
+                <p class="card-text">
+                    <strong>Sucursal:</strong><br>
+                    {{ $reporte->user->sucursal }}
+                </p>
+                <p class="card-text">
+                    <strong>Última actualización:</strong><br>
+                    {{ $reporte->updated_at->format('d/m/Y H:i') }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-1"></i>Estadísticas
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Campos completados:</strong><br>
+                    {{ count($reporte->datos) }} de {{ $reporte->tarea->detalles->count() }}
+                </p>
+                <p class="card-text">
+                    <strong>Imágenes adjuntas:</strong><br>
+                    {{ $reporte->imagenes ? count($reporte->imagenes) : 0 }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
