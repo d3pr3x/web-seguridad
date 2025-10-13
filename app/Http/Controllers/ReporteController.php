@@ -15,35 +15,57 @@ class ReporteController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'tarea_id' => 'required|exists:tareas,id',
-            'datos' => 'required|array',
-            'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'tarea_id' => 'required|exists:tareas,id',
+                'datos' => 'required|array',
+                'imagenes' => 'nullable|array|max:5',
+                'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:15360',
+                'latitud' => 'nullable|numeric|between:-90,90',
+                'longitud' => 'nullable|numeric|between:-180,180',
+                'precision' => 'nullable|numeric|min:0',
+            ], [
+                'imagenes.max' => 'Solo puedes subir un máximo de 5 imágenes.',
+                'imagenes.*.image' => 'Todos los archivos deben ser imágenes.',
+                'imagenes.*.mimes' => 'Las imágenes deben ser de tipo: jpeg, png, jpg, gif o webp.',
+                'imagenes.*.max' => 'Cada imagen no debe superar los 15MB.',
+            ]);
 
-        $tarea = Tarea::findOrFail($request->tarea_id);
-        $usuario = auth()->user();
-        
-        // Procesar imágenes si existen
-        $imagenes = [];
-        if ($request->hasFile('imagenes')) {
-            foreach ($request->file('imagenes') as $imagen) {
-                $nombreArchivo = Str::uuid() . '.' . $imagen->getClientOriginalExtension();
-                $ruta = $imagen->storeAs('reportes', $nombreArchivo, 'public');
-                $imagenes[] = $ruta;
+            $tarea = Tarea::findOrFail($request->tarea_id);
+            $usuario = auth()->user();
+            
+            // Procesar imágenes si existen
+            $imagenes = [];
+            if ($request->hasFile('imagenes')) {
+                foreach ($request->file('imagenes') as $index => $imagen) {
+                    if ($imagen->isValid()) {
+                        $nombreArchivo = Str::uuid() . '.' . $imagen->getClientOriginalExtension();
+                        $ruta = $imagen->storeAs('reportes', $nombreArchivo, 'public');
+                        $imagenes[] = $ruta;
+                    }
+                }
             }
+
+            // Crear reporte
+            $reporte = Reporte::create([
+                'user_id' => $usuario->id,
+                'tarea_id' => $tarea->id,
+                'datos' => $request->datos,
+                'imagenes' => $imagenes,
+                'latitud' => $request->latitud,
+                'longitud' => $request->longitud,
+                'precision' => $request->precision,
+                'estado' => 'pendiente',
+            ]);
+
+            return redirect()->to('/')->with('success', 'Reporte enviado exitosamente.');
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error al subir reporte: ' . $e->getMessage());
+            return back()->with('error', 'Hubo un error al procesar el reporte. Por favor, intenta nuevamente.')->withInput();
         }
-
-        // Crear reporte
-        $reporte = Reporte::create([
-            'user_id' => $usuario->id,
-            'tarea_id' => $tarea->id,
-            'datos' => $request->datos,
-            'imagenes' => $imagenes,
-            'estado' => 'pendiente',
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Reporte enviado exitosamente.');
     }
 
     /**

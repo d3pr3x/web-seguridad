@@ -120,3 +120,5 @@ new RutFormatter();
 
 // Hacer disponible globalmente
 window.RutFormatter = RutFormatter;
+
+

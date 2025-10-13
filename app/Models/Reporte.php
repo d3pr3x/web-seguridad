@@ -11,6 +11,9 @@ class Reporte extends Model
         'tarea_id',
         'datos',
         'imagenes',
+        'latitud',
+        'longitud',
+        'precision',
         'estado',
         'comentarios_admin',
     ];

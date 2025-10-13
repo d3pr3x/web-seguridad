@@ -9,9 +9,14 @@
             <h1 class="h3 mb-0">
                 <i class="fas fa-file-alt me-2"></i>Mis Reportes
             </h1>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i>Volver al Dashboard
-            </a>
+            <div>
+                <a href="{{ route('informes.index') }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-file-pdf me-1"></i>Ver Mis Informes
+                </a>
+                <a href="{{ url('/') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -50,6 +55,13 @@
                             </p>
                         @endif
                         
+                        @if($reporte->latitud && $reporte->longitud)
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt me-1 text-success"></i>
+                                <span class="text-success">Ubicación GPS capturada</span>
+                            </p>
+                        @endif
+                        
                         @if($reporte->comentarios_admin)
                             <div class="alert alert-info p-2">
                                 <small>
@@ -81,11 +93,13 @@
                 <i class="fas fa-info-circle fa-3x mb-3"></i>
                 <h4>No tienes reportes</h4>
                 <p class="mb-3">Aún no has enviado ningún reporte.</p>
-                <a href="{{ route('dashboard') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i>Crear mi primer reporte
+                <a href="{{ url('/') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Ir al inicio
                 </a>
             </div>
         </div>
     </div>
 @endif
 @endsection
+
+

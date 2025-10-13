@@ -10,8 +10,10 @@ class Sucursal extends Model
     
     protected $fillable = [
         'nombre',
+        'empresa',
         'codigo',
         'direccion',
+        'comuna',
         'ciudad',
         'region',
         'telefono',
@@ -32,6 +34,30 @@ class Sucursal extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Relación con sectores
+     */
+    public function sectores()
+    {
+        return $this->hasMany(Sector::class);
+    }
+
+    /**
+     * Relación con acciones
+     */
+    public function acciones()
+    {
+        return $this->hasMany(Accion::class);
+    }
+
+    /**
+     * Relación con reportes especiales
+     */
+    public function reportesEspeciales()
+    {
+        return $this->hasMany(ReporteEspecial::class);
     }
 
     /**

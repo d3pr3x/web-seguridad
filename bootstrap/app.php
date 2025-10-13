@@ -11,8 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+        
         $middleware->alias([
             'validar.imei' => \App\Http\Middleware\ValidarImei::class,
+            'verificar.sucursal' => \App\Http\Middleware\VerificarSucursal::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

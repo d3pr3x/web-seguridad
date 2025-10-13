@@ -120,7 +120,7 @@
     @auth
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
+            <a class="navbar-brand" href="{{ url('/') }}">
                 <i class="fas fa-shield-alt me-2"></i>Sistema de Seguridad
             </a>
             
@@ -131,13 +131,70 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">
-                            <i class="fas fa-home me-1"></i>Dashboard
+                        <a class="nav-link" href="{{ url('/') }}">
+                            <i class="fas fa-home me-1"></i>Inicio
                         </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-tasks me-1"></i>Acciones
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('acciones.index') }}">
+                                <i class="fas fa-list me-1"></i>Ver Todas las Acciones
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'inicio_servicio']) }}">
+                                <i class="fas fa-play-circle me-1"></i>Inicio del Servicio
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'rondas']) }}">
+                                <i class="fas fa-route me-1"></i>Rondas
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'constancias']) }}">
+                                <i class="fas fa-file-signature me-1"></i>Constancias
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'concurrencia_carabineros']) }}">
+                                <i class="fas fa-user-shield me-1"></i>Concurrencia de Carabineros
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'concurrencia_servicios']) }}">
+                                <i class="fas fa-ambulance me-1"></i>Concurrencia de Servicios
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'entrega_servicio']) }}">
+                                <i class="fas fa-stop-circle me-1"></i>Entrega del Servicio
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Reportes
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('reportes-especiales.index') }}">
+                                <i class="fas fa-list me-1"></i>Ver Todos los Reportes
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('reportes-especiales.create', ['tipo' => 'incidentes']) }}">
+                                <i class="fas fa-exclamation-circle me-1"></i>Incidentes
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('reportes-especiales.create', ['tipo' => 'denuncia']) }}">
+                                <i class="fas fa-file-alt me-1"></i>Denuncia
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('reportes-especiales.create', ['tipo' => 'detenido']) }}">
+                                <i class="fas fa-user-lock me-1"></i>Detenido
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('reportes-especiales.create', ['tipo' => 'accion_sospechosa']) }}">
+                                <i class="fas fa-eye me-1"></i>Acción Sospechosa
+                            </a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('reportes.index') }}">
-                            <i class="fas fa-file-alt me-1"></i>Mis Reportes
+                            <i class="fas fa-file-alt me-1"></i>Mis Tareas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('informes.index') }}">
+                            <i class="fas fa-file-pdf me-1"></i>Mis Informes
                         </a>
                     </li>
                     <li class="nav-item">
@@ -153,8 +210,18 @@
                             <li><a class="dropdown-item" href="{{ route('admin.reportes-diarios') }}">
                                 <i class="fas fa-chart-line me-1"></i>Reportes Diarios
                             </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.reporte-sucursal') }}">
+                                <i class="fas fa-building me-1"></i>Reporte por Sucursal
+                            </a></li>
                             <li><a class="dropdown-item" href="{{ route('admin.calculo-sueldos') }}">
                                 <i class="fas fa-calculator me-1"></i>Cálculo de Sueldos
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.sectores.index') }}">
+                                <i class="fas fa-map-marked-alt me-1"></i>Gestión de Sectores
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.documentos.index') }}">
+                                <i class="fas fa-file-alt me-1"></i>Documentos Personales
                             </a></li>
                         </ul>
                     </li>
@@ -211,6 +278,9 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- RUT Formatter -->
     <script src="{{ asset('js/rut-formatter.js') }}"></script>

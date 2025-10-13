@@ -21,12 +21,13 @@ class User extends Authenticatable
         'name',
         'email',
         'rut',
+        'perfil',
         'apellido',
         'fecha_nacimiento',
         'domicilio',
         'sucursal_id',
-        'imei',
-        'imei_verificado',
+        'browser_fingerprint',
+        'dispositivo_verificado',
         'password',
     ];
 
@@ -51,7 +52,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'fecha_nacimiento' => 'date',
             'password' => 'hashed',
-            'imei_verificado' => 'boolean',
+            'dispositivo_verificado' => 'boolean',
         ];
     }
 
@@ -80,6 +81,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Relación con acciones (novedades)
+     */
+    public function acciones()
+    {
+        return $this->hasMany(\App\Models\Accion::class);
+    }
+
+    /**
+     * Relación con reportes especiales
+     */
+    public function reportesEspeciales()
+    {
+        return $this->hasMany(\App\Models\ReporteEspecial::class);
+    }
+
+    /**
+     * Relación con documentos personales
+     */
+    public function documentosPersonales()
+    {
+        return $this->hasMany(DocumentoPersonal::class);
+    }
+
+    /**
      * Obtener el nombre completo del usuario
      */
     public function getNombreCompletoAttribute()
@@ -96,14 +121,72 @@ class User extends Authenticatable
     }
 
     /**
-     * Verificar si el IMEI del usuario está permitido
+     * Verificar si el dispositivo del usuario está permitido
      */
-    public function isImeiPermitido()
+    public function isDispositivoPermitido()
     {
-        if (!$this->imei) {
+        if (!$this->browser_fingerprint) {
             return false;
         }
 
-        return \App\Models\ImeiPermitido::isPermitido($this->imei);
+        return \App\Models\DispositivoPermitido::isPermitido($this->browser_fingerprint);
+    }
+
+    /**
+     * Verificar si el usuario tiene una sucursal asignada
+     */
+    public function tieneSucursal()
+    {
+        return !is_null($this->sucursal_id);
+    }
+
+    /**
+     * Verificar si el usuario es administrador
+     * Perfil 1 = Administrador
+     */
+    public function esAdministrador()
+    {
+        return $this->perfil === 1;
+    }
+
+    /**
+     * Verificar si el usuario es supervisor (incluye supervisor-usuario)
+     * Perfil 2 = Supervisor
+     * Perfil 3 = Supervisor-Usuario
+     */
+    public function esSupervisor()
+    {
+        return in_array($this->perfil, [2, 3]);
+    }
+
+    /**
+     * Obtener el nombre del perfil
+     */
+    public function getNombrePerfilAttribute()
+    {
+        $perfiles = [
+            1 => 'Administrador',
+            2 => 'Supervisor',
+            3 => 'Supervisor-Usuario',
+            4 => 'Usuario',
+        ];
+        
+        return $perfiles[$this->perfil] ?? 'Desconocido';
+    }
+
+    /**
+     * Verificar si el usuario es supervisor-usuario
+     */
+    public function esSupervisorUsuario()
+    {
+        return $this->perfil === 3;
+    }
+
+    /**
+     * Verificar si el usuario es solo usuario
+     */
+    public function esUsuario()
+    {
+        return $this->perfil === 4;
     }
 }

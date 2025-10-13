@@ -71,3 +71,5 @@ class ProfileController extends Controller
             ->with('success', 'Contraseña actualizada exitosamente.');
     }
 }
+
+

@@ -16,7 +16,7 @@ class TareaController extends Controller
         $tarea = Tarea::with('detalles')->findOrFail($id);
         
         if (!$tarea->activa) {
-            return redirect()->route('dashboard')->with('error', 'Esta tarea no está disponible.');
+            return redirect()->to('/')->with('error', 'Esta tarea no está disponible.');
         }
         
         return view('tareas.formulario', compact('tarea'));

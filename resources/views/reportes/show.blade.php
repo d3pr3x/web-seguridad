@@ -9,9 +9,14 @@
             <h1 class="h3 mb-0">
                 <i class="fas fa-file-alt me-2"></i>Detalle del Reporte
             </h1>
-            <a href="{{ route('reportes.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i>Volver
-            </a>
+            <div>
+                <a href="{{ route('informes.create', $reporte->id) }}" class="btn btn-primary me-2">
+                    <i class="fas fa-file-pdf me-1"></i>Generar Informe
+                </a>
+                <a href="{{ route('reportes.index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -89,6 +94,47 @@
                     </div>
                 @endif
                 
+                @if($reporte->latitud && $reporte->longitud)
+                    <hr>
+                    <h6>
+                        <i class="fas fa-map-marker-alt me-2"></i>Ubicación GPS
+                    </h6>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Latitud:</strong>
+                            <p class="mb-0">{{ $reporte->latitud }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Longitud:</strong>
+                            <p class="mb-0">{{ $reporte->longitud }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Precisión:</strong>
+                            <p class="mb-0">{{ $reporte->precision ? round($reporte->precision) . 'm' : 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <a href="https://www.google.com/maps?q={{ $reporte->latitud }},{{ $reporte->longitud }}" 
+                           target="_blank" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-map me-1"></i>Ver en Google Maps
+                        </a>
+                        <a href="https://www.openstreetmap.org/?mlat={{ $reporte->latitud }}&mlon={{ $reporte->longitud }}&zoom=16" 
+                           target="_blank" 
+                           class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-map-marked-alt me-1"></i>Ver en OpenStreetMap
+                        </a>
+                    </div>
+                    
+                    <!-- Mapa embebido -->
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe 
+                            src="https://www.openstreetmap.org/export/embed.html?bbox={{ $reporte->longitud - 0.01 }},{{ $reporte->latitud - 0.01 }},{{ $reporte->longitud + 0.01 }},{{ $reporte->latitud + 0.01 }}&layer=mapnik&marker={{ $reporte->latitud }},{{ $reporte->longitud }}" 
+                            style="border: 1px solid #ccc; border-radius: 0.25rem;">
+                        </iframe>
+                    </div>
+                @endif
+                
                 @if($reporte->comentarios_admin)
                     <hr>
                     <h6>Comentarios del administrador:</h6>
@@ -148,3 +194,5 @@
     </div>
 </div>
 @endsection
+
+

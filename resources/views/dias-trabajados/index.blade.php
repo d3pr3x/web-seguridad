@@ -13,7 +13,7 @@
                 <a href="{{ route('dias-trabajados.create') }}" class="btn btn-primary me-2">
                     <i class="fas fa-plus me-1"></i>Agregar Día
                 </a>
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
+                <a href="{{ url('/') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-1"></i>Volver
                 </a>
             </div>
@@ -176,3 +176,5 @@
     }
 </script>
 @endpush
+
+

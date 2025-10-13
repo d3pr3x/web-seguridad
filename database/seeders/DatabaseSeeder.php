@@ -15,9 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SucursalSeeder::class,
+            UbicacionPermitidaSeeder::class,
             UserSeeder::class,
-            TareaSeeder::class,
-            TareaDetalleSeeder::class,
+            TareaNovedadesSeeder::class,
+            TareaIncidentesSeeder::class,
             FeriadoSeeder::class,
             ConfiguracionSueldoSeeder::class,
         ]);

@@ -141,7 +141,7 @@
             <div class="card-body">
                 <p class="card-text">
                     <strong>Mes actual:</strong><br>
-                    {{ \Carbon\Carbon::now()->format('F Y') }}
+                    {{ \App\Helpers\DateHelper::yearMonth() }}
                 </p>
                 <p class="card-text">
                     <strong>Días registrados:</strong><br>
@@ -156,3 +156,34 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaInput = document.getElementById('fecha');
+        
+        // Mostrar la fecha actual en formato chileno (DD-MM-YYYY)
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        
+        // El input de tipo date siempre usa formato ISO (YYYY-MM-DD)
+        // pero podemos mostrar información adicional al usuario
+        console.log('Fecha actual en formato chileno:', `${day}-${month}-${year}`);
+        
+        // Agregar un pequeño indicador visual de la fecha
+        const fechaLabel = document.querySelector('label[for="fecha"]');
+        const fechaInfo = document.createElement('small');
+        fechaInfo.className = 'text-muted d-block mt-1';
+        fechaInfo.innerHTML = `<i class="fas fa-calendar-day me-1"></i>Hoy: ${day}-${month}-${year}`;
+        fechaLabel.appendChild(fechaInfo);
+        
+        // Agregar información sobre el formato
+        const formatoInfo = document.createElement('small');
+        formatoInfo.className = 'text-info d-block mt-1';
+        formatoInfo.innerHTML = `<i class="fas fa-info-circle me-1"></i>El calendario usa formato internacional (DD/MM/YYYY)`;
+        fechaLabel.appendChild(formatoInfo);
+    });
+</script>
+@endpush

@@ -9,7 +9,7 @@
             <h1 class="h3 mb-0">
                 <i class="fas fa-user me-2"></i>Mi Perfil
             </h1>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
+            <a href="{{ url('/') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i>Volver
             </a>
         </div>
@@ -157,7 +157,7 @@
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ route('dashboard') }}" class="btn btn-secondary me-md-2">
+                        <a href="{{ url('/') }}" class="btn btn-secondary me-md-2">
                             <i class="fas fa-times me-1"></i>Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -236,3 +236,5 @@
     </div>
 </div>
 @endsection
+
+
