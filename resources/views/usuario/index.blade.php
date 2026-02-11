@@ -44,10 +44,10 @@
                 </div>
             </div>
 
-            <!-- Grid de Secciones (desktop: 2 columnas, móvil: 1 columna) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Sección NOVEDADES -->
-                <div>
+            <!-- Grid de Secciones - Solo REPORTES -->
+            <div class="grid grid-cols-1 gap-6">
+                {{-- Temporalmente comentado - Sección NOVEDADES --}}
+                {{-- <div>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <!-- Header de Sección -->
                         <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
@@ -147,7 +147,7 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Sección REPORTES -->
                 <div>

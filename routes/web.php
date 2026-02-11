@@ -23,6 +23,12 @@ use App\Http\Controllers\Admin\NovedadController as AdminNovedadController;
 use App\Http\Controllers\Admin\ReporteEspecialController as AdminReporteEspecialController;
 use App\Http\Controllers\UsuarioAccionController;
 use App\Http\Controllers\UsuarioReporteController;
+use App\Http\Controllers\UsuarioRondaController;
+use App\Http\Controllers\RondaEscaneoController;
+use App\Http\Controllers\Admin\PuntoRondaController;
+use App\Http\Controllers\Admin\RondaQrController;
+use App\Http\Controllers\Admin\RondaReporteController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 // Ruta principal - redirigir según autenticación y rol
 Route::get('/', function () {
@@ -94,7 +100,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/documentos/crear', [\App\Http\Controllers\UsuarioDocumentoController::class, 'create'])->name('documentos.create');
             Route::post('/documentos', [\App\Http\Controllers\UsuarioDocumentoController::class, 'store'])->name('documentos.store');
             Route::get('/documentos/{documento}', [\App\Http\Controllers\UsuarioDocumentoController::class, 'show'])->name('documentos.show');
+
+            // Rondas QR (guardia: instrucciones y listado de escaneos del día)
+            Route::get('/ronda', [UsuarioRondaController::class, 'index'])->name('ronda.index');
         });
+
+        // Escaneo de QR de ronda (el guardia abre esta URL al escanear; debe estar autenticado)
+        Route::get('/ronda/escanear/{codigo}', [RondaEscaneoController::class, 'escanear'])->name('ronda.escanear');
         
         // Tareas
         Route::get('/tareas/{id}', [TareaController::class, 'show'])->name('tareas.show');
@@ -148,6 +160,13 @@ Route::middleware(['auth'])->group(function () {
         
         // Administración
         Route::prefix('admin')->name('admin.')->group(function () {
+            // Gestión de usuarios
+            Route::get('usuarios', [AdminUserController::class, 'index'])->name('usuarios.index');
+            Route::get('usuarios/crear', [AdminUserController::class, 'create'])->name('usuarios.create');
+            Route::post('usuarios', [AdminUserController::class, 'store'])->name('usuarios.store');
+            Route::get('usuarios/{usuario}/editar', [AdminUserController::class, 'edit'])->name('usuarios.edit');
+            Route::put('usuarios/{usuario}', [AdminUserController::class, 'update'])->name('usuarios.update');
+
             // Documentos Personales
             Route::get('/documentos', [\App\Http\Controllers\Admin\DocumentoPersonalController::class, 'index'])->name('documentos.index');
             Route::get('/documentos/usuarios', [\App\Http\Controllers\Admin\DocumentoPersonalController::class, 'usuarios'])->name('documentos.usuarios');
@@ -192,6 +211,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('reportes-especiales', [AdminReporteEspecialController::class, 'index'])->name('reportes-especiales.index');
             Route::get('reportes-especiales/{reporteEspecial}', [AdminReporteEspecialController::class, 'show'])->name('reportes-especiales.show');
             Route::patch('reportes-especiales/{reporteEspecial}/estado', [AdminReporteEspecialController::class, 'updateEstado'])->name('reportes-especiales.update-estado');
+
+            // Puntos de ronda (QR) y reporte de escaneos
+            Route::get('rondas', [PuntoRondaController::class, 'index'])->name('rondas.index');
+            Route::get('rondas/sucursal/{sucursal}', [PuntoRondaController::class, 'show'])->name('rondas.show');
+            Route::get('rondas/crear', [PuntoRondaController::class, 'create'])->name('rondas.create');
+            Route::post('rondas', [PuntoRondaController::class, 'store'])->name('rondas.store');
+            Route::get('rondas/{punto}/editar', [PuntoRondaController::class, 'edit'])->name('rondas.edit');
+            Route::put('rondas/{punto}', [PuntoRondaController::class, 'update'])->name('rondas.update');
+            Route::delete('rondas/{punto}', [PuntoRondaController::class, 'destroy'])->name('rondas.destroy');
+            Route::get('rondas/{punto}/qr', [RondaQrController::class, 'show'])->name('rondas.qr.show');
+            Route::get('rondas/{punto}/qr/descargar', [RondaQrController::class, 'download'])->name('rondas.qr.download');
+            Route::get('rondas-reporte', [RondaReporteController::class, 'index'])->name('rondas.reporte');
         });
     });
 });

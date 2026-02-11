@@ -105,6 +105,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relación con escaneos de ronda QR
+     */
+    public function rondaEscaneos()
+    {
+        return $this->hasMany(RondaEscaneo::class);
+    }
+
+    /**
      * Obtener el nombre completo del usuario
      */
     public function getNombreCompletoAttribute()

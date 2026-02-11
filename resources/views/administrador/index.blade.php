@@ -125,6 +125,20 @@
 
                         <!-- Opciones de Administración -->
                         <div class="p-4 space-y-3">
+                            <a href="{{ route('admin.usuarios.index') }}" class="block">
+                                <div class="bg-slate-50 border-l-4 border-slate-600 p-4 rounded-r-lg hover:bg-slate-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-slate-800">Gestión de Usuarios</h3>
+                                            <p class="text-sm text-slate-600">Ver, crear y editar usuarios del sistema</p>
+                                        </div>
+                                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </a>
+
                             <a href="{{ route('admin.reportes-diarios') }}" class="block">
                                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg hover:bg-blue-100 transition">
                                     <div class="flex items-center justify-between">
@@ -139,7 +153,8 @@
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.calculo-sueldos') }}" class="block">
+                            {{-- Oculto - no solicitado: Cálculo de Sueldos --}}
+                            {{-- <a href="{{ route('admin.calculo-sueldos') }}" class="block">
                                 <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hover:bg-green-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -151,7 +166,7 @@
                                         </svg>
                                     </div>
                                 </div>
-                            </a>
+                            </a> --}}
 
                             <a href="{{ route('admin.reporte-sucursal') }}" class="block">
                                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg hover:bg-yellow-100 transition">

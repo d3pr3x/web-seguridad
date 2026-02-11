@@ -121,7 +121,7 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                            {{ $dispositivo->created_at->format('d/m/Y H:i') }}
+                                            {{ $dispositivo->created_at?->format('d/m/Y H:i') ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex flex-col gap-1">

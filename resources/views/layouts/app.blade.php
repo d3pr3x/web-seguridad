@@ -213,9 +213,10 @@
                             <li><a class="dropdown-item" href="{{ route('admin.reporte-sucursal') }}">
                                 <i class="fas fa-building me-1"></i>Reporte por Sucursal
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ route('admin.calculo-sueldos') }}">
+                            {{-- Oculto - no solicitado: Cálculo de Sueldos --}}
+                            {{-- <li><a class="dropdown-item" href="{{ route('admin.calculo-sueldos') }}">
                                 <i class="fas fa-calculator me-1"></i>Cálculo de Sueldos
-                            </a></li>
+                            </a></li> --}}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ route('admin.sectores.index') }}">
                                 <i class="fas fa-map-marked-alt me-1"></i>Gestión de Sectores

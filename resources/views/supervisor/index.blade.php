@@ -45,10 +45,10 @@
             </div>
 
             @if(auth()->user()->esSupervisorUsuario())
-            <!-- Grid para Supervisor-Usuario: Novedades y Reportes (como usuario regular) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Sección NOVEDADES -->
-                <div>
+            <!-- Grid para Supervisor-Usuario: Solo Reportes -->
+            <div class="grid grid-cols-1 gap-6 mb-6">
+                {{-- Temporalmente comentado - Sección NOVEDADES --}}
+                {{-- <div>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <!-- Header de Sección -->
                         <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
@@ -148,7 +148,7 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Sección REPORTES -->
                 <div>
@@ -259,7 +259,8 @@
                                 </div>
                             </a>
 
-                            <a href="{{ route('acciones.index') }}" class="block">
+                            {{-- Temporalmente comentado - Ver Todas las Novedades --}}
+                            {{-- <a href="{{ route('acciones.index') }}" class="block">
                                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -271,7 +272,7 @@
                                         </svg>
                                     </div>
                                 </div>
-                            </a>
+                            </a> --}}
 
                             <a href="{{ route('reportes-especiales.index') }}" class="block">
                                 <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-r-lg hover:bg-pink-100 transition">

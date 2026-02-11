@@ -61,6 +61,14 @@ class Sucursal extends Model
     }
 
     /**
+     * Relación con puntos de ronda (QR)
+     */
+    public function puntosRonda()
+    {
+        return $this->hasMany(PuntoRonda::class);
+    }
+
+    /**
      * Scope para sucursales activas
      */
     public function scopeActivas($query)

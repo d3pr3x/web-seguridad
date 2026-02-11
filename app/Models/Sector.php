@@ -47,6 +47,14 @@ class Sector extends Model
     }
 
     /**
+     * Relación con puntos de ronda (QR)
+     */
+    public function puntosRonda()
+    {
+        return $this->hasMany(PuntoRonda::class);
+    }
+
+    /**
      * Scope para sectores activos
      */
     public function scopeActivos($query)
