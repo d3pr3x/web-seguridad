@@ -202,6 +202,11 @@
                             <i class="fas fa-calendar me-1"></i>Días Trabajados
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('ingresos.index') }}">
+                            <i class="fas fa-qrcode me-1"></i>Control de acceso
+                        </a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-cog me-1"></i>Administración

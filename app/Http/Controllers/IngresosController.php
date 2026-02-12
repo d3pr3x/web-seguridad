@@ -1,0 +1,264 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Ingreso;
+use App\Models\Blacklist;
+use App\Rules\ChileRut;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class IngresosController extends Controller
+{
+    /**
+     * Listado de ingresos (paginado).
+     */
+    public function index(Request $request)
+    {
+        $query = Ingreso::with('guardia')->latest('fecha_ingreso');
+
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_ingreso', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_ingreso', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('guardia_id')) {
+            $query->where('guardia_id', $request->guardia_id);
+        }
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        $ingresos = $query->paginate(50)->withQueryString();
+
+        return view('ingresos.listado', compact('ingresos'));
+    }
+
+    /**
+     * Vista del escáner (peatonal/vehicular).
+     */
+    public function escaner()
+    {
+        return view('ingresos.escaner');
+    }
+
+    /**
+     * Detalle de un ingreso (solo lectura; muestra QR de salida para reimprimir).
+     */
+    public function show(int $id)
+    {
+        $ingreso = Ingreso::with('guardia')->findOrFail($id);
+        $qrSalidaUrl = route('ingresos.qr-salida', ['id' => $ingreso->id]);
+
+        return view('ingresos.show', compact('ingreso', 'qrSalidaUrl'));
+    }
+
+    /**
+     * Registrar ingreso (peatonal o vehicular). Valida blacklist y devuelve JSON.
+     */
+    public function store(Request $request)
+    {
+        $rut = $request->rut ? $this->normalizarRut($request->rut) : null;
+        $nombre = $request->nombre ?? '';
+        $patente = $request->filled('patente') ? strtoupper(preg_replace('/\s+/', '', $request->patente)) : null;
+
+        if ($request->filled('qr_data')) {
+            $parsed = $this->parseQrCedula($request->qr_data);
+            if ($parsed) {
+                $rut = $parsed['rut'] ?? $rut;
+                $nombre = $parsed['nombre'] ?? $nombre;
+            }
+        }
+
+        $rules = [
+            'tipo' => 'required|in:peatonal,vehicular',
+            'rut' => ['nullable', 'required_if:tipo,peatonal', 'string', 'max:12', new ChileRut],
+            'nombre' => 'nullable|string|max:100',
+            'patente' => ['nullable', 'required_if:tipo,vehicular', 'regex:/^[A-Z]{3,4}\d{2,3}$/i', 'max:10'],
+        ];
+        $validated = $request->validate($rules);
+
+        $rut = $rut ?? $this->normalizarRut($validated['rut'] ?? '');
+        $nombre = $nombre ?: ($validated['nombre'] ?? '');
+        $patente = $patente ?? (isset($validated['patente']) ? strtoupper($validated['patente']) : null);
+
+        $blacklistHit = Blacklist::activos()
+            ->where(function ($q) use ($rut, $patente) {
+                if ($rut) {
+                    $q->where('rut', $rut);
+                }
+                if ($patente) {
+                    $q->orWhere('patente', $patente);
+                }
+            })
+            ->first();
+
+        if ($blacklistHit) {
+            $ingreso = Ingreso::create([
+                'tipo' => $request->tipo,
+                'rut' => $rut,
+                'nombre' => $nombre,
+                'patente' => $patente,
+                'guardia_id' => auth()->id(),
+                'estado' => 'bloqueado',
+                'alerta_blacklist' => true,
+                'ip_ingreso' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            Log::channel('single')->warning('Ingreso bloqueado por blacklist', [
+                'ingreso_id' => $ingreso->id,
+                'rut' => $rut,
+                'patente' => $patente,
+                'motivo' => $blacklistHit->motivo,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Acceso bloqueado: persona o vehículo en lista restringida.',
+                'motivo' => $blacklistHit->motivo,
+                'ingreso_id' => $ingreso->id,
+            ], 422);
+        }
+
+        $ingreso = Ingreso::create([
+            'tipo' => $request->tipo,
+            'rut' => $rut,
+            'nombre' => $nombre,
+            'patente' => $patente,
+            'guardia_id' => auth()->id(),
+            'estado' => 'ingresado',
+            'alerta_blacklist' => false,
+            'ip_ingreso' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        $qrSalidaUrl = route('ingresos.qr-salida', ['id' => $ingreso->id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ingreso registrado correctamente.',
+            'ingreso_id' => $ingreso->id,
+            'qr_salida_url' => $qrSalidaUrl,
+        ]);
+    }
+
+    /**
+     * Registrar salida de un ingreso.
+     */
+    public function salida(int $id)
+    {
+        $ingreso = Ingreso::findOrFail($id);
+        $ingreso->update([
+            'fecha_salida' => now(),
+            'estado' => 'salida',
+        ]);
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Salida registrada.']);
+        }
+
+        return redirect()->route('ingresos.index')->with('success', 'Salida registrada.');
+    }
+
+    /**
+     * Página o recurso QR para registrar salida (escaneo del QR de salida).
+     */
+    public function qrSalida(int $id)
+    {
+        $ingreso = Ingreso::findOrFail($id);
+
+        if ($ingreso->estado !== 'ingresado') {
+            if (request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Este ingreso ya tiene salida registrada.'], 422);
+            }
+            return redirect()->route('ingresos.index')->with('error', 'Este ingreso ya tiene salida registrada.');
+        }
+
+        $ingreso->update([
+            'fecha_salida' => now(),
+            'estado' => 'salida',
+        ]);
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Salida registrada.']);
+        }
+
+        return redirect()->route('ingresos.index')->with('success', 'Salida registrada correctamente.');
+    }
+
+    /**
+     * Exportar ingresos a CSV.
+     */
+    public function exportarCsv(Request $request)
+    {
+        $query = Ingreso::with('guardia')->latest('fecha_ingreso');
+
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_ingreso', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_ingreso', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        $ingresos = $query->limit(10000)->get();
+
+        $filename = 'ingresos_' . now()->format('Y-m-d_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($ingresos) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['ID', 'Fecha ingreso', 'Fecha salida', 'Tipo', 'RUT', 'Nombre', 'Patente', 'Guardia', 'Estado', 'Alerta blacklist'], ';');
+            foreach ($ingresos as $i) {
+                fputcsv($out, [
+                    $i->id,
+                    $i->fecha_ingreso?->format('Y-m-d H:i:s'),
+                    $i->fecha_salida?->format('Y-m-d H:i:s'),
+                    $i->tipo,
+                    $i->rut,
+                    $i->nombre,
+                    $i->patente ?? '',
+                    $i->guardia?->name ?? '',
+                    $i->estado,
+                    $i->alerta_blacklist ? 'Sí' : 'No',
+                ], ';');
+            }
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function normalizarRut(string $rut): string
+    {
+        $rut = preg_replace('/[^0-9kK]/', '', strtoupper($rut));
+        if (strlen($rut) >= 2) {
+            $rut = substr($rut, 0, -1) . '-' . substr($rut, -1);
+        }
+        return $rut;
+    }
+
+    /**
+     * Parsear datos QR cédula Chile (formato típico RUT|Nombre|DV|FechaNacimiento o similar).
+     */
+    private function parseQrCedula(string $qrData): ?array
+    {
+        $parts = array_map('trim', explode('|', $qrData));
+        if (count($parts) < 2) {
+            return null;
+        }
+        $rut = $this->normalizarRut($parts[0]);
+        $nombre = $parts[1] ?? '';
+        return ['rut' => $rut, 'nombre' => $nombre];
+    }
+}

@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'validar.imei' => \App\Http\Middleware\ValidarImei::class,
             'verificar.sucursal' => \App\Http\Middleware\VerificarSucursal::class,
+            'guardia.control_acceso' => \App\Http\Middleware\EnsureGuardiaControlAcceso::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

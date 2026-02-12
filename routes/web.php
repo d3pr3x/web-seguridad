@@ -29,6 +29,8 @@ use App\Http\Controllers\Admin\PuntoRondaController;
 use App\Http\Controllers\Admin\RondaQrController;
 use App\Http\Controllers\Admin\RondaReporteController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\IngresosController;
+use App\Http\Controllers\BlacklistController;
 
 // Ruta principal - redirigir según autenticación y rol
 Route::get('/', function () {
@@ -63,7 +65,22 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    
+
+    // Control de acceso (QR cédula + OCR patente) – todos los perfiles, sin exigir sucursal
+    Route::prefix('ingresos')->name('ingresos.')->group(function () {
+        Route::get('/', [IngresosController::class, 'index'])->name('index');
+        Route::get('/escaner', [IngresosController::class, 'escaner'])->name('escaner');
+        Route::get('/{id}/qr-salida', [IngresosController::class, 'qrSalida'])->name('qr-salida');
+        Route::get('/{id}', [IngresosController::class, 'show'])->name('show');
+        Route::post('/', [IngresosController::class, 'store'])->name('store');
+        Route::post('/exportar-csv', [IngresosController::class, 'exportarCsv'])->name('exportar-csv');
+        Route::post('/{id}/salida', [IngresosController::class, 'salida'])->name('salida');
+    });
+    Route::get('/blacklist', [BlacklistController::class, 'index'])->name('blacklist.index');
+    Route::post('/blacklist', [BlacklistController::class, 'store'])->name('blacklist.store');
+    Route::delete('/blacklist/{id}', [BlacklistController::class, 'destroy'])->name('blacklist.destroy');
+    Route::patch('/blacklist/{id}/toggle', [BlacklistController::class, 'toggle'])->name('blacklist.toggle');
+
     // Rutas que requieren verificación de sucursal
     Route::middleware(['verificar.sucursal'])->group(function () {
         // Portal de Supervisor

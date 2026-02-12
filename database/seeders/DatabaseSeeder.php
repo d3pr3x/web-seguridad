@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             TareaIncidentesSeeder::class,
             FeriadoSeeder::class,
             ConfiguracionSueldoSeeder::class,
+            ControlAccesoSeeder::class,
         ]);
     }
 }

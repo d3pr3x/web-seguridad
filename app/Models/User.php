@@ -113,6 +113,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Ingresos registrados por este guardia (control de acceso)
+     */
+    public function ingresosRegistrados()
+    {
+        return $this->hasMany(Ingreso::class, 'guardia_id');
+    }
+
+    /**
+     * Verificar si es guardia de control de acceso (perfil 5 = control_acceso)
+     */
+    public function esGuardiaControlAcceso()
+    {
+        return $this->perfil === 5;
+    }
+
+    /**
      * Obtener el nombre completo del usuario
      */
     public function getNombreCompletoAttribute()
@@ -177,6 +193,7 @@ class User extends Authenticatable
             2 => 'Supervisor',
             3 => 'Supervisor-Usuario',
             4 => 'Usuario',
+            5 => 'Guardia control acceso',
         ];
         
         return $perfiles[$this->perfil] ?? 'Desconocido';

@@ -93,5 +93,20 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('123456'),
             ]
         );
+
+        // Guardia control de acceso - Perfil 5 (QR cédula + OCR patente)
+        User::updateOrCreate(
+            ['rut' => '55667788-9'],
+            [
+                'name' => 'Luis',
+                'email' => 'luis.guardia@empresa.com',
+                'perfil' => 5,
+                'apellido' => 'Guardia',
+                'fecha_nacimiento' => '1990-01-10',
+                'domicilio' => 'Av. Control 100, Santiago',
+                'sucursal_id' => $sucursalCentral->id,
+                'password' => Hash::make('123456'),
+            ]
+        );
     }
 }
