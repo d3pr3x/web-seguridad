@@ -50,6 +50,7 @@
                             </button>
                         </div>
                         <canvas id="canvas-cedula" style="display:none"></canvas>
+                        <canvas id="canvas-cedula-espejo" style="display:none"></canvas>
                         <div id="dummy-cedula" style="width:1px;height:1px;overflow:hidden;position:absolute;opacity:0;pointer-events:none;"></div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
@@ -221,46 +222,73 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajeCapturaCedula.textContent = 'Procesando…';
         mensajeCapturaCedula.classList.remove('hidden');
         requestAnimationFrame(function() {
+        var maxLado = 1200;
+        var scale = 1;
+        if (w > maxLado || h > maxLado) {
+            scale = Math.min(maxLado / w, maxLado / h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+        }
         canvasCedula.width = w;
         canvasCedula.height = h;
         var ctx = canvasCedula.getContext('2d');
         ctx.drawImage(videoCedula, 0, 0, w, h);
-        escribirLogQR('2. Imagen capturada (' + w + '×' + h + ' px)');
+        escribirLogQR('2. Imagen capturada (' + canvasCedula.width + '×' + canvasCedula.height + ' px)');
         function terminar() {
             mensajeCapturaCedula.classList.add('hidden');
             mensajeCapturaCedula.textContent = '';
             btnCapturarCedula.disabled = false;
         }
-        function procesarConArchivo(file) {
-            escribirLogQR('3. Decodificando QR…');
-            setTimeout(function() {
-                var scanner = new Html5Qrcode('dummy-cedula');
-                scanner.scanFile(file, false).then(function(decodedText) {
-                    escribirLogQR('4. QR obtenido: ' + (decodedText.length > 60 ? decodedText.slice(0, 60) + '…' : decodedText));
-                    onScanCedula(decodedText);
-                    var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
-                    if (runMatch) escribirLogQR('5. RUT extraído: ' + formatearRut(runMatch[1].trim()));
-                    var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
-                    if (parts.length >= 2) escribirLogQR('   Nombre: ' + parts.slice(1).join(' '));
-                    escribirLogQR('--- Listo.');
-                }).catch(function() {
+        function exitoQR(decodedText) {
+            escribirLogQR('4. QR obtenido: ' + (decodedText.length > 60 ? decodedText.slice(0, 60) + '…' : decodedText));
+            onScanCedula(decodedText);
+            var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
+            if (runMatch) escribirLogQR('5. RUT extraído: ' + formatearRut(runMatch[1].trim()));
+            var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
+            if (parts.length >= 2) escribirLogQR('   Nombre: ' + parts.slice(1).join(' '));
+            escribirLogQR('--- Listo.');
+            terminar();
+        }
+        function procesarConArchivo(file, esEspejo) {
+            if (esEspejo) escribirLogQR('3b. Reintentando con imagen espejo…');
+            else escribirLogQR('3. Decodificando QR…');
+            var scanner = new Html5Qrcode('dummy-cedula');
+            scanner.scanFile(file, false).then(exitoQR).catch(function() {
+                if (!esEspejo) {
+                    escribirLogQR('3a. Sin QR, probando imagen espejo…');
+                    var c2 = document.getElementById('canvas-cedula-espejo');
+                    c2.width = canvasCedula.width;
+                    c2.height = canvasCedula.height;
+                    var ctx2 = c2.getContext('2d');
+                    ctx2.translate(c2.width, 0);
+                    ctx2.scale(-1, 1);
+                    ctx2.drawImage(canvasCedula, 0, 0);
+                    ctx2.setTransform(1, 0, 0, 1, 0, 0);
+                    c2.toBlob(function(blob2) {
+                        if (blob2) procesarConArchivo(new File([blob2], 'captura2.png', { type: 'image/png' }), true);
+                        else { escribirLogQR('4. No se detectó QR.'); alert('No se detectó un QR. Encuadre bien el código y vuelva a capturar.'); terminar(); }
+                    }, 'image/png', 1);
+                } else {
                     escribirLogQR('4. No se detectó QR en la imagen.');
                     escribirLogQR('--- Fallo.');
                     alert('No se detectó un QR en la imagen. Encuadre bien el código y vuelva a capturar.');
-                }).finally(function() { terminar(); });
-            }, 100);
+                    terminar();
+                }
+            });
         }
+        setTimeout(function() {
         canvasCedula.toBlob(function(blob) {
             if (!blob) {
                 escribirLogQR('2b. toBlob falló, usando toDataURL…');
                 var dataUrl = canvasCedula.toDataURL('image/png');
                 fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(blob) {
-                    procesarConArchivo(new File([blob], 'captura.png', { type: 'image/png' }));
+                    procesarConArchivo(new File([blob], 'captura.png', { type: 'image/png' }), false);
                 }).catch(function() { escribirLogQR('Error al obtener imagen.'); terminar(); });
                 return;
             }
-            procesarConArchivo(new File([blob], 'captura.png', { type: 'image/png' }));
-        }, 'image/png', 0.92);
+            procesarConArchivo(new File([blob], 'captura.png', { type: 'image/png' }), false);
+        }, 'image/png', 1);
+        }, 100);
         });
     }
     if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);

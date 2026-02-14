@@ -99,12 +99,13 @@
                         <p class="text-sm text-gray-500 mb-3">Encuadre el QR de la cédula y pulse «Capturar y leer QR».</p>
                         <div id="lector-cedula" class="bg-gray-900 rounded overflow-hidden mb-2">
                             <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[400px] object-cover block"></video>
-                            <button type="button" id="btn-capturar-cedula" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
+                            <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
+                            <button type="button" id="btn-capturar-cedula" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
                                 Capturar y leer QR
                             </button>
                         </div>
                         <canvas id="canvas-cedula" style="display:none"></canvas>
-                        <div id="dummy-cedula" style="position:absolute;left:-9999px;width:1px;height:1px;"></div>
+                        <div id="dummy-cedula" style="width:1px;height:1px;overflow:hidden;position:absolute;opacity:0;pointer-events:none;"></div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
@@ -120,6 +121,10 @@
                             <input type="text" id="rut-manual" class="w-full px-3 py-2 border border-gray-300 rounded-lg rut-input" placeholder="RUT manual">
                             <input type="text" id="nombre-manual" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Nombre manual">
                         </div>
+                        <details class="mt-4 border border-gray-200 rounded-lg overflow-hidden">
+                            <summary class="px-4 py-3 bg-gray-50 font-medium text-gray-800 cursor-pointer select-none">Ver proceso de captura (consola)</summary>
+                            <div id="log-qr" class="p-3 bg-gray-900 text-green-400 text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap break-all"></div>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -129,7 +134,8 @@
                     <div class="p-6">
                         <p class="text-sm text-gray-500 mb-3">Encuadre la patente del vehículo y pulse «Capturar y leer patente».</p>
                         <video id="video-patente" autoplay playsinline muted width="100%" height="300" class="rounded bg-gray-900"></video>
-                        <button type="button" id="btn-capturar-patente" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
+                        <p id="mensaje-captura-patente" class="text-center text-sm py-2 hidden"></p>
+                        <button type="button" id="btn-capturar-patente" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
                             Capturar y leer patente
                         </button>
                         <canvas id="canvas" width="640" height="480" style="display:none"></canvas>
@@ -143,6 +149,10 @@
                                 <input type="text" id="conductor-rut" class="w-full px-3 py-2 border border-gray-300 rounded-lg rut-input" placeholder="12.345.678-9">
                             </div>
                         </div>
+                        <details class="mt-4 border border-gray-200 rounded-lg overflow-hidden">
+                            <summary class="px-4 py-3 bg-gray-50 font-medium text-gray-800 cursor-pointer select-none">Ver proceso de captura (consola)</summary>
+                            <div id="log-patente" class="p-3 bg-gray-900 text-green-400 text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap break-all"></div>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -238,26 +248,75 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    var mensajeCapturaCedula = document.getElementById('mensaje-captura-cedula');
+    var logQR = document.getElementById('log-qr');
+    function escribirLogQR(linea) {
+        if (!logQR) return;
+        var t = new Date().toLocaleTimeString('es-CL', { hour12: false });
+        logQR.textContent += '[' + t + '] ' + linea + '\n';
+        logQR.scrollTop = logQR.scrollHeight;
+    }
+    function limpiarLogQR() {
+        if (logQR) logQR.textContent = '';
+    }
     function capturarYLeerQR() {
-        if (!videoCedula.srcObject || videoCedula.readyState < 2) return;
+        if (!videoCedula.srcObject || videoCedula.readyState < 2) {
+            alert('Espere a que la cámara esté lista.');
+            return;
+        }
         var w = videoCedula.videoWidth;
         var h = videoCedula.videoHeight;
-        if (!w || !h) return;
+        if (!w || !h) {
+            alert('La cámara no tiene tamaño aún. Espere un momento.');
+            return;
+        }
+        limpiarLogQR();
+        escribirLogQR('1. Iniciando captura…');
+        btnCapturarCedula.disabled = true;
+        mensajeCapturaCedula.textContent = 'Procesando…';
+        mensajeCapturaCedula.classList.remove('hidden');
+        requestAnimationFrame(function() {
         canvasCedula.width = w;
         canvasCedula.height = h;
         var ctx = canvasCedula.getContext('2d');
         ctx.drawImage(videoCedula, 0, 0, w, h);
-        btnCapturarCedula.disabled = true;
+        escribirLogQR('2. Imagen capturada (' + w + '×' + h + ' px)');
+        function terminar() {
+            mensajeCapturaCedula.classList.add('hidden');
+            mensajeCapturaCedula.textContent = '';
+            btnCapturarCedula.disabled = false;
+        }
+        function procesarConArchivo(file) {
+            escribirLogQR('3. Decodificando QR…');
+            setTimeout(function() {
+                var scanner = new Html5Qrcode('dummy-cedula');
+                scanner.scanFile(file, false).then(function(decodedText) {
+                    escribirLogQR('4. QR obtenido: ' + (decodedText.length > 60 ? decodedText.slice(0, 60) + '…' : decodedText));
+                    onScanCedula(decodedText);
+                    var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
+                    if (runMatch) escribirLogQR('5. RUT extraído: ' + formatearRut(runMatch[1].trim()));
+                    var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
+                    if (parts.length >= 2) escribirLogQR('   Nombre: ' + parts.slice(1).join(' '));
+                    escribirLogQR('--- Listo.');
+                }).catch(function() {
+                    escribirLogQR('4. No se detectó QR en la imagen.');
+                    escribirLogQR('--- Fallo.');
+                    alert('No se detectó un QR en la imagen. Encuadre bien el código y vuelva a capturar.');
+                }).finally(function() { terminar(); });
+            }, 100);
+        }
         canvasCedula.toBlob(function(blob) {
-            if (!blob) { btnCapturarCedula.disabled = false; return; }
-            var file = new File([blob], 'captura.png', { type: 'image/png' });
-            var scanner = new Html5Qrcode('dummy-cedula');
-            scanner.scanFile(file, false).then(function(decodedText) {
-                onScanCedula(decodedText);
-            }).catch(function() {
-                alert('No se detectó un QR en la imagen. Encuadre bien el código y vuelva a capturar.');
-            }).finally(function() { btnCapturarCedula.disabled = false; });
-        }, 'image/png');
+            if (!blob) {
+                escribirLogQR('2b. toBlob falló, usando toDataURL…');
+                var dataUrl = canvasCedula.toDataURL('image/png');
+                fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(blob) {
+                    procesarConArchivo(new File([blob], 'captura.png', { type: 'image/png' }));
+                }).catch(function() { escribirLogQR('Error al obtener imagen.'); terminar(); });
+                return;
+            }
+            procesarConArchivo(new File([blob], 'captura.png', { type: 'image/png' }));
+        }, 'image/png', 0.92);
+        });
     }
     if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);
     if (btnCapturarCedula) btnCapturarCedula.disabled = true;
@@ -326,22 +385,59 @@ document.addEventListener('DOMContentLoaded', function() {
         videoPatente.srcObject = null;
     }
 
+    var mensajeCapturaPatente = document.getElementById('mensaje-captura-patente');
+    var logPatente = document.getElementById('log-patente');
+    function escribirLogPatente(linea) {
+        if (!logPatente) return;
+        var t = new Date().toLocaleTimeString('es-CL', { hour12: false });
+        logPatente.textContent += '[' + t + '] ' + linea + '\n';
+        logPatente.scrollTop = logPatente.scrollHeight;
+    }
+    function limpiarLogPatente() {
+        if (logPatente) logPatente.textContent = '';
+    }
     function capturarYLeerPatente() {
-        if (!videoPatente.srcObject || videoPatente.readyState < 2) return;
+        if (!videoPatente.srcObject || videoPatente.readyState < 2) {
+            alert('Espere a que la cámara esté lista.');
+            return;
+        }
+        limpiarLogPatente();
+        escribirLogPatente('1. Iniciando captura…');
         ctx.drawImage(videoPatente, 0, 0, 640, 480);
+        escribirLogPatente('2. Imagen capturada (640×480 px)');
         btnCapturarPatente.disabled = true;
-        Tesseract.recognize(canvas, 'eng', { tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', tessedit_pageseg_mode: '8' })
-            .then(function(result) {
-                var text = (result.data.text || '').trim().toUpperCase().replace(/\s/g, '').replace(/[^A-Z0-9]/g, '');
-                var match = text.match(/([A-Z]{4}\d{2}|[A-Z]{3}\d{3})/);
-                if (match) {
-                    patenteResult.value = match[1];
-                } else {
-                    alert('No se detectó una patente en la imagen. Encuadre bien la patente y vuelva a capturar.');
-                }
-            })
-            .catch(function() { alert('Error al leer la imagen.'); })
-            .finally(function() { btnCapturarPatente.disabled = false; });
+        mensajeCapturaPatente.textContent = 'Procesando…';
+        mensajeCapturaPatente.classList.remove('hidden');
+        setTimeout(function() {
+            escribirLogPatente('3. Reconociendo texto (OCR)…');
+            Tesseract.recognize(canvas, 'eng', { tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', tessedit_pageseg_mode: '8' })
+                .then(function(result) {
+                    var raw = (result.data.text || '').trim();
+                    var text = raw.toUpperCase().replace(/\s/g, '').replace(/[^A-Z0-9]/g, '');
+                    escribirLogPatente('4. OCR crudo: "' + (raw.slice(0, 80) || '(vacío)') + (raw.length > 80 ? '…' : '') + '"');
+                    escribirLogPatente('   Normalizado: ' + (text.slice(0, 40) || '(vacío)'));
+                    var match = text.match(/([A-Z]{4}\d{2}|[A-Z]{3}\d{3})/);
+                    if (match) {
+                        patenteResult.value = match[1];
+                        escribirLogPatente('5. Patente detectada: ' + match[1]);
+                        escribirLogPatente('--- Listo.');
+                    } else {
+                        escribirLogPatente('5. No se encontró patente en el texto.');
+                        escribirLogPatente('--- Fallo.');
+                        alert('No se detectó una patente en la imagen. Encuadre bien la patente y vuelva a capturar.');
+                    }
+                })
+                .catch(function(err) {
+                    escribirLogPatente('4. Error OCR: ' + (err && err.message ? err.message : 'Error'));
+                    escribirLogPatente('--- Fallo.');
+                    alert('Error al leer la imagen.');
+                })
+                .finally(function() {
+                    mensajeCapturaPatente.classList.add('hidden');
+                    mensajeCapturaPatente.textContent = '';
+                    btnCapturarPatente.disabled = false;
+                });
+        }, 100);
     }
     if (btnCapturarPatente) btnCapturarPatente.addEventListener('click', capturarYLeerPatente);
 
