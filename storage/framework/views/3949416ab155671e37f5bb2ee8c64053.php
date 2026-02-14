@@ -1,6 +1,4 @@
-@extends('layouts.usuario')
-
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
     #lector-cedula { width: 100%; min-height: 400px; position: relative; }
     #lector-cedula video { width: 100% !important; max-height: 400px; object-fit: cover; display: block; }
@@ -12,14 +10,71 @@
         #video-patente { max-height: 260px; }
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-gray-100 flex">
-    <x-usuario.sidebar />
+    <?php if (isset($component)) { $__componentOriginal43bea641c2438270a49238c99ecefb58 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal43bea641c2438270a49238c99ecefb58 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.sidebar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('usuario.sidebar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal43bea641c2438270a49238c99ecefb58)): ?>
+<?php $attributes = $__attributesOriginal43bea641c2438270a49238c99ecefb58; ?>
+<?php unset($__attributesOriginal43bea641c2438270a49238c99ecefb58); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal43bea641c2438270a49238c99ecefb58)): ?>
+<?php $component = $__componentOriginal43bea641c2438270a49238c99ecefb58; ?>
+<?php unset($__componentOriginal43bea641c2438270a49238c99ecefb58); ?>
+<?php endif; ?>
     <div class="flex-1 lg:ml-64">
-        <x-usuario.header />
-        <x-usuario.mobile-menu />
+        <?php if (isset($component)) { $__componentOriginal68a91bba458c966ce613394dc1ac6078 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal68a91bba458c966ce613394dc1ac6078 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.header','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('usuario.header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal68a91bba458c966ce613394dc1ac6078)): ?>
+<?php $attributes = $__attributesOriginal68a91bba458c966ce613394dc1ac6078; ?>
+<?php unset($__attributesOriginal68a91bba458c966ce613394dc1ac6078); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal68a91bba458c966ce613394dc1ac6078)): ?>
+<?php $component = $__componentOriginal68a91bba458c966ce613394dc1ac6078; ?>
+<?php unset($__componentOriginal68a91bba458c966ce613394dc1ac6078); ?>
+<?php endif; ?>
+        <?php if (isset($component)) { $__componentOriginal34cad1f9e1defdf87895216072b487b3 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal34cad1f9e1defdf87895216072b487b3 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.mobile-menu','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('usuario.mobile-menu'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal34cad1f9e1defdf87895216072b487b3)): ?>
+<?php $attributes = $__attributesOriginal34cad1f9e1defdf87895216072b487b3; ?>
+<?php unset($__attributesOriginal34cad1f9e1defdf87895216072b487b3); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal34cad1f9e1defdf87895216072b487b3)): ?>
+<?php $component = $__componentOriginal34cad1f9e1defdf87895216072b487b3; ?>
+<?php unset($__componentOriginal34cad1f9e1defdf87895216072b487b3); ?>
+<?php endif; ?>
 
         <div class="container mx-auto px-4 py-6 max-w-4xl">
             <div class="flex justify-between items-center mb-6">
@@ -29,10 +84,10 @@
                     </svg>
                     Control de acceso
                 </h1>
-                <a href="{{ route('ingresos.index') }}" class="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg transition text-sm">Ver listado</a>
+                <a href="<?php echo e(route('ingresos.index')); ?>" class="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg transition text-sm">Ver listado</a>
             </div>
 
-            {{-- Tabs --}}
+            
             <div class="flex border-b border-gray-200 mb-4">
                 <button type="button" id="tab-peatonal" class="tab-btn px-4 py-2 font-medium rounded-t-lg bg-emerald-600 text-white" data-tab="peatonal">Peatonal (cédula)</button>
                 <button type="button" id="tab-vehicular" class="tab-btn px-4 py-2 font-medium rounded-t-lg bg-gray-100 text-gray-600 hover:bg-gray-200" data-tab="vehicular">Vehicular (patente)</button>
@@ -101,11 +156,11 @@
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="{{ asset('js/rut-formatter.js') }}"></script>
+<script src="<?php echo e(asset('js/rut-formatter.js')); ?>"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tipoActual = document.getElementById('tipo-actual');
@@ -148,47 +203,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const rutManual = document.getElementById('rut-manual');
     const nombreManual = document.getElementById('nombre-manual');
 
-    function aplicarZoomCamara(selectorContenedor) {
-        var container = document.querySelector(selectorContenedor);
-        var video = container ? container.querySelector('video') : null;
-        if (video && video.srcObject) {
-            var stream = video.srcObject;
-            var track = stream.getVideoTracks && stream.getVideoTracks()[0];
-            if (track && typeof track.applyConstraints === 'function')
-                track.applyConstraints({ zoom: { ideal: 1.8 } }).catch(function() {});
-        }
-    }
     function iniciarLectorCedula() {
         if (html5QrCode && html5QrCode.isScanning) return;
         var config = { fps: 10, qrbox: function(w, h) { return { width: Math.max(200, Math.floor(w * 0.98)), height: Math.max(200, Math.floor(h * 0.98)) }; } };
-        function tryStart(constraints) {
+        var tryStart = function(constraints) {
             if (html5QrCode && html5QrCode.isScanning) return Promise.resolve();
             if (!html5QrCode) html5QrCode = new Html5Qrcode('lector-cedula');
             return html5QrCode.start(constraints, config, onScanCedula, function() {}).catch(function(err) { throw err; });
-        }
-        function retryAfter(fn, ms) {
-            return new Promise(function(resolve, reject) {
-                setTimeout(function() { fn().then(resolve).catch(reject); }, ms);
-            });
-        }
-        function cuandoInicio() { setTimeout(function() { aplicarZoomCamara('#lector-cedula'); }, 150); }
+        };
         Html5Qrcode.getCameras().then(function(cameras) {
             if (!cameras.length) {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se detectó cámara. Use entrada manual.</p>';
                 return;
             }
-            tryStart({ facingMode: 'environment' })
-                .catch(function() { return retryAfter(function() { return tryStart({ video: true }); }, 400); })
-                .catch(function() { return retryAfter(function() {
-                    if (cameras.length && html5QrCode) return html5QrCode.start(cameras[0].id, config, onScanCedula, function() {});
-                    return Promise.reject(new Error('Sin cámara'));
-                }, 400); })
-                .then(cuandoInicio)
+            tryStart({ facingMode: 'environment', zoom: { ideal: 1.8 } }).catch(function() { return tryStart({ video: true, zoom: { ideal: 1.8 } }); })
                 .catch(function(err) {
-                    lectorCedula.innerHTML = '<p class="text-white p-3">Error: ' + (err.message || err) + '. Use entrada manual.</p>';
-                });
+                    if (cameras.length && html5QrCode) return html5QrCode.start(cameras[0].id, config, onScanCedula, function() {});
+                    throw err;
+                }).catch(function(err) {
+                lectorCedula.innerHTML = '<p class="text-white p-3">Error: ' + (err.message || err) + '. Use entrada manual.</p>';
+            });
         }).catch(function() {
-            retryAfter(function() { return tryStart({ video: true }); }, 400).then(cuandoInicio).catch(function(err) {
+            tryStart({ video: true, zoom: { ideal: 1.8 } }).catch(function(err) {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
             });
         });
@@ -269,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alertaResultado.classList.add('hidden');
         qrSalidaContainer.classList.add('hidden');
         var payload = { tipo: tipo, rut: rut || null, nombre: nombre || null, patente: patente || null, _token: document.querySelector('meta[name="csrf-token"]').content };
-        axios.post('{{ route("ingresos.store") }}', payload)
+        axios.post('<?php echo e(route("ingresos.store")); ?>', payload)
             .then(function(res) {
                 if (res.data.success) {
                     alertaResultado.className = 'mt-4 p-4 rounded bg-green-100 text-green-800';
@@ -304,5 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(iniciarCuandoVisible, 300);
 });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.usuario', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/html/resources/views/ingresos/escaner.blade.php ENDPATH**/ ?>

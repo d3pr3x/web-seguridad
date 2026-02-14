@@ -150,7 +150,7 @@
 
         escaner = new Html5Qrcode('reader');
         escaner.start(
-            { facingMode: 'environment', zoom: { ideal: 1.8 } },
+            { facingMode: 'environment' },
             { fps: 10, qrbox: { width: 250, height: 250 } },
             function(decodedText) {
                 if (!esUrlRondaEscanear(decodedText)) return;
@@ -165,12 +165,32 @@
                 }
             },
             function() {}
-        ).catch(function(err) {
-            escaneando = false;
-            contenedor.classList.add('hidden');
-            btnAbrir.classList.remove('hidden');
-            alert('No se pudo acceder a la cámara. Compruebe que ha dado permiso y que usa HTTPS o localhost.');
-            console.warn(err);
+        ).then(function() {
+            setTimeout(function() {
+                var video = readerDiv ? readerDiv.querySelector('video') : null;
+                if (video && video.srcObject) {
+                    var track = video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
+                    if (track && typeof track.applyConstraints === 'function')
+                        track.applyConstraints({ zoom: { ideal: 1.8 } }).catch(function() {});
+                }
+            }, 150);
+        }).catch(function(err) {
+            if (escaner) {
+                escaner.stop().catch(function() {}).finally(function() {
+                    if (escaner) { escaner.clear(); escaner = null; }
+                    escaneando = false;
+                    contenedor.classList.add('hidden');
+                    btnAbrir.classList.remove('hidden');
+                    alert('No se pudo acceder a la cámara. Compruebe que ha dado permiso y que usa HTTPS o localhost.');
+                    console.warn(err);
+                });
+            } else {
+                escaneando = false;
+                contenedor.classList.add('hidden');
+                btnAbrir.classList.remove('hidden');
+                alert('No se pudo acceder a la cámara. Compruebe que ha dado permiso y que usa HTTPS o localhost.');
+                console.warn(err);
+            }
         });
     }
 
