@@ -151,7 +151,7 @@
         escaner = new Html5Qrcode('reader');
         escaner.start(
             { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
+            { fps: 10 },
             function(decodedText) {
                 if (!esUrlRondaEscanear(decodedText)) return;
                 var url = obtenerUrlEscaneo(decodedText);

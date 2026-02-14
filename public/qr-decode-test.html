@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba decodificar QR desde imagen</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { font-size: 1.25rem; }
+        .block { margin-bottom: 1.5rem; }
+        input[type="file"], input[type="text"], button { margin-right: 0.5rem; margin-bottom: 0.5rem; }
+        #resultado { margin-top: 1rem; padding: 1rem; background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; white-space: pre-wrap; word-break: break-all; }
+        #resultado.error { background: #fef2f2; border-color: #ef4444; }
+        #resultado:empty { display: none; }
+        #preview { max-width: 100%; max-height: 300px; margin-top: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Prueba decodificar QR desde imagen</h1>
+    <p>Sube una imagen con un código QR o indica una URL (misma carpeta, ej: <code>/test-qr.png</code>).</p>
+
+    <div class="block">
+        <label>Desde archivo:</label><br>
+        <input type="file" id="file-input" accept="image/*">
+        <button type="button" id="btn-file">Decodificar archivo</button>
+    </div>
+
+    <div class="block">
+        <label>Desde URL (ej: /test-qr.png):</label><br>
+        <input type="text" id="url-input" placeholder="/test-qr.png" style="width: 220px;">
+        <button type="button" id="btn-url">Decodificar desde URL</button>
+    </div>
+
+    <div id="preview-container" class="block" style="display: none;">
+        <img id="preview" alt="Vista previa">
+    </div>
+
+    <div id="resultado"></div>
+
+    <div id="dummy" style="width:1px;height:1px;overflow:hidden;position:absolute;left:-9999px;"></div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        var resultado = document.getElementById('resultado');
+        var previewContainer = document.getElementById('preview-container');
+        var previewImg = document.getElementById('preview');
+
+        function mostrar(texto, esError) {
+            resultado.textContent = texto;
+            resultado.className = esError ? 'error' : '';
+        }
+
+        function blobToFile(blob, fileName) {
+            return new File([blob], fileName || 'image.png', { type: blob.type || 'image/png' });
+        }
+
+        function decodificarArchivo(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                mostrar('Seleccione un archivo de imagen.', true);
+                return;
+            }
+            mostrar('Decodificando…');
+            var scanner = new Html5Qrcode('dummy');
+            scanner.scanFile(file, false)
+                .then(function(decodedText) {
+                    mostrar('QR decodificado:\n' + decodedText);
+                })
+                .catch(function(err) {
+                    mostrar('Error: ' + (err && err.message ? err.message : String(err)), true);
+                });
+        }
+
+        document.getElementById('btn-file').addEventListener('click', function() {
+            var input = document.getElementById('file-input');
+            if (input.files && input.files[0]) {
+                previewContainer.style.display = 'block';
+                previewImg.src = URL.createObjectURL(input.files[0]);
+                decodificarArchivo(input.files[0]);
+            } else {
+                mostrar('Seleccione primero una imagen.', true);
+            }
+        });
+
+        document.getElementById('btn-url').addEventListener('click', function() {
+            var url = (document.getElementById('url-input').value || '').trim();
+            if (!url) {
+                mostrar('Escriba una URL (ej: /test-qr.png).', true);
+                return;
+            }
+            if (!url.startsWith('/')) url = '/' + url;
+            mostrar('Cargando imagen…');
+            fetch(url)
+                .then(function(r) {
+                    if (!r.ok) throw new Error('No se pudo cargar la imagen: ' + r.status);
+                    return r.blob();
+                })
+                .then(function(blob) {
+                    var file = blobToFile(blob, 'test.png');
+                    previewContainer.style.display = 'block';
+                    previewImg.src = URL.createObjectURL(blob);
+                    return file;
+                })
+                .then(function(file) {
+                    mostrar('Decodificando…');
+                    var scanner = new Html5Qrcode('dummy');
+                    return scanner.scanFile(file, false);
+                })
+                .then(function(decodedText) {
+                    mostrar('QR decodificado:\n' + decodedText);
+                })
+                .catch(function(err) {
+                    mostrar('Error: ' + (err && err.message ? err.message : String(err)), true);
+                });
+        });
+    </script>
+</body>
+</html>

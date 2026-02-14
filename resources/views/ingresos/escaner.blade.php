@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function iniciarLectorCedula() {
         if (html5QrCode && html5QrCode.isScanning) return;
-        var config = { fps: 10, qrbox: function(w, h) { return { width: Math.max(200, Math.floor(w * 0.98)), height: Math.max(200, Math.floor(h * 0.98)) }; } };
+        var config = { fps: 10 };
         function tryStart(constraints) {
             if (html5QrCode && html5QrCode.isScanning) return Promise.resolve();
             if (!html5QrCode) html5QrCode = new Html5Qrcode('lector-cedula');
@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(function() { fn().then(resolve).catch(reject); }, ms);
             });
         }
+        function arrancar() {
         Html5Qrcode.getCameras().then(function(cameras) {
             if (!cameras.length) {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se detectó cámara. Use entrada manual.</p>';
@@ -180,6 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
             });
         });
+        }
+        requestAnimationFrame(function() { setTimeout(arrancar, 100); });
     }
 
     function onScanCedula(decodedText) {
