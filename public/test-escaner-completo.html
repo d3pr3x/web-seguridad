@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba QR carnet + OCR patente</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { font-size: 1.25rem; }
+        section { margin-bottom: 2rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; }
+        section h2 { margin-top: 0; font-size: 1rem; }
+        .ok { color: #059669; }
+        .fail { color: #dc2626; }
+        #resultado-qr, #resultado-patente { margin-top: 0.5rem; white-space: pre-wrap; word-break: break-all; }
+        canvas { max-width: 100%; height: auto; display: block; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <h1>Prueba: QR carnet + patente</h1>
+    <p>Resultados esperados: <strong>RUT 17.795.286-9</strong>, <strong>Nombre Cristian Nicolas Urra Castilo</strong>, <strong>Patente GWCL18</strong>.</p>
+    <p><button type="button" id="btn-todas" style="padding: 0.5rem 1rem; font-weight: bold;">Ejecutar todas las pruebas</button></p>
+
+    <section>
+        <h2>1. QR carnet (test-qr-carnet.png)</h2>
+        <button type="button" id="btn-qr">Decodificar QR carnet</button>
+        <div id="resultado-qr"></div>
+    </section>
+
+    <section>
+        <h2>2. OCR patente (test-patente.png)</h2>
+        <button type="button" id="btn-patente">Reconocer patente</button>
+        <canvas id="canvas-patente" width="640" height="480"></canvas>
+        <div id="resultado-patente"></div>
+    </section>
+
+    <div id="dummy" style="width:1px;height:1px;overflow:hidden;position:absolute;left:-9999px;"></div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script>
+        function formatearRut(val) {
+            var r = (val || '').replace(/[^0-9kK]/g, '').toUpperCase();
+            if (r.length < 2) return r;
+            return r.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + r.slice(-1);
+        }
+
+        document.getElementById('btn-qr').addEventListener('click', function() {
+            var out = document.getElementById('resultado-qr');
+            out.textContent = 'Cargando y decodificando…';
+            fetch('/test-qr-carnet.png')
+                .then(function(r) { if (!r.ok) throw new Error(r.status); return r.blob(); })
+                .then(function(blob) {
+                    var file = new File([blob], 'carnet.png', { type: blob.type || 'image/png' });
+                    var scanner = new Html5Qrcode('dummy');
+                    return scanner.scanFile(file, false);
+                })
+                .then(function(decodedText) {
+                    var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
+                    var rut = '', nombre = '';
+                    if (parts.length >= 2) {
+                        rut = formatearRut(parts[0]);
+                        nombre = parts.slice(1).join(' ').trim();
+                    } else if (parts.length === 1 && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
+                        rut = formatearRut(parts[0]);
+                    }
+                    var rutOk = (rut === '17.795.286-9' || rut.replace(/\./g,'') === '177952869');
+                    var nombreOk = nombre.toUpperCase().indexOf('CRISTIAN') !== -1 && nombre.toUpperCase().indexOf('URRA') !== -1;
+                    out.innerHTML = 'QR crudo: ' + decodedText + '\n\n' +
+                        'RUT extraído: ' + (rut || '(ninguno)') + (rutOk ? ' <span class="ok">✓</span>' : ' <span class="fail">✗ esperado 17.795.286-9</span>') + '\n' +
+                        'Nombre extraído: ' + (nombre || '(ninguno)') + (nombreOk ? ' <span class="ok">✓</span>' : ' <span class="fail">✗ esperado Cristian Nicolas Urra Castilo</span>');
+                })
+                .catch(function(err) {
+                    out.innerHTML = '<span class="fail">Error: ' + (err && err.message ? err.message : String(err)) + '</span>';
+                });
+        });
+
+        document.getElementById('btn-patente').addEventListener('click', function() {
+            var out = document.getElementById('resultado-patente');
+            var canvas = document.getElementById('canvas-patente');
+            var ctx = canvas.getContext('2d');
+            out.textContent = 'Cargando imagen…';
+            var img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, 640, 480);
+                out.textContent = 'Reconociendo con Tesseract…';
+                Tesseract.recognize(canvas, 'eng', { tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' })
+                    .then(function(result) {
+                        var raw = (result.data.text || '').trim();
+                        var text = raw.toUpperCase().replace(/\s/g, '');
+                        var match = text.match(/([A-Z]{4}\d{2}|[A-Z]{3}\d{3})/);
+                        var patente = match ? match[1] : '';
+                        var ok = (patente === 'GWCL18');
+                        out.innerHTML = 'OCR crudo: "' + raw + '"\n\n' +
+                            'Patente extraída: ' + (patente || '(ninguna)') + (ok ? ' <span class="ok">✓</span>' : ' <span class="fail">✗ esperado GWCL18</span>');
+                    })
+                    .catch(function(err) {
+                        out.innerHTML = '<span class="fail">Error: ' + (err && err.message ? err.message : String(err)) + '</span>';
+                    });
+            };
+            img.onerror = function() { out.innerHTML = '<span class="fail">No se pudo cargar test-patente.png</span>'; };
+            img.src = '/test-patente.png';
+        });
+
+        document.getElementById('btn-todas').addEventListener('click', function() {
+            document.getElementById('btn-qr').click();
+            setTimeout(function() { document.getElementById('btn-patente').click(); }, 500);
+        });
+    </script>
+</body>
+</html>

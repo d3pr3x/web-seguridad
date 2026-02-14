@@ -186,11 +186,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function onScanCedula(decodedText) {
-        var parts = decodedText.split('|').map(function(p) { return p.trim(); });
+        var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
+        if (runMatch) {
+            rutInput.value = formatearRut(runMatch[1].trim());
+        }
+        var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
         if (parts.length >= 2) {
-            rutInput.value = formatearRut(parts[0]);
-            nombreInput.value = parts[1] || '';
-        } else if (parts.length === 1 && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
+            if (!runMatch) rutInput.value = formatearRut(parts[0]);
+            nombreInput.value = parts.slice(1).join(' ').trim();
+        } else if (parts.length === 1 && !runMatch && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
             rutInput.value = formatearRut(parts[0]);
         }
     }
@@ -236,9 +240,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function capturarYReconocer() {
         if (!videoPatente.srcObject || videoPatente.readyState < 2) return;
         ctx.drawImage(videoPatente, 0, 0, 640, 480);
-        Tesseract.recognize(canvas, 'eng', { tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ' })
+        Tesseract.recognize(canvas, 'eng', { tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', tessedit_pageseg_mode: '8' })
             .then(function(result) {
-                var text = (result.data.text || '').trim().toUpperCase().replace(/\s/g, '');
+                var text = (result.data.text || '').trim().toUpperCase().replace(/\s/g, '').replace(/[^A-Z0-9]/g, '');
                 var match = text.match(/([A-Z]{4}\d{2}|[A-Z]{3}\d{3})/);
                 if (match) patenteResult.value = match[1];
             }).catch(function() {});
