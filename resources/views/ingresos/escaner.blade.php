@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajeCapturaCedula.textContent = 'Procesando…';
         mensajeCapturaCedula.classList.remove('hidden');
         requestAnimationFrame(function() {
-        var maxLado = 1000;
+        var maxLado = 1920;
         if (w > maxLado || h > maxLado) {
             var scale = Math.min(maxLado / w, maxLado / h);
             w = Math.round(w * scale);
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         canvasCedula.width = w;
         canvasCedula.height = h;
-        var ctx = canvasCedula.getContext('2d');
+        var ctx = canvasCedula.getContext('2d', { willReadFrequently: true });
         ctx.drawImage(videoCedula, 0, 0, w, h);
         escribirLogQR('2. Imagen capturada (' + w + '×' + h + ' px)');
         function terminar() {
@@ -251,14 +251,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         function decodificarConJsQR(canvasEl) {
             try {
+                if (typeof jsQR === 'undefined') return null;
                 var ctxEl = canvasEl.getContext('2d');
                 var imageData = ctxEl.getImageData(0, 0, canvasEl.width, canvasEl.height);
-                var code = typeof jsQR !== 'undefined' && jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+                var code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
                 return code ? code.data : null;
             } catch (e) { return null; }
         }
         function intentarDecodificar() {
-            escribirLogQR('3. Decodificando QR (jsQR)…');
+            escribirLogQR('3. Decodificando QR (jsQR, imagen original)…');
             var decoded = decodificarConJsQR(canvasCedula);
             if (decoded) { exitoQR(decoded); return; }
             escribirLogQR('3a. Sin QR, probando imagen espejo…');
@@ -272,13 +273,26 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx2.setTransform(1, 0, 0, 1, 0, 0);
             decoded = decodificarConJsQR(c2);
             if (decoded) { exitoQR(decoded); return; }
-            escribirLogQR('3b. Probando con Html5Qrcode (archivo)…');
+            if (w <= 800 && h <= 600) {
+                escribirLogQR('3b. Probando con imagen 2x (más resolución)…');
+                var w2 = w * 2, h2 = h * 2;
+                var cBig = document.createElement('canvas');
+                cBig.width = w2;
+                cBig.height = h2;
+                var ctxBig = cBig.getContext('2d');
+                ctxBig.imageSmoothingEnabled = true;
+                ctxBig.imageSmoothingQuality = 'high';
+                ctxBig.drawImage(canvasCedula, 0, 0, w, h, 0, 0, w2, h2);
+                decoded = decodificarConJsQR(cBig);
+                if (decoded) { exitoQR(decoded); return; }
+            }
+            escribirLogQR('3c. Probando con Html5Qrcode (archivo)…');
             canvasCedula.toBlob(function(blob) {
                 if (!blob) {
                     var dataUrl = canvasCedula.toDataURL('image/png');
-                    fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(blob) {
-                        procesarConArchivo(blob);
-                    }).catch(function() { falloQR(); });
+                    fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(b) {
+                        procesarConArchivo(b);
+                    }).catch(falloQR);
                     return;
                 }
                 procesarConArchivo(blob);
@@ -287,7 +301,23 @@ document.addEventListener('DOMContentLoaded', function() {
         function procesarConArchivo(blob) {
             var file = new File([blob], 'captura.png', { type: 'image/png' });
             var scanner = new Html5Qrcode('dummy-cedula');
-            scanner.scanFile(file, false).then(exitoQR).catch(falloQR);
+            scanner.scanFile(file, false).then(exitoQR).catch(function(err) {
+                escribirLogQR('3d. Html5Qrcode falló, reintento con imagen espejo (archivo)…');
+                var c2 = document.getElementById('canvas-cedula-espejo');
+                c2.width = w;
+                c2.height = h;
+                var ctx2 = c2.getContext('2d');
+                ctx2.translate(w, 0);
+                ctx2.scale(-1, 1);
+                ctx2.drawImage(canvasCedula, 0, 0);
+                ctx2.setTransform(1, 0, 0, 1, 0, 0);
+                c2.toBlob(function(blob2) {
+                    if (blob2) {
+                        var file2 = new File([blob2], 'captura-espejo.png', { type: 'image/png' });
+                        new Html5Qrcode('dummy-cedula').scanFile(file2, false).then(exitoQR).catch(falloQR);
+                    } else falloQR();
+                }, 'image/png', 1);
+            });
         }
         function falloQR() {
             escribirLogQR('4. No se detectó QR en la imagen.');
@@ -295,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y vuelva a capturar.');
             terminar();
         }
-        setTimeout(intentarDecodificar, 80);
+        setTimeout(intentarDecodificar, 100);
         });
     }
     if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);
