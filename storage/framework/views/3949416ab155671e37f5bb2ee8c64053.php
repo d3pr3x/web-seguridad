@@ -203,28 +203,47 @@ document.addEventListener('DOMContentLoaded', function() {
     const rutManual = document.getElementById('rut-manual');
     const nombreManual = document.getElementById('nombre-manual');
 
+    function aplicarZoomCamara(selectorContenedor) {
+        var container = document.querySelector(selectorContenedor);
+        var video = container ? container.querySelector('video') : null;
+        if (video && video.srcObject) {
+            var stream = video.srcObject;
+            var track = stream.getVideoTracks && stream.getVideoTracks()[0];
+            if (track && typeof track.applyConstraints === 'function')
+                track.applyConstraints({ zoom: { ideal: 1.8 } }).catch(function() {});
+        }
+    }
     function iniciarLectorCedula() {
         if (html5QrCode && html5QrCode.isScanning) return;
         var config = { fps: 10, qrbox: function(w, h) { return { width: Math.max(200, Math.floor(w * 0.98)), height: Math.max(200, Math.floor(h * 0.98)) }; } };
-        var tryStart = function(constraints) {
+        function tryStart(constraints) {
             if (html5QrCode && html5QrCode.isScanning) return Promise.resolve();
             if (!html5QrCode) html5QrCode = new Html5Qrcode('lector-cedula');
             return html5QrCode.start(constraints, config, onScanCedula, function() {}).catch(function(err) { throw err; });
-        };
+        }
+        function retryAfter(fn, ms) {
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() { fn().then(resolve).catch(reject); }, ms);
+            });
+        }
+        function cuandoInicio() { setTimeout(function() { aplicarZoomCamara('#lector-cedula'); }, 150); }
         Html5Qrcode.getCameras().then(function(cameras) {
             if (!cameras.length) {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se detectó cámara. Use entrada manual.</p>';
                 return;
             }
-            tryStart({ facingMode: 'environment', zoom: { ideal: 1.8 } }).catch(function() { return tryStart({ video: true, zoom: { ideal: 1.8 } }); })
-                .catch(function(err) {
+            tryStart({ facingMode: 'environment' })
+                .catch(function() { return retryAfter(function() { return tryStart({ video: true }); }, 400); })
+                .catch(function() { return retryAfter(function() {
                     if (cameras.length && html5QrCode) return html5QrCode.start(cameras[0].id, config, onScanCedula, function() {});
-                    throw err;
-                }).catch(function(err) {
-                lectorCedula.innerHTML = '<p class="text-white p-3">Error: ' + (err.message || err) + '. Use entrada manual.</p>';
-            });
+                    return Promise.reject(new Error('Sin cámara'));
+                }, 400); })
+                .then(cuandoInicio)
+                .catch(function(err) {
+                    lectorCedula.innerHTML = '<p class="text-white p-3">Error: ' + (err.message || err) + '. Use entrada manual.</p>';
+                });
         }).catch(function() {
-            tryStart({ video: true, zoom: { ideal: 1.8 } }).catch(function(err) {
+            retryAfter(function() { return tryStart({ video: true }); }, 400).then(cuandoInicio).catch(function(err) {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
             });
         });

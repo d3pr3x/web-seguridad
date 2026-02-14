@@ -165,16 +165,7 @@
                 }
             },
             function() {}
-        ).then(function() {
-            setTimeout(function() {
-                var video = readerDiv ? readerDiv.querySelector('video') : null;
-                if (video && video.srcObject) {
-                    var track = video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
-                    if (track && typeof track.applyConstraints === 'function')
-                        track.applyConstraints({ zoom: { ideal: 1.8 } }).catch(function() {});
-                }
-            }, 150);
-        }).catch(function(err) {
+        ).catch(function(err) {
             if (escaner) {
                 escaner.stop().catch(function() {}).finally(function() {
                     if (escaner) { escaner.clear(); escaner = null; }
