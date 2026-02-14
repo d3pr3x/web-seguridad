@@ -41,8 +41,15 @@
             <div id="panel-peatonal" class="tab-panel">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
                     <div class="p-6">
-                        <p class="text-sm text-gray-500 mb-3">Escaneé el código de la cédula de identidad chilena (QR/DataMatrix) o ingrese datos manualmente.</p>
-                        <div id="lector-cedula" class="bg-gray-900 rounded overflow-hidden mb-4"></div>
+                        <p class="text-sm text-gray-500 mb-3">Encuadre el QR de la cédula y pulse «Capturar y leer QR».</p>
+                        <div id="lector-cedula" class="bg-gray-900 rounded overflow-hidden mb-2">
+                            <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[400px] object-cover block"></video>
+                            <button type="button" id="btn-capturar-cedula" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
+                                Capturar y leer QR
+                            </button>
+                        </div>
+                        <canvas id="canvas-cedula" style="display:none"></canvas>
+                        <div id="dummy-cedula" style="position:absolute;left:-9999px;width:1px;height:1px;"></div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
@@ -65,9 +72,12 @@
             <div id="panel-vehicular" class="tab-panel hidden">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
                     <div class="p-6">
-                        <p class="text-sm text-gray-500 mb-3">Enfoque la patente del vehículo (formato ABCD12 o ABC123). Buena luz y 30–50 cm de distancia.</p>
+                        <p class="text-sm text-gray-500 mb-3">Encuadre la patente del vehículo y pulse «Capturar y leer patente».</p>
                         <video id="video-patente" autoplay playsinline muted width="100%" height="300" class="rounded bg-gray-900"></video>
-                        <canvas id="canvas" width="640" height="480"></canvas>
+                        <button type="button" id="btn-capturar-patente" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
+                            Capturar y leer patente
+                        </button>
+                        <canvas id="canvas" width="640" height="480" style="display:none"></canvas>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Patente detectada</label>
@@ -129,9 +139,11 @@ document.addEventListener('DOMContentLoaded', function() {
             panel.classList.toggle('hidden', panel.id !== 'panel-' + tab);
         });
         if (tab === 'vehicular') {
-            iniciarOCRPatente();
+            detenerCedula();
+            iniciarCamaraPatente();
         } else {
-            detenerOCRPatente();
+            detenerCamaraPatente();
+            iniciarLectorCedula();
         }
     }
 
@@ -141,7 +153,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    let html5QrCode = null;
+    var streamCedula = null;
+    const videoCedula = document.getElementById('video-cedula');
+    const btnCapturarCedula = document.getElementById('btn-capturar-cedula');
+    const canvasCedula = document.getElementById('canvas-cedula');
     const lectorCedula = document.getElementById('lector-cedula');
     const rutInput = document.getElementById('rut');
     const nombreInput = document.getElementById('nombre');
@@ -149,41 +164,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const nombreManual = document.getElementById('nombre-manual');
 
     function iniciarLectorCedula() {
-        if (html5QrCode && html5QrCode.isScanning) return;
-        var config = { fps: 10 };
-        function tryStart(constraints) {
-            if (html5QrCode && html5QrCode.isScanning) return Promise.resolve();
-            if (!html5QrCode) html5QrCode = new Html5Qrcode('lector-cedula');
-            return html5QrCode.start(constraints, config, onScanCedula, function() {}).catch(function(err) { throw err; });
-        }
-        function retryAfter(fn, ms) {
-            return new Promise(function(resolve, reject) {
-                setTimeout(function() { fn().then(resolve).catch(reject); }, ms);
-            });
-        }
-        function arrancar() {
-        Html5Qrcode.getCameras().then(function(cameras) {
-            if (!cameras.length) {
-                lectorCedula.innerHTML = '<p class="text-white p-3">No se detectó cámara. Use entrada manual.</p>';
-                return;
-            }
-            tryStart({ facingMode: 'environment' })
-                .catch(function() { return retryAfter(function() { return tryStart({ video: true }); }, 400); })
-                .catch(function() { return retryAfter(function() {
-                    if (cameras.length && html5QrCode) return html5QrCode.start(cameras[0].id, config, onScanCedula, function() {});
-                    return Promise.reject(new Error('Sin cámara'));
-                }, 400); })
-                .catch(function(err) {
-                    lectorCedula.innerHTML = '<p class="text-white p-3">Error: ' + (err.message || err) + '. Use entrada manual.</p>';
-                });
+        if (videoCedula.srcObject) return;
+        var constraints = { video: { facingMode: 'environment' }, audio: false };
+        navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+            streamCedula = stream;
+            videoCedula.srcObject = stream;
+            return videoCedula.play();
         }).catch(function() {
-            retryAfter(function() { return tryStart({ video: true }); }, 400).catch(function(err) {
-                lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
+            return navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
+                streamCedula = stream;
+                videoCedula.srcObject = stream;
+                return videoCedula.play();
             });
+        }).then(function() {
+            btnCapturarCedula.disabled = false;
+        }).catch(function(err) {
+            lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
         });
-        }
-        requestAnimationFrame(function() { setTimeout(arrancar, 100); });
     }
+
+    function capturarYLeerQR() {
+        if (!videoCedula.srcObject || videoCedula.readyState < 2) return;
+        var w = videoCedula.videoWidth;
+        var h = videoCedula.videoHeight;
+        if (!w || !h) return;
+        canvasCedula.width = w;
+        canvasCedula.height = h;
+        var ctx = canvasCedula.getContext('2d');
+        ctx.drawImage(videoCedula, 0, 0, w, h);
+        btnCapturarCedula.disabled = true;
+        canvasCedula.toBlob(function(blob) {
+            if (!blob) { btnCapturarCedula.disabled = false; return; }
+            var file = new File([blob], 'captura.png', { type: 'image/png' });
+            var scanner = new Html5Qrcode('dummy-cedula');
+            scanner.scanFile(file, false).then(function(decodedText) {
+                onScanCedula(decodedText);
+            }).catch(function() {
+                alert('No se detectó un QR en la imagen. Encuadre bien el código y vuelva a capturar.');
+            }).finally(function() { btnCapturarCedula.disabled = false; });
+        }, 'image/png');
+    }
+    if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);
+    if (btnCapturarCedula) btnCapturarCedula.disabled = true;
 
     function onScanCedula(decodedText) {
         var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
@@ -208,45 +230,65 @@ document.addEventListener('DOMContentLoaded', function() {
     rutManual.addEventListener('input', function() { rutInput.value = formatearRut(this.value); });
     nombreManual.addEventListener('input', function() { nombreInput.value = this.value; });
 
-    var videoStream = null, intervalOCR = null;
+    function detenerCedula() {
+        if (streamCedula) {
+            streamCedula.getTracks().forEach(function(t) { t.stop(); });
+            streamCedula = null;
+        }
+        videoCedula.srcObject = null;
+    }
+
+    var streamPatente = null;
     var videoPatente = document.getElementById('video-patente');
+    var btnCapturarPatente = document.getElementById('btn-capturar-patente');
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
     var patenteResult = document.getElementById('patente-result');
 
-    function iniciarOCRPatente() {
-        if (intervalOCR) return;
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 }, zoom: { ideal: 1.8 } }, audio: false })
+    function iniciarCamaraPatente() {
+        if (videoPatente.srcObject) return;
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false })
             .then(function(stream) {
-                videoStream = stream;
+                streamPatente = stream;
                 videoPatente.srcObject = stream;
                 return videoPatente.play();
-            }).then(function() { intervalOCR = setInterval(capturarYReconocer, 2000); })
+            })
             .catch(function() {
-                navigator.mediaDevices.getUserMedia({ video: { zoom: { ideal: 1.8 } }, audio: false }).then(function(stream) {
-                    videoStream = stream;
+                return navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
+                    streamPatente = stream;
                     videoPatente.srcObject = stream;
-                    videoPatente.play().then(function() { intervalOCR = setInterval(capturarYReconocer, 2000); });
-                }).catch(function() {});
-            });
+                    return videoPatente.play();
+                });
+            })
+            .catch(function() {});
     }
 
-    function detenerOCRPatente() {
-        if (intervalOCR) { clearInterval(intervalOCR); intervalOCR = null; }
-        if (videoStream) { videoStream.getTracks().forEach(function(t) { t.stop(); }); videoStream = null; }
+    function detenerCamaraPatente() {
+        if (streamPatente) {
+            streamPatente.getTracks().forEach(function(t) { t.stop(); });
+            streamPatente = null;
+        }
         videoPatente.srcObject = null;
     }
 
-    function capturarYReconocer() {
+    function capturarYLeerPatente() {
         if (!videoPatente.srcObject || videoPatente.readyState < 2) return;
         ctx.drawImage(videoPatente, 0, 0, 640, 480);
+        btnCapturarPatente.disabled = true;
         Tesseract.recognize(canvas, 'eng', { tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', tessedit_pageseg_mode: '8' })
             .then(function(result) {
                 var text = (result.data.text || '').trim().toUpperCase().replace(/\s/g, '').replace(/[^A-Z0-9]/g, '');
                 var match = text.match(/([A-Z]{4}\d{2}|[A-Z]{3}\d{3})/);
-                if (match) patenteResult.value = match[1];
-            }).catch(function() {});
+                if (match) {
+                    patenteResult.value = match[1];
+                } else {
+                    alert('No se detectó una patente en la imagen. Encuadre bien la patente y vuelva a capturar.');
+                }
+            })
+            .catch(function() { alert('Error al leer la imagen.'); })
+            .finally(function() { btnCapturarPatente.disabled = false; });
     }
+    if (btnCapturarPatente) btnCapturarPatente.addEventListener('click', capturarYLeerPatente);
 
     btnRegistrar.addEventListener('click', function() {
         var tipo = tipoActual.value;
