@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se detectó cámara. Use entrada manual.</p>';
                 return;
             }
-            tryStart({ facingMode: 'environment' }).catch(function() { return tryStart({ video: true }); })
+            tryStart({ facingMode: 'environment', zoom: { ideal: 1.8 } }).catch(function() { return tryStart({ video: true, zoom: { ideal: 1.8 } }); })
                 .catch(function(err) {
                     if (cameras.length && html5QrCode) return html5QrCode.start(cameras[0].id, config, onScanCedula, function() {});
                     throw err;
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 lectorCedula.innerHTML = '<p class="text-white p-3">Error: ' + (err.message || err) + '. Use entrada manual.</p>';
             });
         }).catch(function() {
-            tryStart({ video: true }).catch(function(err) {
+            tryStart({ video: true, zoom: { ideal: 1.8 } }).catch(function(err) {
                 lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
             });
         });
@@ -202,14 +202,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function iniciarOCRPatente() {
         if (intervalOCR) return;
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false })
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 }, zoom: { ideal: 1.8 } }, audio: false })
             .then(function(stream) {
                 videoStream = stream;
                 videoPatente.srcObject = stream;
                 return videoPatente.play();
             }).then(function() { intervalOCR = setInterval(capturarYReconocer, 2000); })
             .catch(function() {
-                navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
+                navigator.mediaDevices.getUserMedia({ video: { zoom: { ideal: 1.8 } }, audio: false }).then(function(stream) {
                     videoStream = stream;
                     videoPatente.srcObject = stream;
                     videoPatente.play().then(function() { intervalOCR = setInterval(capturarYReconocer, 2000); });

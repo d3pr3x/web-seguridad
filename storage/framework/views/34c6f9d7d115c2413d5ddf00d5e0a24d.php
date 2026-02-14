@@ -1,24 +1,79 @@
-@extends('layouts.usuario')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-gray-100 flex">
-    <x-usuario.sidebar />
+    <?php if (isset($component)) { $__componentOriginal43bea641c2438270a49238c99ecefb58 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal43bea641c2438270a49238c99ecefb58 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.sidebar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('usuario.sidebar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal43bea641c2438270a49238c99ecefb58)): ?>
+<?php $attributes = $__attributesOriginal43bea641c2438270a49238c99ecefb58; ?>
+<?php unset($__attributesOriginal43bea641c2438270a49238c99ecefb58); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal43bea641c2438270a49238c99ecefb58)): ?>
+<?php $component = $__componentOriginal43bea641c2438270a49238c99ecefb58; ?>
+<?php unset($__componentOriginal43bea641c2438270a49238c99ecefb58); ?>
+<?php endif; ?>
 
     <div class="flex-1 lg:ml-64">
-        <x-usuario.header />
-        <x-usuario.mobile-menu />
+        <?php if (isset($component)) { $__componentOriginal68a91bba458c966ce613394dc1ac6078 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal68a91bba458c966ce613394dc1ac6078 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.header','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('usuario.header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal68a91bba458c966ce613394dc1ac6078)): ?>
+<?php $attributes = $__attributesOriginal68a91bba458c966ce613394dc1ac6078; ?>
+<?php unset($__attributesOriginal68a91bba458c966ce613394dc1ac6078); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal68a91bba458c966ce613394dc1ac6078)): ?>
+<?php $component = $__componentOriginal68a91bba458c966ce613394dc1ac6078; ?>
+<?php unset($__componentOriginal68a91bba458c966ce613394dc1ac6078); ?>
+<?php endif; ?>
+        <?php if (isset($component)) { $__componentOriginal34cad1f9e1defdf87895216072b487b3 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal34cad1f9e1defdf87895216072b487b3 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.mobile-menu','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('usuario.mobile-menu'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal34cad1f9e1defdf87895216072b487b3)): ?>
+<?php $attributes = $__attributesOriginal34cad1f9e1defdf87895216072b487b3; ?>
+<?php unset($__attributesOriginal34cad1f9e1defdf87895216072b487b3); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal34cad1f9e1defdf87895216072b487b3)): ?>
+<?php $component = $__componentOriginal34cad1f9e1defdf87895216072b487b3; ?>
+<?php unset($__componentOriginal34cad1f9e1defdf87895216072b487b3); ?>
+<?php endif; ?>
 
         <div class="container mx-auto px-4 py-6 max-w-7xl">
-            @if(session('success'))
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
             <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
-                <p class="font-medium"><i class="fas fa-check-circle mr-2"></i>{{ session('success') }}</p>
+                <p class="font-medium"><i class="fas fa-check-circle mr-2"></i><?php echo e(session('success')); ?></p>
             </div>
-            @endif
-            @if(session('error'))
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
             <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
-                <p class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}</p>
+                <p class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i><?php echo e(session('error')); ?></p>
             </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
             <!-- Información de Usuario (solo móvil) -->
             <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6">
@@ -27,9 +82,9 @@
                         <i class="fas fa-user text-teal-600 text-xl"></i>
                     </div>
                     <div class="flex-1">
-                        <h2 class="text-lg font-bold text-gray-800">{{ auth()->user()->nombre_completo }}</h2>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_perfil }}</p>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_sucursal }}</p>
+                        <h2 class="text-lg font-bold text-gray-800"><?php echo e(auth()->user()->nombre_completo); ?></h2>
+                        <p class="text-sm text-gray-600"><?php echo e(auth()->user()->nombre_perfil); ?></p>
+                        <p class="text-sm text-gray-600"><?php echo e(auth()->user()->nombre_sucursal); ?></p>
                     </div>
                 </div>
             </div>
@@ -53,7 +108,7 @@
                             <p class="text-teal-100 text-sm mt-1">Aprobaciones y revisión</p>
                         </div>
                         <div class="p-4 space-y-3">
-                            <a href="{{ route('admin.documentos.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.documentos.index')); ?>" class="block">
                                 <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -64,7 +119,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.novedades.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.novedades.index')); ?>" class="block">
                                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -75,7 +130,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.reportes-especiales.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.reportes-especiales.index')); ?>" class="block">
                                 <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-r-lg hover:bg-pink-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -101,7 +156,7 @@
                             <p class="text-slate-200 text-sm mt-1">Herramientas administrativas</p>
                         </div>
                         <div class="p-4 space-y-3">
-                            <a href="{{ route('admin.usuarios.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.usuarios.index')); ?>" class="block">
                                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg hover:bg-blue-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -112,7 +167,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.reportes-diarios') }}" class="block">
+                            <a href="<?php echo e(route('admin.reportes-diarios')); ?>" class="block">
                                 <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hover:bg-green-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -123,7 +178,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.reporte-sucursal') }}" class="block">
+                            <a href="<?php echo e(route('admin.reporte-sucursal')); ?>" class="block">
                                 <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -134,7 +189,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.dispositivos.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.dispositivos.index')); ?>" class="block">
                                 <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg hover:bg-orange-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -145,7 +200,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.ubicaciones.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.ubicaciones.index')); ?>" class="block">
                                 <div class="bg-cyan-50 border-l-4 border-cyan-500 p-4 rounded-r-lg hover:bg-cyan-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -156,7 +211,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('admin.sectores.index') }}" class="block">
+                            <a href="<?php echo e(route('admin.sectores.index')); ?>" class="block">
                                 <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg hover:bg-amber-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -174,4 +229,6 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.usuario', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\UrraServer\Documents\Docker\server-apache\web-seguridad\resources\views/administrador/index.blade.php ENDPATH**/ ?>
