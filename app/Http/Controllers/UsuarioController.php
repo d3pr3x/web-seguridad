@@ -53,7 +53,7 @@ class UsuarioController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $reportes = Reporte::where('user_id', $user->id)
+        $reportes = Reporte::where('id_usuario', $user->id_usuario)
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();

@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class DiaTrabajado extends Model
 {
     protected $table = 'dias_trabajados';
+
+    public const CREATED_AT = 'creado_en';
+    public const UPDATED_AT = 'actualizado_en';
     
     protected $fillable = [
-        'user_id',
+        'id_usuario',
         'fecha',
         'ponderacion',
         'observaciones',
@@ -28,6 +31,6 @@ class DiaTrabajado extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
     }
 }

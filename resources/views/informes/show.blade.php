@@ -1,8 +1,18 @@
-@extends('layouts.app')
-
-@section('title', 'Informe de Incidente N° ' . $informe->numero_informe)
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <style>
     .informe-container {
         max-width: 800px;
@@ -290,7 +300,7 @@
             </tr>
             <tr>
                 <td class="label">Elaborado por:</td>
-                <td>{{ $informe->reporte->user->nombre_completo }} ({{ $informe->reporte->user->rut }})</td>
+                <td>{{ $informe->reporte->user->nombre_completo }} ({{ $informe->reporte->user->run }})</td>
             </tr>
             <tr>
                 <td class="label">Sucursal:</td>
@@ -613,6 +623,9 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

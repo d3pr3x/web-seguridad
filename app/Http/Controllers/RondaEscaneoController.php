@@ -100,7 +100,7 @@ class RondaEscaneoController extends Controller
 
         RondaEscaneo::create([
             'punto_ronda_id' => $punto->id,
-            'user_id' => $user->id,
+            'id_usuario' => $user->id_usuario,
             'escaneado_en' => now(),
             'lat' => $lat,
             'lng' => $lng,

@@ -1,8 +1,18 @@
-@extends('layouts.app')
-
-@section('title', 'Mi Perfil')
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -30,39 +40,19 @@
                     @method('PUT')
                     
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="mb-3">
-                                <label for="name" class="form-label">
-                                    <i class="fas fa-user me-1"></i>Nombre
+                                <label for="nombre_completo" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Nombre completo
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" 
-                                       class="form-control @error('name') is-invalid @enderror" 
-                                       id="name" 
-                                       name="name" 
-                                       value="{{ old('name', auth()->user()->name) }}"
+                                       class="form-control @error('nombre_completo') is-invalid @enderror" 
+                                       id="nombre_completo" 
+                                       name="nombre_completo" 
+                                       value="{{ old('nombre_completo', auth()->user()->nombre_completo) }}"
                                        required>
-                                @error('name')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="apellido" class="form-label">
-                                    <i class="fas fa-user me-1"></i>Apellido
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" 
-                                       class="form-control @error('apellido') is-invalid @enderror" 
-                                       id="apellido" 
-                                       name="apellido" 
-                                       value="{{ old('apellido', auth()->user()->apellido) }}"
-                                       required>
-                                @error('apellido')
+                                @error('nombre_completo')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
@@ -74,21 +64,21 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="rut" class="form-label">
-                                    <i class="fas fa-id-card me-1"></i>RUT
+                                <label for="run" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>RUN
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" 
-                                       class="form-control rut-input @error('rut') is-invalid @enderror" 
-                                       id="rut" 
-                                       name="rut" 
-                                       value="{{ old('rut', auth()->user()->rut) }}"
+                                       class="form-control rut-input @error('run') is-invalid @enderror" 
+                                       id="run" 
+                                       name="run" 
+                                       value="{{ old('run', auth()->user()->run) }}"
                                        required
                                        readonly>
                                 <div class="form-text">
-                                    El RUT no se puede modificar por seguridad.
+                                    El RUN no se puede modificar por seguridad.
                                 </div>
-                                @error('rut')
+                                @error('run')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
@@ -232,6 +222,9 @@
                     <i class="fas fa-key me-1"></i>Cambiar Contraseña
                 </a>
             </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

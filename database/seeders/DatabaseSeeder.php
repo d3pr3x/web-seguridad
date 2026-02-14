@@ -2,25 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Orden por dependencias (español). Padres antes que hijos.
+ */
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call([
             SucursalSeeder::class,
+            RolesUsuarioSeeder::class,
+            PermisosSeeder::class,
             UbicacionPermitidaSeeder::class,
-            UserSeeder::class,
+            UsuariosSeeder::class,
+            SectorSeeder::class,
+            TareaSeeder::class,
             TareaNovedadesSeeder::class,
             TareaIncidentesSeeder::class,
+            TareaSeguridadSeeder::class,
+            TareaDetalleSeeder::class,
             FeriadoSeeder::class,
             ConfiguracionSueldoSeeder::class,
+            DispositivoPermitidoSeeder::class,
+            ReunionesSeeder::class,
             ControlAccesoSeeder::class,
         ]);
     }

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tarea extends Model
 {
+    public const CREATED_AT = 'creado_en';
+    public const UPDATED_AT = 'actualizado_en';
+
     protected $fillable = [
         'nombre',
         'descripcion',

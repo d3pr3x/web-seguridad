@@ -144,7 +144,7 @@
                             <div class="p-4">
                                 <div class="space-y-2 mb-4">
                                     <p class="text-sm text-gray-700"><span class="font-semibold">Sucursal:</span> {{ $calculo['usuario']->nombre_sucursal }}</p>
-                                    <p class="text-sm text-gray-700"><span class="font-semibold">RUT:</span> {{ $calculo['usuario']->rut }}</p>
+                                    <p class="text-sm text-gray-700"><span class="font-semibold">RUN:</span> {{ $calculo['usuario']->run }}</p>
                                 </div>
                                 
                                 <div class="border-t border-gray-200 pt-4 mb-4">

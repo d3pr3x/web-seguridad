@@ -92,7 +92,7 @@
                             <option value="">Todos</option>
                             @foreach($usuarios as $u)
                                 <option value="{{ $u->id }}" {{ request('user_id') == $u->id ? 'selected' : '' }}>
-                                    {{ $u->nombre_completo }} ({{ $u->rut }})
+                                    {{ $u->nombre_completo }} ({{ $u->run }})
                                 </option>
                             @endforeach
                         </select>
@@ -199,7 +199,7 @@
                                         <div>
                                             <p class="text-gray-600 text-sm">Usuario</p>
                                             <p class="font-semibold text-gray-800">{{ $doc->user->nombre_completo }}</p>
-                                            <p class="text-sm text-gray-600">{{ $doc->user->rut }}</p>
+                                            <p class="text-sm text-gray-600">{{ $doc->user->run }}</p>
                                             <p class="text-xs text-gray-500">{{ $doc->user->nombre_sucursal }}</p>
                                         </div>
                                         <div>

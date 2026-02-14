@@ -1,40 +1,39 @@
-<!-- Header móvil (solo visible en móvil) -->
-<div class="lg:hidden bg-gradient-to-r from-blue-600 to-blue-700 text-white sticky top-0 z-50 shadow-lg">
-    <div class="px-4 py-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-xl font-bold">Portal {{ auth()->user()->nombre_perfil }}</h1>
-                <p class="text-sm text-blue-100">{{ auth()->user()->nombre_completo }}</p>
+<!-- Header móvil: mismo estilo que el menú (fondo oscuro, texto claro) -->
+<div class="d-lg-none sticky top-0 z-50 border-bottom" style="background: var(--app-sidebar); border-color: rgba(148,163,184,0.2) !important;">
+    <div class="px-3 py-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="min-w-0">
+                <p class="mb-0 small fw-semibold text-white text-truncate">Portal {{ auth()->user()->nombre_perfil }}</p>
+                <p class="mb-0 small text-truncate" style="color: var(--app-sidebar-text);">{{ auth()->user()->nombre_completo }}</p>
             </div>
-            <button onclick="toggleMenu()" class="p-2 hover:bg-blue-500 rounded-lg transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
+            <button type="button" onclick="toggleMenu()" class="btn btn-link p-2 rounded text-decoration-none d-flex align-items-center justify-content-center" style="color: var(--app-sidebar-text); min-width: 2.5rem;">
+                <i class="fas fa-bars"></i>
             </button>
         </div>
     </div>
 </div>
 
-<!-- Header Desktop (solo visible en escritorio) -->
-<div class="hidden lg:block bg-white shadow-sm sticky top-0 z-40">
-    <div class="px-6 py-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Bienvenido, {{ auth()->user()->name }}</h1>
-                <p class="text-sm text-gray-600">{{ auth()->user()->nombre_sucursal }}</p>
+<!-- Header Desktop: mismo estilo que el menú (fondo oscuro, texto claro) -->
+<div class="d-none d-lg-block sticky top-0 z-40 border-bottom" style="background: var(--app-sidebar); border-color: rgba(148,163,184,0.2) !important;">
+    <div class="px-4 py-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="min-w-0">
+                <p class="mb-0 fw-semibold text-white">Bienvenido, {{ auth()->user()->nombre_completo }}</p>
+                <p class="mb-0 small text-truncate" style="color: var(--app-sidebar-text);">{{ auth()->user()->nombre_sucursal }}</p>
             </div>
-            <div class="flex items-center space-x-4">
-                <div class="text-right">
-                    <p class="text-sm font-medium text-gray-700">{{ auth()->user()->nombre_completo }}</p>
-                    <p class="text-xs text-gray-500">{{ auth()->user()->nombre_perfil }} • RUT: {{ auth()->user()->rut }}</p>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-xl-block">
+                    <p class="mb-0 small fw-medium text-white">{{ auth()->user()->nombre_completo }}</p>
+                    <p class="mb-0 small" style="color: var(--app-sidebar-text);">{{ auth()->user()->nombre_perfil }} • RUN: {{ auth()->user()->run }}</p>
                 </div>
-                <div class="bg-blue-100 rounded-full p-3">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
+                <div class="rounded-circle p-2 d-flex align-items-center justify-content-center" style="background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);">
+                    <i class="fas fa-user"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<style>
+/* Hover del botón menú en header */
+[onclick="toggleMenu()"]:hover { background: rgba(51,65,85,0.5) !important; color: #f1f5f9 !important; }
+</style>

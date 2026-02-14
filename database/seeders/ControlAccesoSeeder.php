@@ -25,7 +25,7 @@ class ControlAccesoSeeder extends Seeder
                 'rut' => '11111111-1',
                 'nombre' => 'Juan Pérez',
                 'patente' => null,
-                'guardia_id' => $guardia->id,
+                'id_guardia' => $guardia->id_usuario,
                 'estado' => 'ingresado',
                 'alerta_blacklist' => false,
             ],
@@ -34,7 +34,7 @@ class ControlAccesoSeeder extends Seeder
                 'rut' => '22222222-2',
                 'nombre' => 'Ana López',
                 'patente' => null,
-                'guardia_id' => $guardia->id,
+                'id_guardia' => $guardia->id_usuario,
                 'estado' => 'salida',
                 'alerta_blacklist' => false,
             ],
@@ -43,16 +43,16 @@ class ControlAccesoSeeder extends Seeder
                 'rut' => '33333333-3',
                 'nombre' => 'Pedro Soto',
                 'patente' => 'ABCD12',
-                'guardia_id' => $guardia->id,
+                'id_guardia' => $guardia->id_usuario,
                 'estado' => 'ingresado',
                 'alerta_blacklist' => false,
             ],
             [
                 'tipo' => 'vehicular',
                 'rut' => '44444444-4',
-                'nombre' => null,
+                'nombre' => 'Vehículo XYZW89',
                 'patente' => 'XYZW89',
-                'guardia_id' => $guardia->id,
+                'id_guardia' => $guardia->id_usuario,
                 'estado' => 'salida',
                 'alerta_blacklist' => false,
             ],
@@ -61,7 +61,7 @@ class ControlAccesoSeeder extends Seeder
                 'rut' => '55555555-5',
                 'nombre' => 'Persona bloqueada',
                 'patente' => null,
-                'guardia_id' => $guardia->id,
+                'id_guardia' => $guardia->id_usuario,
                 'estado' => 'bloqueado',
                 'alerta_blacklist' => true,
             ],
@@ -71,7 +71,7 @@ class ControlAccesoSeeder extends Seeder
             Ingreso::firstOrCreate(
                 [
                     'rut' => $i['rut'],
-                    'guardia_id' => $guardia->id,
+                    'id_guardia' => $guardia->id_usuario,
                     'fecha_ingreso' => now()->subHours(count($ingresos) - $idx),
                 ],
                 array_merge($i, [
@@ -89,7 +89,7 @@ class ControlAccesoSeeder extends Seeder
                 'fecha_inicio' => now()->toDateString(),
                 'fecha_fin' => null,
                 'activo' => true,
-                'created_by' => $guardia->id,
+                'creado_por' => $guardia->id_usuario,
             ]
         );
         if (!Blacklist::where('patente', 'ZZZZ99')->exists()) {
@@ -100,7 +100,7 @@ class ControlAccesoSeeder extends Seeder
                 'fecha_inicio' => now()->toDateString(),
                 'fecha_fin' => null,
                 'activo' => true,
-                'created_by' => $guardia->id,
+                'creado_por' => $guardia->id_usuario,
             ]);
         }
     }

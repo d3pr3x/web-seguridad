@@ -42,13 +42,13 @@ class ReporteDiarioController extends Controller
                     $q->where('sucursal_id', $sucursalId);
                 });
             })
-            ->orderBy('created_at', 'desc')
+            ->orderBy('creado_en', 'desc')
             ->get();
         
         // Estadísticas
         $totalReportes = $reportes->count();
         $totalDiasTrabajados = $diasTrabajados->count();
-        $usuariosActivos = $diasTrabajados->pluck('user_id')->unique()->count();
+        $usuariosActivos = $diasTrabajados->pluck('id_usuario')->unique()->count();
         
         // Agrupar por sucursal
         $reportesPorSucursal = $reportes->groupBy('user.sucursal.nombre');

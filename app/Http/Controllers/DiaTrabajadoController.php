@@ -16,7 +16,7 @@ class DiaTrabajadoController extends Controller
         $usuario = auth()->user();
         $mesActual = Carbon::now()->format('Y-m');
         
-        $diasTrabajados = DiaTrabajado::where('user_id', $usuario->id)
+        $diasTrabajados = DiaTrabajado::where('id_usuario', $usuario->id_usuario)
             ->whereRaw("TO_CHAR(fecha, 'YYYY-MM') = ?", [$mesActual])
             ->orderBy('fecha', 'desc')
             ->get();
@@ -48,7 +48,7 @@ class DiaTrabajadoController extends Controller
         $usuario = auth()->user();
         
         // Verificar que no exista ya un registro para esa fecha
-        $existe = DiaTrabajado::where('user_id', $usuario->id)
+        $existe = DiaTrabajado::where('id_usuario', $usuario->id_usuario)
             ->where('fecha', $request->fecha)
             ->exists();
 
@@ -57,7 +57,7 @@ class DiaTrabajadoController extends Controller
         }
 
         DiaTrabajado::create([
-            'user_id' => $usuario->id,
+            'id_usuario' => $usuario->id_usuario,
             'fecha' => $request->fecha,
             'ponderacion' => $request->ponderacion,
             'observaciones' => $request->observaciones,
@@ -72,7 +72,7 @@ class DiaTrabajadoController extends Controller
     public function edit($id)
     {
         $diaTrabajado = DiaTrabajado::where('id', $id)
-            ->where('user_id', auth()->id())
+            ->where('id_usuario', auth()->id())
             ->firstOrFail();
 
         return view('dias-trabajados.edit', compact('diaTrabajado'));
@@ -90,11 +90,11 @@ class DiaTrabajadoController extends Controller
         ]);
 
         $diaTrabajado = DiaTrabajado::where('id', $id)
-            ->where('user_id', auth()->id())
+            ->where('id_usuario', auth()->id())
             ->firstOrFail();
 
         // Verificar que no exista otro registro para esa fecha (excluyendo el actual)
-        $existe = DiaTrabajado::where('user_id', auth()->id())
+        $existe = DiaTrabajado::where('id_usuario', auth()->id())
             ->where('fecha', $request->fecha)
             ->where('id', '!=', $id)
             ->exists();
@@ -118,7 +118,7 @@ class DiaTrabajadoController extends Controller
     public function destroy($id)
     {
         $diaTrabajado = DiaTrabajado::where('id', $id)
-            ->where('user_id', auth()->id())
+            ->where('id_usuario', auth()->id())
             ->firstOrFail();
 
         $diaTrabajado->delete();

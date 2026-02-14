@@ -80,13 +80,13 @@
                         <!-- RUT -->
                         <div class="bg-gray-50 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-600 mb-1">RUT</label>
-                            <p class="text-gray-900 font-medium">{{ $user->rut }}</p>
+                            <p class="text-gray-900 font-medium">{{ $user->run }}</p>
                         </div>
 
                         <!-- Usuario -->
                         <div class="bg-gray-50 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Usuario</label>
-                            <p class="text-gray-900 font-medium">{{ $user->name }}</p>
+                            <p class="text-gray-900 font-medium">{{ $user->nombre_completo }}</p>
                         </div>
 
                         <!-- Email -->
@@ -119,11 +119,11 @@
                         <div class="bg-gray-50 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Perfil</label>
                             <p class="text-gray-900 font-medium">
-                                @if($user->perfil === 1)
+                                @if($user->esAdministrador())
                                     <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-purple-100 text-purple-800">
                                         Administrador
                                     </span>
-                                @elseif($user->perfil === 2 || $user->perfil === 3)
+                                @elseif($user->esSupervisor())
                                     <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
                                         {{ $user->nombre_perfil }}
                                     </span>

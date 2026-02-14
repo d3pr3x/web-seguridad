@@ -74,9 +74,9 @@ class LoginController extends Controller
             }
         }
         
-        $user = User::where('rut', $rut)->first();
+        $user = User::where('run', $rut)->first();
 
-        if ($user && Hash::check($request->password, $user->password)) {
+        if ($user && Hash::check($request->password, $user->clave)) {
             // Actualizar el fingerprint del dispositivo si es diferente
             if ($user->browser_fingerprint !== $request->browser_fingerprint) {
                 $user->update([

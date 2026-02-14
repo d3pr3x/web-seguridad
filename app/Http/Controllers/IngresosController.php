@@ -23,8 +23,8 @@ class IngresosController extends Controller
         if ($request->filled('fecha_hasta')) {
             $query->whereDate('fecha_ingreso', '<=', $request->fecha_hasta);
         }
-        if ($request->filled('guardia_id')) {
-            $query->where('guardia_id', $request->guardia_id);
+        if ($request->filled('id_guardia')) {
+            $query->where('id_guardia', $request->id_guardia);
         }
         if ($request->filled('tipo')) {
             $query->where('tipo', $request->tipo);
@@ -103,7 +103,7 @@ class IngresosController extends Controller
                 'rut' => $rut,
                 'nombre' => $nombre,
                 'patente' => $patente,
-                'guardia_id' => auth()->id(),
+                'id_guardia' => auth()->id(),
                 'estado' => 'bloqueado',
                 'alerta_blacklist' => true,
                 'ip_ingreso' => $request->ip(),
@@ -130,7 +130,7 @@ class IngresosController extends Controller
             'rut' => $rut,
             'nombre' => $nombre,
             'patente' => $patente,
-            'guardia_id' => auth()->id(),
+            'id_guardia' => auth()->id(),
             'estado' => 'ingresado',
             'alerta_blacklist' => false,
             'ip_ingreso' => $request->ip(),
@@ -228,7 +228,7 @@ class IngresosController extends Controller
                     $i->rut,
                     $i->nombre,
                     $i->patente ?? '',
-                    $i->guardia?->name ?? '',
+                    $i->guardia?->nombre_completo ?? '',
                     $i->estado,
                     $i->alerta_blacklist ? 'Sí' : 'No',
                 ], ';');

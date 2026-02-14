@@ -23,8 +23,8 @@ class RondaReporteController extends Controller
         if ($request->filled('sucursal_id')) {
             $query->whereHas('puntoRonda', fn ($q) => $q->where('sucursal_id', $request->sucursal_id));
         }
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($request->filled('id_usuario')) {
+            $query->where('id_usuario', $request->id_usuario);
         }
         if ($request->filled('fecha_desde')) {
             $query->whereDate('escaneado_en', '>=', $request->fecha_desde);
@@ -37,7 +37,7 @@ class RondaReporteController extends Controller
 
         $usuarios = collect();
         if ($request->filled('sucursal_id')) {
-            $usuarios = User::where('sucursal_id', $request->sucursal_id)->orderBy('name')->get(['id', 'name', 'apellido']);
+            $usuarios = User::where('sucursal_id', $request->sucursal_id)->orderBy('nombre_completo')->get(['id_usuario', 'nombre_completo']);
         }
 
         return view('admin.rondas.reporte', compact('sucursales', 'escaneos', 'usuarios'));

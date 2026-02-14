@@ -15,19 +15,19 @@ class ControlAccesoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\SucursalSeeder::class);
+        $this->seed([\Database\Seeders\RolesUsuarioSeeder::class, \Database\Seeders\SucursalSeeder::class]);
     }
 
     public function test_ingresos_index_requiere_guardia_o_admin(): void
     {
-        $admin = User::factory()->administrador()->create(['rut' => '12345678-9']);
+        $admin = User::factory()->administrador()->create(['run' => '12345678-9']);
         $response = $this->actingAs($admin)->get(route('ingresos.index'));
         $response->assertStatus(200);
     }
 
     public function test_store_ingreso_peatonal_ok(): void
     {
-        $admin = User::factory()->administrador()->create(['rut' => '12345678-9']);
+        $admin = User::factory()->administrador()->create(['run' => '12345678-9']);
         $response = $this->actingAs($admin)->postJson(route('ingresos.store'), [
             'tipo' => 'peatonal',
             'rut' => '11111111-1',
@@ -45,7 +45,7 @@ class ControlAccesoTest extends TestCase
 
     public function test_store_ingreso_vehicular_ok(): void
     {
-        $admin = User::factory()->administrador()->create(['rut' => '12345678-9']);
+        $admin = User::factory()->administrador()->create(['run' => '12345678-9']);
         $response = $this->actingAs($admin)->postJson(route('ingresos.store'), [
             'tipo' => 'vehicular',
             'patente' => 'ABCD12',
@@ -61,13 +61,13 @@ class ControlAccesoTest extends TestCase
 
     public function test_salida_registra_fecha_salida(): void
     {
-        $admin = User::factory()->administrador()->create(['rut' => '12345678-9']);
+        $admin = User::factory()->administrador()->create(['run' => '12345678-9']);
         $ingreso = Ingreso::create([
             'tipo' => 'peatonal',
             'rut' => '22222222-2',
             'nombre' => 'Test',
             'patente' => null,
-            'guardia_id' => $admin->id,
+            'id_guardia' => $admin->id_usuario,
             'estado' => 'ingresado',
             'alerta_blacklist' => false,
         ]);
@@ -82,14 +82,14 @@ class ControlAccesoTest extends TestCase
 
     public function test_blacklist_bloquea_ingreso(): void
     {
-        $admin = User::factory()->administrador()->create(['rut' => '12345678-9']);
+        $admin = User::factory()->administrador()->create(['run' => '12345678-9']);
         Blacklist::create([
             'rut' => '55555555-5',
             'patente' => null,
             'motivo' => 'No autorizado',
             'fecha_inicio' => now()->toDateString(),
             'activo' => true,
-            'created_by' => $admin->id,
+            'creado_por' => $admin->id_usuario,
         ]);
         $response = $this->actingAs($admin)->postJson(route('ingresos.store'), [
             'tipo' => 'peatonal',

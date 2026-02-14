@@ -34,17 +34,11 @@
                     @method('PUT')
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre <span class="text-red-500">*</span></label>
-                            <input type="text" id="name" name="name" value="{{ old('name', $usuario->name) }}" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('name') border-red-500 @enderror">
-                            @error('name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido <span class="text-red-500">*</span></label>
-                            <input type="text" id="apellido" name="apellido" value="{{ old('apellido', $usuario->apellido) }}" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('apellido') border-red-500 @enderror">
-                            @error('apellido')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        <div class="md:col-span-2">
+                            <label for="nombre_completo" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo <span class="text-red-500">*</span></label>
+                            <input type="text" id="nombre_completo" name="nombre_completo" value="{{ old('nombre_completo', $usuario->nombre_completo) }}" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('nombre_completo') border-red-500 @enderror">
+                            @error('nombre_completo')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
@@ -56,10 +50,10 @@
                             @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
                         <div>
-                            <label for="rut" class="block text-sm font-medium text-gray-700 mb-1">RUT <span class="text-red-500">*</span></label>
-                            <input type="text" id="rut" name="rut" value="{{ old('rut', $usuario->rut) }}" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('rut') border-red-500 @enderror">
-                            @error('rut')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                            <label for="run" class="block text-sm font-medium text-gray-700 mb-1">RUN <span class="text-red-500">*</span></label>
+                            <input type="text" id="run" name="run" value="{{ old('run', $usuario->run) }}" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('run') border-red-500 @enderror">
+                            @error('run')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
@@ -81,14 +75,13 @@
 
                     <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="perfil" class="block text-sm font-medium text-gray-700 mb-1">Perfil <span class="text-red-500">*</span></label>
-                            <select id="perfil" name="perfil" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('perfil') border-red-500 @enderror">
-                                <option value="4" {{ old('perfil', $usuario->perfil) == 4 ? 'selected' : '' }}>Usuario</option>
-                                <option value="3" {{ old('perfil', $usuario->perfil) == 3 ? 'selected' : '' }}>Supervisor-Usuario</option>
-                                <option value="2" {{ old('perfil', $usuario->perfil) == 2 ? 'selected' : '' }}>Supervisor</option>
-                                <option value="1" {{ old('perfil', $usuario->perfil) == 1 ? 'selected' : '' }}>Administrador</option>
+                            <label for="rol_id" class="block text-sm font-medium text-gray-700 mb-1">Rol <span class="text-red-500">*</span></label>
+                            <select id="rol_id" name="rol_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 @error('rol_id') border-red-500 @enderror">
+                                @foreach($roles as $rol)
+                                    <option value="{{ $rol->id }}" {{ old('rol_id', $usuario->rol_id) == $rol->id ? 'selected' : '' }}>{{ $rol->nombre }}</option>
+                                @endforeach
                             </select>
-                            @error('perfil')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                            @error('rol_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
                         <div>
                             <label for="sucursal_id" class="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>

@@ -24,16 +24,14 @@ class ProfileController extends Controller
         $user = auth()->user();
         
         $request->validate([
-            'name' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
+            'nombre_completo' => 'required|string|max:255',
             'fecha_nacimiento' => 'required|date|before:today',
             'domicilio' => 'required|string|max:500',
             'sucursal_id' => 'nullable|exists:sucursales,id',
         ]);
 
         $user->update([
-            'name' => $request->name,
-            'apellido' => $request->apellido,
+            'nombre_completo' => $request->nombre_completo,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'domicilio' => $request->domicilio,
             'sucursal_id' => $request->sucursal_id,
@@ -64,7 +62,7 @@ class ProfileController extends Controller
         ]);
 
         $user->update([
-            'password' => Hash::make($request->password),
+            'clave' => Hash::make($request->password),
         ]);
 
         return redirect()->route('profile.index')

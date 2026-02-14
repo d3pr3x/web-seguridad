@@ -6,20 +6,45 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Sistema de Seguridad')</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
+        :root {
+            --app-font: 'DM Sans', system-ui, sans-serif;
+            --app-primary: #0f766e;
+            --app-primary-hover: #0d9488;
+            --app-surface: #f8fafc;
+            --app-card: #ffffff;
+            --app-border: #e2e8f0;
+            --app-text: #1e293b;
+            --app-text-muted: #64748b;
+            --app-nav-bg: #0f172a;
+            --app-nav-text: #f1f5f9;
+        }
+        body {
+            font-family: var(--app-font);
+            background: var(--app-surface);
+            color: var(--app-text);
+        }
         .navbar-brand {
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
         }
         .card {
-            transition: transform 0.2s;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            border: 1px solid var(--app-border);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         .card:hover {
-            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
         .btn-task {
             min-height: 120px;
@@ -29,29 +54,82 @@
             justify-content: center;
             text-decoration: none;
             color: white;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 20px;
             padding: 20px;
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .btn-task:hover {
             color: white;
             text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 118, 110, 0.25);
         }
         .btn-task i {
             font-size: 2rem;
             margin-bottom: 10px;
         }
         .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--app-primary) 0%, #115e59 100%);
             color: white;
+            border: none;
         }
         .footer {
-            background-color: #f8f9fa;
-            padding: 20px 0;
-            margin-top: 50px;
+            background: var(--app-card);
+            border-top: 1px solid var(--app-border);
+            padding: 24px 0;
+            margin-top: 48px;
+        }
+        .footer p {
+            color: var(--app-text-muted);
+            font-size: 0.875rem;
+        }
+        .form-control, .input-group-text {
+            border-radius: 8px;
+            border-color: var(--app-border);
+        }
+        .form-control:focus {
+            border-color: var(--app-primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+        }
+        .btn-primary {
+            background: var(--app-primary);
+            border-color: var(--app-primary);
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background: var(--app-primary-hover);
+            border-color: var(--app-primary-hover);
+        }
+        .btn-outline-app {
+            border: 1px solid var(--app-primary);
+            color: var(--app-primary);
+            background: transparent;
+        }
+        .btn-outline-app:hover {
+            background: rgba(15, 118, 110, 0.08);
+            color: var(--app-primary);
+            border-color: var(--app-primary);
+        }
+        .dropdown-menu {
+            border-radius: 10px;
+            border: 1px solid var(--app-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .dropdown-item {
+            border-radius: 6px;
+            margin: 2px 6px;
+        }
+        .dropdown-item:hover {
+            background: var(--app-surface);
+        }
+        .alert {
+            border-radius: 10px;
+            border: 1px solid transparent;
         }
         
-        /* Responsividad móvil */
         @media (max-width: 768px) {
             .btn-task {
                 min-height: 100px;
@@ -71,8 +149,8 @@
                 font-size: 1rem;
             }
             .container {
-                padding-left: 10px;
-                padding-right: 10px;
+                padding-left: 12px;
+                padding-right: 12px;
             }
             .card-body {
                 padding: 1rem;
@@ -118,7 +196,7 @@
 </head>
 <body>
     @auth
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: var(--app-nav-bg);">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
                 <i class="fas fa-shield-alt me-2"></i>Sistema de Seguridad
@@ -153,8 +231,8 @@
                             <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'constancias']) }}">
                                 <i class="fas fa-file-signature me-1"></i>Constancias
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'concurrencia_carabineros']) }}">
-                                <i class="fas fa-user-shield me-1"></i>Concurrencia de Carabineros
+                            <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'concurrencia_autoridades']) }}">
+                                <i class="fas fa-user-shield me-1"></i>Concurrencia de autoridades
                             </a></li>
                             <li><a class="dropdown-item" href="{{ route('acciones.create', ['tipo' => 'concurrencia_servicios']) }}">
                                 <i class="fas fa-ambulance me-1"></i>Concurrencia de Servicios
@@ -278,7 +356,7 @@
 
     <footer class="footer">
         <div class="container text-center">
-            <p class="text-muted mb-0">&copy; {{ date('Y') }} Sistema de Seguridad. Todos los derechos reservados.</p>
+            <p class="mb-0">&copy; {{ date('Y') }} Sistema de Seguridad. Todos los derechos reservados.</p>
         </div>
     </footer>
 

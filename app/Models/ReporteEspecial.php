@@ -9,7 +9,7 @@ class ReporteEspecial extends Model
     protected $table = 'reportes_especiales';
     
     protected $fillable = [
-        'user_id',
+        'id_usuario',
         'sucursal_id',
         'sector_id',
         'tipo',
@@ -63,7 +63,7 @@ class ReporteEspecial extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
     }
 
     /**

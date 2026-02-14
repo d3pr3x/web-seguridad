@@ -45,7 +45,7 @@
                                 <option value="inicio_servicio" {{ request('tipo') == 'inicio_servicio' ? 'selected' : '' }}>Inicio del Servicio</option>
                                 <option value="rondas" {{ request('tipo') == 'rondas' ? 'selected' : '' }}>Rondas</option>
                                 <option value="constancias" {{ request('tipo') == 'constancias' ? 'selected' : '' }}>Constancias</option>
-                                <option value="concurrencia_carabineros" {{ request('tipo') == 'concurrencia_carabineros' ? 'selected' : '' }}>Concurrencia Carabineros</option>
+                                <option value="concurrencia_autoridades" {{ request('tipo') == 'concurrencia_autoridades' ? 'selected' : '' }}>Concurrencia de autoridades</option>
                                 <option value="concurrencia_servicios" {{ request('tipo') == 'concurrencia_servicios' ? 'selected' : '' }}>Concurrencia Servicios</option>
                                 <option value="entrega_servicio" {{ request('tipo') == 'entrega_servicio' ? 'selected' : '' }}>Entrega del Servicio</option>
                             </select>

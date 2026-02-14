@@ -48,7 +48,7 @@ class ReporteController extends Controller
 
             // Crear reporte
             $reporte = Reporte::create([
-                'user_id' => $usuario->id,
+                'id_usuario' => $usuario->id_usuario,
                 'tarea_id' => $tarea->id,
                 'datos' => $request->datos,
                 'imagenes' => $imagenes,
@@ -75,7 +75,7 @@ class ReporteController extends Controller
     {
         $usuario = auth()->user();
         $reportes = Reporte::with('tarea')
-            ->where('user_id', $usuario->id)
+            ->where('id_usuario', $usuario->id_usuario)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -89,7 +89,7 @@ class ReporteController extends Controller
     {
         $reporte = Reporte::with(['tarea', 'user'])
             ->where('id', $id)
-            ->where('user_id', auth()->id())
+            ->where('id_usuario', auth()->id())
             ->firstOrFail();
 
         return view('reportes.show', compact('reporte'));

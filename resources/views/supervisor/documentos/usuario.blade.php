@@ -1,13 +1,25 @@
-@extends('layouts.app')
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="h3 mb-0">Documentos de {{ $user->nombre_completo }}</h1>
-                    <p class="text-muted">RUT: {{ $user->rut }} | Sucursal: {{ $user->nombre_sucursal }}</p>
+                    <p class="text-muted">RUN: {{ $user->run }} | Sucursal: {{ $user->nombre_sucursal }}</p>
                 </div>
                 <a href="{{ route('supervisor.documentos.usuarios') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-2"></i> Volver
@@ -130,6 +142,9 @@
         </div>
     </div>
     @endif
+</div>
+        </div>
+    </div>
 </div>
 @endsection
 

@@ -23,8 +23,8 @@ class DocumentoPersonalController extends Controller
             $query->where('tipo_documento', $request->tipo_documento);
         }
         
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($request->filled('id_usuario')) {
+            $query->where('id_usuario', $request->id_usuario);
         }
         
         $documentos = $query->orderBy('created_at', 'desc')->paginate(20);
@@ -36,7 +36,7 @@ class DocumentoPersonalController extends Controller
             'total' => DocumentoPersonal::count(),
         ];
         
-        $usuarios = User::orderBy('name')->orderBy('apellido')->get();
+        $usuarios = User::orderBy('nombre_completo')->get();
         
         return view('supervisor.documentos.index', compact('documentos', 'estadisticas', 'usuarios'));
     }
@@ -65,7 +65,7 @@ class DocumentoPersonalController extends Controller
         
         $documento->update([
             'estado' => 'aprobado',
-            'aprobado_por' => $user->id,
+            'aprobado_por' => $user->id_usuario,
             'aprobado_en' => now(),
         ]);
         
@@ -89,7 +89,7 @@ class DocumentoPersonalController extends Controller
         $documento->update([
             'estado' => 'rechazado',
             'motivo_rechazo' => $validated['motivo_rechazo'],
-            'aprobado_por' => $user->id,
+            'aprobado_por' => $user->id_usuario,
             'aprobado_en' => now(),
         ]);
         
@@ -100,7 +100,7 @@ class DocumentoPersonalController extends Controller
     {
         $usuarios = User::with(['documentosPersonales' => function($query) {
             $query->where('estado', 'aprobado');
-        }])->orderBy('name')->orderBy('apellido')->get();
+        }])->orderBy('nombre_completo')->get();
         
         return view('supervisor.documentos.usuarios', compact('usuarios'));
     }

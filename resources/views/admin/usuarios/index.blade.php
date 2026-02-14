@@ -40,7 +40,7 @@
                     <div class="flex-1 min-w-[200px]">
                         <label for="buscar" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                         <input type="text" id="buscar" name="buscar" value="{{ request('buscar') }}"
-                               placeholder="Nombre, apellido, email o RUT"
+                               placeholder="Nombre, email o RUN"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
                     </div>
                     <div class="w-48">
@@ -53,13 +53,12 @@
                         </select>
                     </div>
                     <div class="w-48">
-                        <label for="perfil" class="block text-sm font-medium text-gray-700 mb-1">Perfil</label>
-                        <select id="perfil" name="perfil" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                        <label for="rol_id" class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+                        <select id="rol_id" name="rol_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
                             <option value="">Todos</option>
-                            <option value="1" {{ request('perfil') === '1' ? 'selected' : '' }}>Administrador</option>
-                            <option value="2" {{ request('perfil') === '2' ? 'selected' : '' }}>Supervisor</option>
-                            <option value="3" {{ request('perfil') === '3' ? 'selected' : '' }}>Supervisor-Usuario</option>
-                            <option value="4" {{ request('perfil') === '4' ? 'selected' : '' }}>Usuario</option>
+                            @foreach($roles as $rol)
+                                <option value="{{ $rol->id }}" {{ request('rol_id') == $rol->id ? 'selected' : '' }}>{{ $rol->nombre }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800">Filtrar</button>
@@ -87,18 +86,21 @@
                                         <span class="font-medium text-gray-900">{{ $u->nombre_completo }}</span>
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-600">
-                                        <div>{{ $u->rut }}</div>
+                                        <div>{{ $u->run }}</div>
                                         <div class="text-gray-500">{{ $u->email }}</div>
                                     </td>
                                     <td class="px-4 py-3">
+                                        @if($u->rol)
                                         <span class="px-2 py-1 text-xs font-medium rounded-full
-                                            @if($u->perfil == 1) bg-red-100 text-red-800
-                                            @elseif($u->perfil == 2) bg-purple-100 text-purple-800
-                                            @elseif($u->perfil == 3) bg-indigo-100 text-indigo-800
+                                            @if($u->rol_id == 1) bg-red-100 text-red-800
+                                            @elseif($u->rol_id == 2) bg-purple-100 text-purple-800
+                                            @elseif($u->rol_id == 3) bg-indigo-100 text-indigo-800
                                             @else bg-blue-100 text-blue-800
                                             @endif">
-                                            {{ $u->nombre_perfil }}
+                                            {{ $u->rol->nombre }}
                                         </span>
+                                        @else —
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-600">{{ $u->nombre_sucursal }}</td>
                                     <td class="px-4 py-3 text-right">

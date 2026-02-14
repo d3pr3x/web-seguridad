@@ -2,216 +2,158 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Modelo Usuario (tabla usuarios). PK: id_usuario, identificador: run (ej. 987403M).
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'usuarios';
+
+    protected $primaryKey = 'id_usuario';
+
+    public const CREATED_AT = 'creado_en';
+    public const UPDATED_AT = 'actualizado_en';
+
     protected $fillable = [
-        'name',
+        'run',
+        'nombre_completo',
+        'rango',
         'email',
-        'rut',
-        'perfil',
-        'apellido',
+        'clave',
         'fecha_nacimiento',
         'domicilio',
+        'rol_id',
         'sucursal_id',
         'browser_fingerprint',
         'dispositivo_verificado',
-        'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
+        'clave',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'email_verificado_en' => 'datetime',
             'fecha_nacimiento' => 'date',
-            'password' => 'hashed',
+            'clave' => 'hashed',
             'dispositivo_verificado' => 'boolean',
         ];
     }
 
-    /**
-     * Relación con sucursal
-     */
+    public function getAuthPassword()
+    {
+        return $this->clave;
+    }
+
     public function sucursal()
     {
         return $this->belongsTo(Sucursal::class);
     }
 
-    /**
-     * Relación con días trabajados
-     */
+    public function rol()
+    {
+        return $this->belongsTo(RolUsuario::class, 'rol_id');
+    }
+
     public function diasTrabajados()
     {
-        return $this->hasMany(DiaTrabajado::class);
+        return $this->hasMany(DiaTrabajado::class, 'id_usuario');
     }
 
-    /**
-     * Relación con reportes
-     */
     public function reportes()
     {
-        return $this->hasMany(Reporte::class);
+        return $this->hasMany(Reporte::class, 'id_usuario');
     }
 
-    /**
-     * Relación con acciones (novedades)
-     */
     public function acciones()
     {
-        return $this->hasMany(\App\Models\Accion::class);
+        return $this->hasMany(Accion::class, 'id_usuario');
     }
 
-    /**
-     * Relación con reportes especiales
-     */
     public function reportesEspeciales()
     {
-        return $this->hasMany(\App\Models\ReporteEspecial::class);
+        return $this->hasMany(ReporteEspecial::class, 'id_usuario');
     }
 
-    /**
-     * Relación con documentos personales
-     */
     public function documentosPersonales()
     {
-        return $this->hasMany(DocumentoPersonal::class);
+        return $this->hasMany(DocumentoPersonal::class, 'id_usuario');
     }
 
-    /**
-     * Relación con escaneos de ronda QR
-     */
     public function rondaEscaneos()
     {
-        return $this->hasMany(RondaEscaneo::class);
+        return $this->hasMany(RondaEscaneo::class, 'id_usuario');
     }
 
-    /**
-     * Ingresos registrados por este guardia (control de acceso)
-     */
     public function ingresosRegistrados()
     {
-        return $this->hasMany(Ingreso::class, 'guardia_id');
+        return $this->hasMany(Ingreso::class, 'id_guardia');
     }
 
-    /**
-     * Verificar si es guardia de control de acceso (perfil 5 = control_acceso)
-     */
     public function esGuardiaControlAcceso()
     {
-        return $this->perfil === 5;
+        return $this->rol && $this->rol->slug === 'GUARDIA';
     }
 
-    /**
-     * Obtener el nombre completo del usuario
-     */
-    public function getNombreCompletoAttribute()
+    public function getNombreCompletoAttribute($value)
     {
-        return $this->name . ' ' . $this->apellido;
+        return $value ?? $this->attributes['nombre_completo'] ?? '';
     }
 
-    /**
-     * Obtener el nombre de la sucursal
-     */
     public function getNombreSucursalAttribute()
     {
         return $this->sucursal ? $this->sucursal->nombre : 'Sin sucursal';
     }
 
-    /**
-     * Verificar si el dispositivo del usuario está permitido
-     */
     public function isDispositivoPermitido()
     {
         if (!$this->browser_fingerprint) {
             return false;
         }
-
-        return \App\Models\DispositivoPermitido::isPermitido($this->browser_fingerprint);
+        return DispositivoPermitido::isPermitido($this->browser_fingerprint);
     }
 
-    /**
-     * Verificar si el usuario tiene una sucursal asignada
-     */
     public function tieneSucursal()
     {
         return !is_null($this->sucursal_id);
     }
 
-    /**
-     * Verificar si el usuario es administrador
-     * Perfil 1 = Administrador
-     */
     public function esAdministrador()
     {
-        return $this->perfil === 1;
+        return $this->rol && $this->rol->slug === 'ADMIN';
     }
 
-    /**
-     * Verificar si el usuario es supervisor (incluye supervisor-usuario)
-     * Perfil 2 = Supervisor
-     * Perfil 3 = Supervisor-Usuario
-     */
     public function esSupervisor()
     {
-        return in_array($this->perfil, [2, 3]);
+        return $this->rol && in_array($this->rol->slug, ['SUPERVISOR', 'SUPERVISOR_USUARIO']);
     }
 
-    /**
-     * Obtener el nombre del perfil
-     */
     public function getNombrePerfilAttribute()
     {
-        $perfiles = [
-            1 => 'Administrador',
-            2 => 'Supervisor',
-            3 => 'Supervisor-Usuario',
-            4 => 'Usuario',
-            5 => 'Guardia control acceso',
-        ];
-        
-        return $perfiles[$this->perfil] ?? 'Desconocido';
+        return $this->rol ? $this->rol->nombre : 'Sin rol';
     }
 
-    /**
-     * Verificar si el usuario es supervisor-usuario
-     */
     public function esSupervisorUsuario()
     {
-        return $this->perfil === 3;
+        return $this->rol && $this->rol->slug === 'SUPERVISOR_USUARIO';
     }
 
-    /**
-     * Verificar si el usuario es solo usuario
-     */
     public function esUsuario()
     {
-        return $this->perfil === 4;
+        return $this->rol && $this->rol->slug === 'USUARIO';
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'id_usuario';
     }
 }

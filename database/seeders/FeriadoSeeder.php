@@ -49,24 +49,16 @@ class FeriadoSeeder extends Seeder
             ['nombre' => 'Navidad', 'fecha' => '2025-12-25', 'irrenunciable' => true],
         ];
 
-        // Crear feriados 2024
-        foreach ($feriados2024 as $feriado) {
-            Feriado::create([
-                'nombre' => $feriado['nombre'],
-                'fecha' => $feriado['fecha'],
-                'irrenunciable' => $feriado['irrenunciable'],
-                'activo' => true,
-            ]);
-        }
-
-        // Crear feriados 2025
-        foreach ($feriados2025 as $feriado) {
-            Feriado::create([
-                'nombre' => $feriado['nombre'],
-                'fecha' => $feriado['fecha'],
-                'irrenunciable' => $feriado['irrenunciable'],
-                'activo' => true,
-            ]);
+        // Crear/actualizar feriados (idempotente para poder ejecutar db:seed varias veces)
+        foreach (array_merge($feriados2024, $feriados2025) as $feriado) {
+            Feriado::updateOrCreate(
+                ['fecha' => $feriado['fecha']],
+                [
+                    'nombre' => $feriado['nombre'],
+                    'irrenunciable' => $feriado['irrenunciable'],
+                    'activo' => true,
+                ]
+            );
         }
     }
 }

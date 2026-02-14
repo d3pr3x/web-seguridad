@@ -21,7 +21,7 @@ class ValidarImei
             $user = Auth::user();
             
             // Verificar si el usuario tiene un IMEI verificado y permitido
-            if (!$user->imei_verificado || !$user->isImeiPermitido()) {
+            if (!$user->dispositivo_verificado || !$user->isDispositivoPermitido()) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();

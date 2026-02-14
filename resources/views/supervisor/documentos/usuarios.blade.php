@@ -1,6 +1,18 @@
-@extends('layouts.app')
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -54,7 +66,7 @@
                                         <strong>{{ $usuario->nombre_completo }}</strong>
                                     </div>
                                 </td>
-                                <td>{{ $usuario->rut }}</td>
+                                <td>{{ $usuario->run }}</td>
                                 <td>{{ $usuario->nombre_sucursal }}</td>
                                 <td class="text-center">
                                     @if($docs->has('cedula_identidad'))
@@ -85,7 +97,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('supervisor.documentos.usuario', $usuario->id) }}" class="btn btn-sm btn-primary">
+                                    <a href="{{ route('supervisor.documentos.usuario', $usuario) }}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-folder-open me-1"></i> Ver Documentos
                                     </a>
                                 </td>
@@ -100,6 +112,9 @@
                     <p class="text-muted">No hay usuarios registrados</p>
                 </div>
             @endif
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

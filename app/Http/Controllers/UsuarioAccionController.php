@@ -17,7 +17,7 @@ class UsuarioAccionController extends Controller
         $user = Auth::user();
         
         $query = Accion::with(['sucursal', 'sector'])
-                       ->where('user_id', $user->id);
+                       ->where('id_usuario', $user->id_usuario);
 
         // Filtros
         if ($request->filled('tipo')) {
@@ -65,7 +65,7 @@ class UsuarioAccionController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'tipo' => 'required|in:inicio_servicio,rondas,constancias,concurrencia_carabineros,concurrencia_servicios,entrega_servicio',
+            'tipo' => 'required|in:inicio_servicio,rondas,constancias,concurrencia_autoridades,concurrencia_servicios,entrega_servicio',
             'dia' => 'required|date',
             'hora' => 'required',
             'sector_id' => 'nullable|exists:sectores,id',
@@ -93,7 +93,7 @@ class UsuarioAccionController extends Controller
         }
 
         $accion = Accion::create([
-            'user_id' => $user->id,
+            'id_usuario' => $user->id_usuario,
             'sucursal_id' => $user->sucursal_id,
             'tipo' => $validated['tipo'],
             'dia' => $validated['dia'],
@@ -120,7 +120,7 @@ class UsuarioAccionController extends Controller
         $user = Auth::user();
 
         // Verificar que la acción pertenece al usuario
-        if ($accion->user_id !== $user->id) {
+        if ($accion->id_usuario !== $user->id_usuario) {
             abort(403, 'No tienes permiso para ver esta acción.');
         }
 

@@ -1,228 +1,110 @@
 @extends('layouts.usuario')
 
 @section('content')
-<div class="min-h-screen bg-gray-100 flex">
-    <!-- Sidebar -->
+<div class="min-h-screen flex">
     <x-usuario.sidebar />
-
-    <!-- Contenido principal -->
     <div class="flex-1 lg:ml-64">
-        <!-- Headers -->
         <x-usuario.header />
-
-        <!-- Menú Móvil -->
         <x-usuario.mobile-menu />
 
-        <!-- Contenido Principal -->
         <div class="container mx-auto px-4 py-6 max-w-7xl">
-        <!-- Mensajes de éxito/error -->
-        @if(session('success'))
-        <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
-            <p class="font-medium">{{ session('success') }}</p>
-        </div>
-        @endif
+            @if(session('success'))
+            <div class="mb-3 px-3 py-2 rounded-2 border font-medium" style="font-size: 0.8125rem; background: rgba(15, 118, 110, 0.08); border-color: rgba(15, 118, 110, 0.25); color: #0f766e;">
+                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            </div>
+            @endif
+            @if(session('error'))
+            <div class="mb-3 px-3 py-2 rounded-2 border font-medium" style="font-size: 0.8125rem; background: rgba(220, 38, 38, 0.08); border-color: rgba(220, 38, 38, 0.25); color: #b91c1c;">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+            </div>
+            @endif
 
-        @if(session('error'))
-        <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
-            <p class="font-medium">{{ session('error') }}</p>
-        </div>
-        @endif
-
-            <!-- Información de Usuario (solo móvil) -->
-            <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6">
-                <div class="flex items-center">
-                    <div class="bg-red-100 rounded-full p-3 mr-4">
-                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
+            <!-- Info usuario (solo móvil) -->
+            <div class="lg:hidden bg-white rounded-2 border p-3 mb-4 shadow-sm portal-card">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: var(--app-sidebar-active); color: var(--app-sidebar-active-text); font-size: 0.85rem;">
+                        <i class="fas fa-user"></i>
                     </div>
-                    <div class="flex-1">
-                        <h2 class="text-lg font-bold text-gray-800">{{ auth()->user()->nombre_completo }}</h2>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_perfil }}</p>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_sucursal }}</p>
+                    <div class="min-w-0">
+                        <p class="mb-0 fw-semibold text-dark" style="font-size: 0.9rem;">{{ auth()->user()->nombre_completo }}</p>
+                        <p class="mb-0 text-secondary" style="font-size: 0.75rem;">{{ auth()->user()->nombre_perfil }} · {{ auth()->user()->nombre_sucursal }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Grid de Secciones Administrativas -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Sección SUPERVISIÓN -->
-                <div>
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <!-- Header de Sección -->
-                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4">
-                            <h2 class="text-xl font-bold text-white flex items-center">
-                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Supervisión
-                            </h2>
-                            <p class="text-purple-100 text-sm mt-1">Aprobaciones y revisión</p>
+            <!-- Título (escritorio) -->
+            <div class="d-none d-lg-block mb-3">
+                <p class="mb-0 small text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Panel de control</p>
+                <h1 class="h5 mb-0 mt-0 fw-bold" style="color: var(--app-text); font-size: 1.1rem;">Resumen</h1>
+            </div>
+
+            <!-- Secciones -->
+            <div class="row g-3">
+                <!-- Supervisión -->
+                <div class="col-12 col-lg-6">
+                    <div class="portal-card h-100 rounded-3 overflow-hidden border shadow-sm">
+                        <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2" style="background: var(--app-surface); border-color: var(--app-border) !important;">
+                            <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 portal-card-icon" style="width: 32px; height: 32px; background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);">
+                                <i class="fas fa-clipboard-check" style="font-size: 0.8rem;"></i>
+                            </div>
+                            <div>
+                                <h2 class="mb-0 fw-bold portal-card-title" style="color: var(--app-text); font-size: 0.95rem;">Supervisión</h2>
+                                <p class="mb-0 portal-card-subtitle text-secondary">Aprobaciones y revisión</p>
+                            </div>
                         </div>
-
-                        <!-- Opciones de Supervisión -->
-                        <div class="p-4 space-y-3">
-                            <a href="{{ route('admin.documentos.index') }}" class="block">
-                                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-purple-800">Aprobar Documentos</h3>
-                                            <p class="text-sm text-purple-600">Revisar documentos personales</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
+                        <div class="p-2">
+                            @foreach([
+                                ['route' => 'admin.documentos.index', 'title' => 'Aprobar Documentos', 'desc' => 'Revisar documentos personales', 'icon' => 'fa-file-alt'],
+                                ['route' => 'admin.novedades.index', 'title' => 'Todas las Novedades', 'desc' => 'Historial completo de novedades', 'icon' => 'fa-bell'],
+                                ['route' => 'admin.reportes-especiales.index', 'title' => 'Todos los Reportes', 'desc' => 'Historial completo de reportes', 'icon' => 'fa-chart-bar'],
+                            ] as $item)
+                            <a href="{{ route($item['route']) }}" class="portal-link d-flex align-items-center gap-2 px-2 py-2 rounded-2 text-decoration-none">
+                                <span class="portal-link-icon rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; background: var(--app-surface); color: var(--app-text-muted); font-size: 0.75rem;">
+                                    <i class="fas {{ $item['icon'] }}"></i>
+                                </span>
+                                <div class="min-w-0 flex-grow-1">
+                                    <span class="fw-semibold d-block portal-link-title" style="color: var(--app-text); font-size: 0.875rem;">{{ $item['title'] }}</span>
+                                    <span class="portal-link-desc text-secondary" style="font-size: 0.75rem;">{{ $item['desc'] }}</span>
                                 </div>
+                                <i class="fas fa-chevron-right flex-shrink-0 text-secondary" style="font-size: 0.7rem;"></i>
                             </a>
-
-                            <a href="{{ route('admin.novedades.index') }}" class="block">
-                                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-indigo-800">Todas las Novedades</h3>
-                                            <p class="text-sm text-indigo-600">Historial completo de novedades</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="{{ route('admin.reportes-especiales.index') }}" class="block">
-                                <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-r-lg hover:bg-pink-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-pink-800">Todos los Reportes</h3>
-                                            <p class="text-sm text-pink-600">Historial completo de reportes</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
+                            @endforeach
                         </div>
                     </div>
                 </div>
 
-                <!-- Sección ADMINISTRACIÓN -->
-                <div>
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <!-- Header de Sección -->
-                        <div class="bg-gradient-to-r from-red-500 to-red-600 p-4">
-                            <h2 class="text-xl font-bold text-white flex items-center">
-                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                Administración
-                            </h2>
-                            <p class="text-red-100 text-sm mt-1">Herramientas administrativas</p>
+                <!-- Administración -->
+                <div class="col-12 col-lg-6">
+                    <div class="portal-card h-100 rounded-3 overflow-hidden border shadow-sm">
+                        <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2" style="background: var(--app-surface); border-color: var(--app-border) !important;">
+                            <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 portal-card-icon" style="width: 32px; height: 32px; background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);">
+                                <i class="fas fa-cog" style="font-size: 0.8rem;"></i>
+                            </div>
+                            <div>
+                                <h2 class="mb-0 fw-bold portal-card-title" style="color: var(--app-text); font-size: 0.95rem;">Administración</h2>
+                                <p class="mb-0 portal-card-subtitle text-secondary">Herramientas administrativas</p>
+                            </div>
                         </div>
-
-                        <!-- Opciones de Administración -->
-                        <div class="p-4 space-y-3">
-                            <a href="{{ route('admin.usuarios.index') }}" class="block">
-                                <div class="bg-slate-50 border-l-4 border-slate-600 p-4 rounded-r-lg hover:bg-slate-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-slate-800">Gestión de Usuarios</h3>
-                                            <p class="text-sm text-slate-600">Ver, crear y editar usuarios del sistema</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
+                        <div class="p-2">
+                            @foreach([
+                                ['route' => 'admin.usuarios.index', 'title' => 'Gestión de Usuarios', 'desc' => 'Ver, crear y editar usuarios', 'icon' => 'fa-users'],
+                                ['route' => 'admin.reportes-diarios', 'title' => 'Reportes Diarios', 'desc' => 'Ver reportes del sistema', 'icon' => 'fa-calendar-day'],
+                                ['route' => 'admin.reporte-sucursal', 'title' => 'Reporte por Sucursal', 'desc' => 'Análisis por ubicación', 'icon' => 'fa-building'],
+                                ['route' => 'admin.dispositivos.index', 'title' => 'Gestión de Dispositivos', 'desc' => 'Control de navegadores permitidos', 'icon' => 'fa-laptop'],
+                                ['route' => 'admin.ubicaciones.index', 'title' => 'Gestión de Ubicaciones', 'desc' => 'Zonas de acceso permitidas', 'icon' => 'fa-map-marker-alt'],
+                                ['route' => 'admin.sectores.index', 'title' => 'Gestión de Sectores', 'desc' => 'Configurar zonas', 'icon' => 'fa-th-large'],
+                            ] as $item)
+                            <a href="{{ route($item['route']) }}" class="portal-link d-flex align-items-center gap-2 px-2 py-2 rounded-2 text-decoration-none">
+                                <span class="portal-link-icon rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; background: var(--app-surface); color: var(--app-text-muted); font-size: 0.75rem;">
+                                    <i class="fas {{ $item['icon'] }}"></i>
+                                </span>
+                                <div class="min-w-0 flex-grow-1">
+                                    <span class="fw-semibold d-block portal-link-title" style="color: var(--app-text); font-size: 0.875rem;">{{ $item['title'] }}</span>
+                                    <span class="portal-link-desc text-secondary" style="font-size: 0.75rem;">{{ $item['desc'] }}</span>
                                 </div>
+                                <i class="fas fa-chevron-right flex-shrink-0 text-secondary" style="font-size: 0.7rem;"></i>
                             </a>
-
-                            <a href="{{ route('admin.reportes-diarios') }}" class="block">
-                                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg hover:bg-blue-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-blue-800">Reportes Diarios</h3>
-                                            <p class="text-sm text-blue-600">Ver reportes del sistema</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
-
-                            {{-- Oculto - no solicitado: Cálculo de Sueldos --}}
-                            {{-- <a href="{{ route('admin.calculo-sueldos') }}" class="block">
-                                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hover:bg-green-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-green-800">Cálculo de Sueldos</h3>
-                                            <p class="text-sm text-green-600">Gestión de nómina</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a> --}}
-
-                            <a href="{{ route('admin.reporte-sucursal') }}" class="block">
-                                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg hover:bg-yellow-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-yellow-800">Reporte por Sucursal</h3>
-                                            <p class="text-sm text-yellow-600">Análisis por ubicación</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="{{ route('admin.dispositivos.index') }}" class="block">
-                                <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-teal-800">Gestión de Dispositivos</h3>
-                                            <p class="text-sm text-teal-600">Control de navegadores permitidos</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="{{ route('admin.ubicaciones.index') }}" class="block">
-                                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg hover:bg-orange-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-orange-800">Gestión de Ubicaciones</h3>
-                                            <p class="text-sm text-orange-600">Zonas de acceso permitidas</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="{{ route('admin.sectores.index') }}" class="block">
-                                <div class="bg-cyan-50 border-l-4 border-cyan-500 p-4 rounded-r-lg hover:bg-cyan-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-cyan-800">Gestión de Sectores</h3>
-                                            <p class="text-sm text-cyan-600">Configurar zonas</p>
-                                        </div>
-                                        <svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -231,4 +113,3 @@
     </div>
 </div>
 @endsection
-

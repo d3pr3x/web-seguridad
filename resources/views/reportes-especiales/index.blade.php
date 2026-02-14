@@ -1,6 +1,18 @@
-@extends('layouts.app')
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Reportes Especiales</h2>
@@ -88,7 +100,7 @@
                                         </span>
                                     </td>
                                     <td>{{ $reporte->sector?->nombre ?? 'N/A' }}</td>
-                                    <td>{{ $reporte->user->name }}</td>
+                                    <td>{{ $reporte->user->nombre_completo }}</td>
                                     <td>{{ $reporte->sucursal->nombre }}</td>
                                     <td>
                                         @php
@@ -125,6 +137,9 @@
             No se encontraron reportes especiales.
         </div>
     @endif
+</div>
+        </div>
+    </div>
 </div>
 @endsection
 

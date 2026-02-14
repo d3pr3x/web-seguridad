@@ -176,7 +176,7 @@
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <p class="text-gray-600 text-sm">Usuario</p>
-                                            <p class="font-semibold text-gray-800">{{ $reporte->user->name }} {{ $reporte->user->apellido }}</p>
+                                            <p class="font-semibold text-gray-800">{{ $reporte->user->nombre_completo }}</p>
                                         </div>
                                         <div>
                                             <p class="text-gray-600 text-sm">Sucursal</p>

@@ -1,6 +1,18 @@
-@extends('layouts.app')
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -118,7 +130,7 @@
                         <option value="">Todos</option>
                         @foreach($usuarios as $u)
                             <option value="{{ $u->id }}" {{ request('user_id') == $u->id ? 'selected' : '' }}>
-                                {{ $u->nombre_completo }} ({{ $u->rut }})
+                                {{ $u->nombre_completo }} ({{ $u->run }})
                             </option>
                         @endforeach
                     </select>
@@ -176,7 +188,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $doc->user->rut }}</td>
+                                <td>{{ $doc->user->run }}</td>
                                 <td>
                                     <span class="badge bg-secondary">{{ $doc->nombre_tipo }}</span>
                                 </td>
@@ -226,6 +238,9 @@
                     <p class="text-muted">No hay documentos que mostrar</p>
                 </div>
             @endif
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

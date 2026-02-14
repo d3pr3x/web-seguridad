@@ -1,6 +1,18 @@
-@extends('layouts.app')
+@extends('layouts.usuario')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            @endif
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -48,7 +60,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="text-muted small">RUT</label>
-                        <p class="fw-bold mb-0">{{ $documento->user->rut }}</p>
+                        <p class="fw-bold mb-0">{{ $documento->user->run }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="text-muted small">Sucursal</label>
@@ -57,9 +69,9 @@
                     <div class="mb-3">
                         <label class="text-muted small">Perfil</label>
                         <p class="mb-0">
-                            @if($documento->user->perfil === 1)
+                            @if($documento->user->esAdministrador())
                                 <span class="badge bg-purple">Administrador</span>
-                            @elseif($documento->user->perfil === 2 || $documento->user->perfil === 3)
+                            @elseif($documento->user->esSupervisor())
                                 <span class="badge bg-info">{{ $documento->user->nombre_perfil }}</span>
                             @else
                                 <span class="badge bg-success">Usuario</span>
@@ -327,5 +339,8 @@ function confirmarRechazo() {
     });
 }
 </script>
+        </div>
+    </div>
+</div>
 @endsection
 

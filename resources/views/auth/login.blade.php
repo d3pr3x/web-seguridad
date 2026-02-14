@@ -3,14 +3,16 @@
 @section('title', 'Iniciar Sesión')
 
 @section('content')
-<div class="row justify-content-center">
+<div class="row justify-content-center py-4">
     <div class="col-md-6 col-lg-4">
-        <div class="card shadow">
+        <div class="card shadow-sm border-0">
             <div class="card-body p-5">
                 <div class="text-center mb-4">
-                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-                    <h2 class="card-title">Sistema de Seguridad</h2>
-                    <p class="text-muted">Inicia sesión con tu RUT</p>
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-3" style="width: 64px; height: 64px; background: rgba(15, 118, 110, 0.12);">
+                        <i class="fas fa-shield-alt fa-2x" style="color: var(--app-primary);"></i>
+                    </div>
+                    <h2 class="card-title fw-bold mb-1" style="color: var(--app-text); font-size: 1.5rem;">Sistema de Seguridad</h2>
+                    <p class="text-muted small mb-0">Inicia sesión con tu RUT</p>
                 </div>
 
                 <!-- Mensajes de error generales -->
@@ -95,7 +97,7 @@
 
                     <!-- Estado de verificación -->
                     <div class="mb-3">
-                        <div class="card bg-light" style="cursor: pointer;" onclick="toggleDeviceInfo()" title="Haz clic para ver el ID del dispositivo">
+                        <div class="card border" style="cursor: pointer; border-color: var(--app-border) !important; background: var(--app-surface);" onclick="toggleDeviceInfo()" title="Haz clic para ver el ID del dispositivo">
                             <div class="card-body p-2">
                                 <small class="d-flex align-items-center mb-1" id="device-status">
                                     <i class="fas fa-circle-notch fa-spin text-warning me-2"></i>
@@ -109,10 +111,10 @@
                                 <!-- Información expandible del dispositivo -->
                                 <div id="device-details" style="display: none;" class="mt-3 pt-3 border-top">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <strong class="text-primary">ID del Dispositivo:</strong>
+                                        <strong style="color: var(--app-primary);">ID del Dispositivo:</strong>
                                         <button type="button" 
                                                 onclick="event.stopPropagation(); copiarFingerprint();" 
-                                                class="btn btn-sm btn-outline-primary"
+                                                class="btn btn-sm btn-outline-app"
                                                 id="copyButton">
                                             <i class="fas fa-copy me-1"></i>Copiar
                                         </button>
@@ -170,13 +172,13 @@ function copiarFingerprint() {
         const copyButton = document.getElementById('copyButton');
         const originalHTML = copyButton.innerHTML;
         copyButton.innerHTML = '<i class="fas fa-check me-1"></i>¡Copiado!';
-        copyButton.classList.remove('btn-outline-primary');
+        copyButton.classList.remove('btn-outline-app');
         copyButton.classList.add('btn-success');
         
         setTimeout(() => {
             copyButton.innerHTML = originalHTML;
             copyButton.classList.remove('btn-success');
-            copyButton.classList.add('btn-outline-primary');
+            copyButton.classList.add('btn-outline-app');
         }, 2000);
     }).catch(err => {
         // Fallback para navegadores antiguos

@@ -9,7 +9,7 @@ class Accion extends Model
     protected $table = 'acciones';
     
     protected $fillable = [
-        'user_id',
+        'id_usuario',
         'sucursal_id',
         'sector_id',
         'tipo',
@@ -44,7 +44,7 @@ class Accion extends Model
             'inicio_servicio' => 'Inicio del Servicio',
             'rondas' => 'Rondas',
             'constancias' => 'Constancias',
-            'concurrencia_carabineros' => 'Concurrencia de Carabineros',
+            'concurrencia_autoridades' => 'Concurrencia de autoridades',
             'concurrencia_servicios' => 'Concurrencia de Servicios',
             'entrega_servicio' => 'Entrega del Servicio',
         ];
@@ -63,7 +63,7 @@ class Accion extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
     }
 
     /**

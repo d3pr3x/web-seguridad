@@ -95,8 +95,8 @@ class UsuarioDocumentoController extends Controller
         }
         
         // Subir imágenes
-        $imagenFrente = $request->file('imagen_frente')->store('documentos/' . $user->id, 'public');
-        $imagenReverso = $request->file('imagen_reverso')->store('documentos/' . $user->id, 'public');
+        $imagenFrente = $request->file('imagen_frente')->store('documentos/' . $user->id_usuario, 'public');
+        $imagenReverso = $request->file('imagen_reverso')->store('documentos/' . $user->id_usuario, 'public');
         
         // Verificar si es un cambio de documento existente
         $documentoExistente = $user->documentosPersonales()
@@ -106,7 +106,7 @@ class UsuarioDocumentoController extends Controller
         
         // Crear el documento
         $documento = DocumentoPersonal::create([
-            'user_id' => $user->id,
+            'id_usuario' => $user->id_usuario,
             'tipo_documento' => $validated['tipo_documento'],
             'imagen_frente' => $imagenFrente,
             'imagen_reverso' => $imagenReverso,
@@ -126,7 +126,7 @@ class UsuarioDocumentoController extends Controller
         $user = Auth::user();
         
         // Verificar que el documento pertenece al usuario
-        if ($documento->user_id !== $user->id) {
+        if ($documento->id_usuario !== $user->id_usuario) {
             abort(403);
         }
         

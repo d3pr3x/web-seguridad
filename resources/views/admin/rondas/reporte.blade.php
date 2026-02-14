@@ -35,7 +35,7 @@
                             <select name="user_id" class="rounded border-gray-300 focus:ring-emerald-500">
                                 <option value="">Todos</option>
                                 @foreach($usuarios as $u)
-                                    <option value="{{ $u->id }}" {{ request('user_id') == $u->id ? 'selected' : '' }}>{{ $u->name }} {{ $u->apellido }}</option>
+                                    <option value="{{ $u->id_usuario }}" {{ request('user_id') == $u->id_usuario ? 'selected' : '' }}>{{ $u->nombre_completo }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -71,7 +71,7 @@
                                             {{ $e->escaneado_en->format('d/m/Y H:i') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $e->user->nombre_completo ?? $e->user->name }}
+                                            {{ $e->user->nombre_completo }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-900">{{ $e->puntoRonda->nombre }}</td>
                                         <td class="px-6 py-4 text-sm text-gray-600">{{ $e->puntoRonda->sucursal->nombre ?? '-' }}</td>

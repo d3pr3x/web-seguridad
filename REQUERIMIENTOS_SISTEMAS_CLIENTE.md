@@ -20,7 +20,7 @@ El proyecto incluye un **sistema de reportes** operativo con varias vistas y uso
 | **Exportación a PDF** | Generación de reporte por sucursal en PDF con encabezado, estadísticas y tabla. | ✅ Implementado |
 | **Reportes especiales** | Tipos: Incidentes, Denuncia, Detenido, Acción sospechosa; por sector/sucursal, con imágenes y geolocalización. | ✅ Implementado |
 | **Novedades / informes** | Registro de incidentes, observaciones e información general con nivel de gravedad y evidencias. | ✅ Implementado |
-| **Acciones de servicio** | Registro de inicio de servicio, rondas, constancias, concurrencia carabineros/servicios, entrega de servicio. | ✅ Implementado |
+| **Acciones de servicio** | Registro de inicio de servicio, rondas, constancias, concurrencia autoridades/servicios, entrega de servicio. | ✅ Implementado |
 
 #### Requerimientos funcionales que ya cumple (para mostrar al cliente)
 

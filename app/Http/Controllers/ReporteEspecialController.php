@@ -18,9 +18,9 @@ class ReporteEspecialController extends Controller
         $query = ReporteEspecial::with(['user', 'sucursal', 'sector']);
 
         // Si es guardia, solo ve sus propios reportes
-        if ($user->rol === 'guardia') {
-            $query->where('user_id', $user->id);
-        } elseif ($user->rol === 'supervisor' && $user->sucursal_id) {
+        if ($user->esGuardiaControlAcceso()) {
+            $query->where('id_usuario', $user->id_usuario);
+        } elseif ($user->esSupervisor() && $user->sucursal_id) {
             // Si es supervisor, solo ve reportes de su sucursal
             $query->where('sucursal_id', $user->sucursal_id);
         }
@@ -103,7 +103,7 @@ class ReporteEspecialController extends Controller
         }
 
         $reporte = ReporteEspecial::create([
-            'user_id' => $user->id,
+            'id_usuario' => $user->id_usuario,
             'sucursal_id' => $user->sucursal_id,
             'tipo' => $validated['tipo'],
             'dia' => $validated['dia'],
@@ -131,11 +131,11 @@ class ReporteEspecialController extends Controller
         $user = Auth::user();
 
         // Verificar permisos
-        if ($user->rol === 'guardia' && $reporteEspecial->user_id !== $user->id) {
+        if ($user->esGuardiaControlAcceso() && $reporteEspecial->id_usuario !== $user->id_usuario) {
             abort(403, 'No tienes permiso para ver este reporte.');
         }
 
-        if ($user->rol === 'supervisor' && $reporteEspecial->sucursal_id !== $user->sucursal_id) {
+        if ($user->esSupervisor() && $reporteEspecial->sucursal_id !== $user->sucursal_id) {
             abort(403, 'No tienes permiso para ver este reporte.');
         }
 
@@ -151,7 +151,7 @@ class ReporteEspecialController extends Controller
     {
         $user = Auth::user();
 
-        if (!in_array($user->rol, ['admin', 'supervisor'])) {
+        if (!$user->esAdministrador() && !$user->esSupervisor()) {
             abort(403, 'No tienes permiso para actualizar el estado.');
         }
 

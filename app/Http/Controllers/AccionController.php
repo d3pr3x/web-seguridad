@@ -18,9 +18,9 @@ class AccionController extends Controller
         $query = Accion::with(['user', 'sucursal', 'sector']);
 
         // Si es guardia, solo ve sus propias acciones
-        if ($user->rol === 'guardia') {
-            $query->where('user_id', $user->id);
-        } elseif ($user->rol === 'supervisor' && $user->sucursal_id) {
+        if ($user->esGuardiaControlAcceso()) {
+            $query->where('id_usuario', $user->id_usuario);
+        } elseif ($user->esSupervisor() && $user->sucursal_id) {
             // Si es supervisor, solo ve acciones de su sucursal
             $query->where('sucursal_id', $user->sucursal_id);
         }
@@ -71,7 +71,7 @@ class AccionController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'tipo' => 'required|in:inicio_servicio,rondas,constancias,concurrencia_carabineros,concurrencia_servicios,entrega_servicio',
+            'tipo' => 'required|in:inicio_servicio,rondas,constancias,concurrencia_autoridades,concurrencia_servicios,entrega_servicio',
             'dia' => 'required|date',
             'hora' => 'required',
             'sector_id' => 'nullable|exists:sectores,id',
@@ -99,7 +99,7 @@ class AccionController extends Controller
         }
 
         $accion = Accion::create([
-            'user_id' => $user->id,
+            'id_usuario' => $user->id_usuario,
             'sucursal_id' => $user->sucursal_id,
             'tipo' => $validated['tipo'],
             'dia' => $validated['dia'],
@@ -126,11 +126,11 @@ class AccionController extends Controller
         $user = Auth::user();
 
         // Verificar permisos
-        if ($user->rol === 'guardia' && $accion->user_id !== $user->id) {
+        if ($user->esGuardiaControlAcceso() && $accion->id_usuario !== $user->id_usuario) {
             abort(403, 'No tienes permiso para ver esta acción.');
         }
 
-        if ($user->rol === 'supervisor' && $accion->sucursal_id !== $user->sucursal_id) {
+        if ($user->esSupervisor() && $accion->sucursal_id !== $user->sucursal_id) {
             abort(403, 'No tienes permiso para ver esta acción.');
         }
 

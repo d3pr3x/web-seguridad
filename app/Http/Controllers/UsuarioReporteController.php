@@ -17,7 +17,7 @@ class UsuarioReporteController extends Controller
         $user = Auth::user();
         
         $query = ReporteEspecial::with(['sucursal', 'sector'])
-                                ->where('user_id', $user->id);
+                                ->where('id_usuario', $user->id_usuario);
 
         // Filtros
         if ($request->filled('tipo')) {
@@ -97,7 +97,7 @@ class UsuarioReporteController extends Controller
         }
 
         $reporte = ReporteEspecial::create([
-            'user_id' => $user->id,
+            'id_usuario' => $user->id_usuario,
             'sucursal_id' => $user->sucursal_id,
             'tipo' => $validated['tipo'],
             'dia' => $validated['dia'],
@@ -125,7 +125,7 @@ class UsuarioReporteController extends Controller
         $user = Auth::user();
 
         // Verificar que el reporte pertenece al usuario
-        if ($reporteEspecial->user_id !== $user->id) {
+        if ($reporteEspecial->id_usuario !== $user->id_usuario) {
             abort(403, 'No tienes permiso para ver este reporte.');
         }
 

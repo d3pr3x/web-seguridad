@@ -41,7 +41,7 @@ class BlacklistController extends Controller
             'fecha_inicio' => $request->fecha_inicio,
             'fecha_fin' => $request->fecha_fin,
             'activo' => true,
-            'created_by' => auth()->id(),
+            'creado_por' => auth()->id(),
         ]);
 
         return redirect()->route('blacklist.index')->with('success', 'Entrada agregada a la blacklist.');

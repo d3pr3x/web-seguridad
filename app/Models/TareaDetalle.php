@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class TareaDetalle extends Model
 {
-    protected $table = 'tarea_detalles';
+    protected $table = 'detalles_tarea';
+
+    public const CREATED_AT = 'creado_en';
+    public const UPDATED_AT = 'actualizado_en';
     
     protected $fillable = [
         'tarea_id',

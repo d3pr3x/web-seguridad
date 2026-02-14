@@ -249,7 +249,7 @@
                             name="autoridades_notificadas" 
                             value="1"
                             class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-                        <span class="ml-2 text-sm text-gray-700">Se notificó a autoridades (Carabineros, PDI, Bomberos, etc.)</span>
+                        <span class="ml-2 text-sm text-gray-700">Se notificó a autoridades (policía, PDI, Bomberos, etc.)</span>
                     </label>
                 </div>
 

@@ -105,11 +105,11 @@
                                 </div>
                             </a>
 
-                            <a href="{{ route('usuario.acciones.create', ['tipo' => 'concurrencia_carabineros']) }}" class="block">
+                            <a href="{{ route('usuario.acciones.create', ['tipo' => 'concurrencia_autoridades']) }}" class="block">
                                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <h3 class="font-bold text-indigo-800">Concurrencia Carabineros</h3>
+                                            <h3 class="font-bold text-indigo-800">Concurrencia de autoridades</h3>
                                             <p class="text-sm text-indigo-600">Presencia de policía</p>
                                         </div>
                                         <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

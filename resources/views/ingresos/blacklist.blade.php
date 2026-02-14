@@ -1,122 +1,142 @@
-@extends('layouts.app')
-
-@section('title', 'Blacklist - Control de acceso')
+@extends('layouts.usuario')
 
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0"><i class="fas fa-ban me-2"></i>Blacklist</h1>
-        <a href="{{ route('ingresos.index') }}" class="btn btn-outline-primary btn-sm">Volver a ingresos</a>
-    </div>
+<div class="min-h-screen flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:ml-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <strong>Agregar a blacklist</strong>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('blacklist.store') }}" method="post">
-                @csrf
-                <div class="row g-3">
-                    <div class="col-md-2">
-                        <label class="form-label">RUT <span class="text-danger">*</span></label>
-                        <input type="text" name="rut" class="form-control form-control-sm rut-input" placeholder="12.345.678-9" required maxlength="12">
-                        @error('rut')<small class="text-danger">{{ $message }}</small>@enderror
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Patente (opcional)</label>
-                        <input type="text" name="patente" class="form-control form-control-sm text-uppercase" placeholder="ABCD12" maxlength="7">
-                        @error('patente')<small class="text-danger">{{ $message }}</small>@enderror
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Motivo <span class="text-danger">*</span></label>
-                        <input type="text" name="motivo" class="form-control form-control-sm" placeholder="Motivo" required maxlength="500" value="{{ old('motivo') }}">
-                        @error('motivo')<small class="text-danger">{{ $message }}</small>@enderror
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Fecha inicio</label>
-                        <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="{{ old('fecha_inicio', date('Y-m-d')) }}" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Fecha fin (opcional)</label>
-                        <input type="date" name="fecha_fin" class="form-control form-control-sm" value="{{ old('fecha_fin') }}">
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="submit" class="btn btn-danger btn-sm">Agregar</button>
-                    </div>
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            @if(session('success'))
+                <div class="mb-4 p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800">
+                    <p class="font-medium">{{ session('success') }}</p>
                 </div>
-            </form>
+            @endif
+
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-10 h-10 rounded-xl flex items-center justify-center text-red-600 shrink-0 bg-red-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                        </svg>
+                    </span>
+                    Blacklist
+                </h1>
+                <a href="{{ route('ingresos.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium border transition bg-white hover:bg-slate-50" style="border-color: var(--app-border); color: var(--app-text);">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Volver a ingresos
+                </a>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+                <div class="px-5 py-4 border-b border-slate-100" style="background: var(--app-surface);">
+                    <h2 class="text-sm font-semibold text-slate-700">Agregar a blacklist</h2>
+                </div>
+                <div class="p-5">
+                    <form action="{{ route('blacklist.store') }}" method="post" class="flex flex-wrap gap-4 items-end">
+                        @csrf
+                        <div class="min-w-[140px]">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">RUT <span class="text-red-500">*</span></label>
+                            <input type="text" name="rut" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition rut-input" style="border-color: var(--app-border);" placeholder="12.345.678-9" required maxlength="12">
+                            @error('rut')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="min-w-[120px]">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Patente (opcional)</label>
+                            <input type="text" name="patente" class="w-full px-3 py-2.5 rounded-lg border uppercase text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" placeholder="ABCD12" maxlength="7">
+                            @error('patente')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="flex-1 min-w-[180px]">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Motivo <span class="text-red-500">*</span></label>
+                            <input type="text" name="motivo" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" placeholder="Motivo" required maxlength="500" value="{{ old('motivo') }}">
+                            @error('motivo')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="min-w-[140px]">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Fecha inicio</label>
+                            <input type="date" name="fecha_inicio" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ old('fecha_inicio', date('Y-m-d')) }}" required>
+                        </div>
+                        <div class="min-w-[140px]">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Fecha fin (opcional)</label>
+                            <input type="date" name="fecha_fin" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ old('fecha_fin') }}">
+                        </div>
+                        <button type="submit" class="px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm bg-red-600 hover:bg-red-700">Agregar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-slate-200" style="background: var(--app-surface);">
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">RUT</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Patente</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Motivo</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Inicio</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Fin</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Activo</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Creado por</th>
+                                <th class="px-5 py-3.5 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse($blacklists as $b)
+                            <tr class="{{ $b->trashed() ? 'bg-slate-50/50' : 'hover:bg-slate-50/80' }} transition">
+                                <td class="px-5 py-3.5 text-sm text-slate-800 font-medium">{{ $b->rut }}</td>
+                                <td class="px-5 py-3.5 text-sm text-slate-600">{{ $b->patente ?? '-' }}</td>
+                                <td class="px-5 py-3.5 text-sm text-slate-600">{{ Str::limit($b->motivo, 40) }}</td>
+                                <td class="px-5 py-3.5 text-sm text-slate-600">{{ $b->fecha_inicio->format('d/m/Y') }}</td>
+                                <td class="px-5 py-3.5 text-sm text-slate-600">{{ $b->fecha_fin ? $b->fecha_fin->format('d/m/Y') : '-' }}</td>
+                                <td class="px-5 py-3.5">
+                                    @if($b->activo)
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700">Activo</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-3.5 text-sm text-slate-600">{{ $b->creador->nombre_completo ?? '-' }}</td>
+                                <td class="px-5 py-3.5 text-right">
+                                    <div class="flex items-center justify-end gap-2 flex-wrap">
+                                        @if(!$b->trashed())
+                                            <form action="{{ route('blacklist.toggle', $b->id) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline">{{ $b->activo ? 'Desactivar' : 'Activar' }}</button>
+                                            </form>
+                                            <span class="text-slate-300">·</span>
+                                            <form action="{{ route('blacklist.destroy', $b->id) }}" method="post" class="inline" onsubmit="return confirm('¿Eliminar de la blacklist?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">Eliminar</button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('blacklist.toggle', $b->id) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="text-sm font-medium text-teal-600 hover:text-teal-700 hover:underline">Restaurar</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="px-5 py-12 text-center text-slate-500">No hay entradas en la blacklist.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if($blacklists->hasPages())
+                    <div class="px-5 py-3 border-t border-slate-200" style="background: var(--app-surface);">
+                        {{ $blacklists->links() }}
+                    </div>
+                @endif
+            </div>
         </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>RUT</th>
-                    <th>Patente</th>
-                    <th>Motivo</th>
-                    <th>Inicio</th>
-                    <th>Fin</th>
-                    <th>Activo</th>
-                    <th>Creado por</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($blacklists as $b)
-                <tr class="{{ $b->trashed() ? 'table-secondary' : '' }}">
-                    <td>{{ $b->rut }}</td>
-                    <td>{{ $b->patente ?? '-' }}</td>
-                    <td><small>{{ Str::limit($b->motivo, 40) }}</small></td>
-                    <td>{{ $b->fecha_inicio->format('d/m/Y') }}</td>
-                    <td>{{ $b->fecha_fin ? $b->fecha_fin->format('d/m/Y') : '-' }}</td>
-                    <td>
-                        @if($b->activo)
-                            <span class="badge bg-success">Activo</span>
-                        @else
-                            <span class="badge bg-secondary">Inactivo</span>
-                        @endif
-                    </td>
-                    <td>{{ $b->creador->name ?? '-' }}</td>
-                    <td>
-                        @if(!$b->trashed())
-                            <form action="{{ route('blacklist.toggle', $b->id) }}" method="post" class="d-inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-sm btn-outline-warning">{{ $b->activo ? 'Desactivar' : 'Activar' }}</button>
-                            </form>
-                            <form action="{{ route('blacklist.destroy', $b->id) }}" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar de la blacklist?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                            </form>
-                        @else
-                            <form action="{{ route('blacklist.toggle', $b->id) }}" method="post" class="d-inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-sm btn-outline-success">Restaurar</button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="8" class="text-center text-muted py-4">No hay entradas en la blacklist.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-flex justify-content-center mt-3">
-        {{ $blacklists->links() }}
     </div>
 </div>
+@push('scripts')
+<script src="{{ asset('js/rut-formatter.js') }}"></script>
+@endpush
 @endsection

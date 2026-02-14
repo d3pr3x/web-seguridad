@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Sucursal extends Model
 {
     protected $table = 'sucursales';
+
+    public const CREATED_AT = 'creado_en';
+    public const UPDATED_AT = 'actualizado_en';
     
     protected $fillable = [
         'nombre',

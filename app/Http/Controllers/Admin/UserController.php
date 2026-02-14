@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\RolUsuario;
 use App\Models\User;
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
@@ -16,15 +17,14 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::with('sucursal')->orderBy('name')->orderBy('apellido');
+        $query = User::with(['sucursal', 'rol'])->orderBy('nombre_completo');
 
         if ($request->filled('buscar')) {
             $term = $request->buscar;
             $query->where(function ($q) use ($term) {
-                $q->where('name', 'like', "%{$term}%")
-                  ->orWhere('apellido', 'like', "%{$term}%")
+                $q->where('nombre_completo', 'like', "%{$term}%")
                   ->orWhere('email', 'like', "%{$term}%")
-                  ->orWhere('rut', 'like', "%{$term}%");
+                  ->orWhere('run', 'like', "%{$term}%");
             });
         }
 
@@ -32,14 +32,15 @@ class UserController extends Controller
             $query->where('sucursal_id', $request->sucursal_id);
         }
 
-        if ($request->filled('perfil')) {
-            $query->where('perfil', $request->perfil);
+        if ($request->filled('rol_id')) {
+            $query->where('rol_id', $request->rol_id);
         }
 
         $usuarios = $query->paginate(15)->withQueryString();
         $sucursales = Sucursal::orderBy('nombre')->get();
+        $roles = RolUsuario::orderBy('nombre')->get();
 
-        return view('admin.usuarios.index', compact('usuarios', 'sucursales'));
+        return view('admin.usuarios.index', compact('usuarios', 'sucursales', 'roles'));
     }
 
     /**
@@ -48,7 +49,8 @@ class UserController extends Controller
     public function create()
     {
         $sucursales = Sucursal::activas()->orderBy('nombre')->get();
-        return view('admin.usuarios.create', compact('sucursales'));
+        $roles = RolUsuario::orderBy('nombre')->get();
+        return view('admin.usuarios.create', compact('sucursales', 'roles'));
     }
 
     /**
@@ -57,18 +59,19 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'rut' => 'required|string|max:20|unique:users,rut',
+            'nombre_completo' => 'required|string|max:255',
+            'email' => 'required|email|unique:usuarios,email',
+            'run' => 'required|string|max:20|unique:usuarios,run',
             'password' => 'required|string|min:8|confirmed',
-            'perfil' => 'required|in:1,2,3,4',
+            'rol_id' => 'required|exists:roles_usuario,id',
             'sucursal_id' => 'nullable|exists:sucursales,id',
             'fecha_nacimiento' => 'nullable|date',
             'domicilio' => 'nullable|string|max:500',
+            'rango' => 'nullable|string|max:80',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        $validated['clave'] = Hash::make($validated['password']);
+        unset($validated['password']);
         $validated['sucursal_id'] = $validated['sucursal_id'] ?: null;
 
         User::create($validated);
@@ -83,7 +86,8 @@ class UserController extends Controller
     public function edit(User $usuario)
     {
         $sucursales = Sucursal::activas()->orderBy('nombre')->get();
-        return view('admin.usuarios.edit', compact('usuario', 'sucursales'));
+        $roles = RolUsuario::orderBy('nombre')->get();
+        return view('admin.usuarios.edit', compact('usuario', 'sucursales', 'roles'));
     }
 
     /**
@@ -92,24 +96,23 @@ class UserController extends Controller
     public function update(Request $request, User $usuario)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($usuario->id)],
-            'rut' => ['required', 'string', 'max:20', Rule::unique('users', 'rut')->ignore($usuario->id)],
+            'nombre_completo' => 'required|string|max:255',
+            'email' => ['required', 'email', Rule::unique('usuarios', 'email')->ignore($usuario->id_usuario, 'id_usuario')],
+            'run' => ['required', 'string', 'max:20', Rule::unique('usuarios', 'run')->ignore($usuario->id_usuario, 'id_usuario')],
             'password' => 'nullable|string|min:8|confirmed',
-            'perfil' => 'required|in:1,2,3,4',
+            'rol_id' => 'required|exists:roles_usuario,id',
             'sucursal_id' => 'nullable|exists:sucursales,id',
             'fecha_nacimiento' => 'nullable|date',
             'domicilio' => 'nullable|string|max:500',
+            'rango' => 'nullable|string|max:80',
         ]);
 
         $validated['sucursal_id'] = $validated['sucursal_id'] ?: null;
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+        if (!empty($validated['password'] ?? null)) {
+            $validated['clave'] = Hash::make($validated['password']);
         }
+        unset($validated['password'], $validated['password_confirmation'] ?? null);
 
         $usuario->update($validated);
 

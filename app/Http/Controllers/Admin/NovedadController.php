@@ -22,8 +22,8 @@ class NovedadController extends Controller
             $query->where('sucursal_id', $request->sucursal_id);
         }
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($request->filled('id_usuario')) {
+            $query->where('id_usuario', $request->id_usuario);
         }
 
         if ($request->filled('tipo')) {
@@ -44,7 +44,7 @@ class NovedadController extends Controller
 
         // Datos para filtros
         $sucursales = Sucursal::activas()->orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
+        $usuarios = User::orderBy('nombre_completo')->get();
         $tipos = Accion::tipos();
 
         // Estadísticas

@@ -100,7 +100,7 @@ class TareaIncidentesSeeder extends Seeder
             'campo_nombre' => 'Autoridades notificadas',
             'tipo_campo' => 'select',
             'opciones' => json_encode([
-                'Carabineros',
+                'Autoridades',
                 'Policía de Investigaciones (PDI)',
                 'Supervisión',
                 'Cliente',
@@ -116,7 +116,7 @@ class TareaIncidentesSeeder extends Seeder
             'campo_nombre' => 'Estado del detenido',
             'tipo_campo' => 'select',
             'opciones' => json_encode([
-                'Entregado a Carabineros',
+                'Entregado a autoridades',
                 'Entregado a PDI',
                 'Liberado con advertencia',
                 'En custodia en sitio',
@@ -232,7 +232,7 @@ class TareaIncidentesSeeder extends Seeder
             'campo_nombre' => 'Autoridades notificadas',
             'tipo_campo' => 'select',
             'opciones' => json_encode([
-                'Carabineros',
+                'Autoridades',
                 'Ambulancia',
                 'Supervisión',
                 'Cliente',
@@ -360,7 +360,7 @@ class TareaIncidentesSeeder extends Seeder
             'campo_nombre' => 'Notificaciones realizadas',
             'tipo_campo' => 'select',
             'opciones' => json_encode([
-                'Carabineros',
+                'Autoridades',
                 'Supervisión',
                 'Cliente',
                 'Múltiples',

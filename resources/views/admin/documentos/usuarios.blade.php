@@ -70,7 +70,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $usuario->rut }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $usuario->run }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $usuario->nombre_sucursal }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         @if($docs->has('cedula_identidad'))
@@ -117,7 +117,7 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.documentos.usuario', $usuario->id) }}" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition inline-flex items-center text-sm">
+                                        <a href="{{ route('admin.documentos.usuario', $usuario) }}" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition inline-flex items-center text-sm">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                                             </svg>

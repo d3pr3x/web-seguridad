@@ -23,8 +23,8 @@ class DocumentoPersonalController extends Controller
             $query->where('tipo_documento', $request->tipo_documento);
         }
         
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($request->filled('id_usuario')) {
+            $query->where('id_usuario', $request->id_usuario);
         }
         
         // Obtener documentos
@@ -75,7 +75,7 @@ class DocumentoPersonalController extends Controller
         // Aprobar el documento
         $documento->update([
             'estado' => 'aprobado',
-            'aprobado_por' => $user->id,
+            'aprobado_por' => $user->id_usuario,
             'aprobado_en' => now(),
         ]);
         
@@ -105,7 +105,7 @@ class DocumentoPersonalController extends Controller
         $documento->update([
             'estado' => 'rechazado',
             'motivo_rechazo' => $validated['motivo_rechazo'],
-            'aprobado_por' => $user->id,
+            'aprobado_por' => $user->id_usuario,
             'aprobado_en' => now(),
         ]);
         

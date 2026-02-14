@@ -20,7 +20,7 @@ class Blacklist extends Model
         'fecha_inicio',
         'fecha_fin',
         'activo',
-        'created_by',
+        'creado_por',
     ];
 
     protected function casts(): array
@@ -34,7 +34,7 @@ class Blacklist extends Model
 
     public function creador(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'creado_por', 'id_usuario');
     }
 
     /**

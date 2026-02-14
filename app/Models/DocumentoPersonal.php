@@ -9,10 +9,13 @@ class DocumentoPersonal extends Model
 {
     use HasFactory;
 
-    protected $table = 'documentos_personales';
+    protected $table = 'documentos';
+
+    public const CREATED_AT = 'creado_en';
+    public const UPDATED_AT = 'actualizado_en';
 
     protected $fillable = [
-        'user_id',
+        'id_usuario',
         'tipo_documento',
         'imagen_frente',
         'imagen_reverso',
@@ -31,12 +34,12 @@ class DocumentoPersonal extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
     }
 
     public function aprobador()
     {
-        return $this->belongsTo(User::class, 'aprobado_por');
+        return $this->belongsTo(User::class, 'aprobado_por', 'id_usuario');
     }
 
     public function documentoAnterior()

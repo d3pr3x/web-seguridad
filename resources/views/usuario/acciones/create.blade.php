@@ -206,8 +206,8 @@
             color: 'bg-purple-500',
             buttonColor: 'bg-purple-600 hover:bg-purple-700'
         },
-        'concurrencia_carabineros': {
-            title: 'Concurrencia Carabineros',
+        'concurrencia_autoridades': {
+            title: 'Concurrencia de autoridades',
             description: 'Presencia de policía',
             color: 'bg-indigo-500',
             buttonColor: 'bg-indigo-600 hover:bg-indigo-700'

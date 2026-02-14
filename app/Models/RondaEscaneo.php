@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class RondaEscaneo extends Model
 {
-    protected $table = 'ronda_escaneos';
+    protected $table = 'escaneos_ronda';
 
     protected $fillable = [
         'punto_ronda_id',
-        'user_id',
+        'id_usuario',
         'escaneado_en',
         'lat',
         'lng',
@@ -30,6 +30,6 @@ class RondaEscaneo extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
     }
 }

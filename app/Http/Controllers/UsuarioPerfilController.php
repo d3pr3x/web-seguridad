@@ -31,13 +31,13 @@ class UsuarioPerfilController extends Controller
         $user = Auth::user();
         
         // Verificar que la contraseña actual sea correcta
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (!Hash::check($validated['current_password'], $user->clave)) {
             return redirect()->back()->with('error', 'La contraseña actual es incorrecta.');
         }
         
         // Actualizar la contraseña
         $user->update([
-            'password' => Hash::make($validated['new_password'])
+            'clave' => Hash::make($validated['new_password'])
         ]);
         
         return redirect()->back()->with('success', 'Contraseña actualizada exitosamente.');

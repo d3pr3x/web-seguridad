@@ -17,7 +17,7 @@ class Ingreso extends Model
         'rut',
         'nombre',
         'patente',
-        'guardia_id',
+        'id_guardia',
         'fecha_ingreso',
         'fecha_salida',
         'estado',
@@ -37,12 +37,12 @@ class Ingreso extends Model
 
     public function guardia(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'guardia_id');
+        return $this->belongsTo(User::class, 'id_guardia', 'id_usuario');
     }
 
     public function scopeByGuardia($query, $guardiaId)
     {
-        return $query->where('guardia_id', $guardiaId);
+        return $query->where('id_guardia', $guardiaId);
     }
 
     public function scopeRecientes($query, int $dias = 7)

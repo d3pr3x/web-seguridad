@@ -21,7 +21,7 @@ class InformeController extends Controller
         $userId = Auth::id();
         $informes = Informe::with(['reporte.tarea', 'reporte.user'])
             ->whereHas('reporte', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('id_usuario', $userId);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -37,7 +37,7 @@ class InformeController extends Controller
         $userId = Auth::id();
         $reporte = Reporte::with(['tarea', 'user'])
             ->where('id', $reporteId)
-            ->where('user_id', $userId)
+            ->where('id_usuario', $userId)
             ->firstOrFail();
 
         return view('informes.create', compact('reporte'));
@@ -72,7 +72,7 @@ class InformeController extends Controller
             // Verificar que el reporte pertenece al usuario
             $userId = Auth::id();
             $reporte = Reporte::where('id', $request->reporte_id)
-                ->where('user_id', $userId)
+                ->where('id_usuario', $userId)
                 ->firstOrFail();
 
             // Validar total de fotografías (reporte base + nuevas)
@@ -138,7 +138,7 @@ class InformeController extends Controller
         $informe = Informe::with(['reporte.tarea', 'reporte.user'])
             ->where('id', $id)
             ->whereHas('reporte', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('id_usuario', $userId);
             })
             ->firstOrFail();
 
@@ -154,7 +154,7 @@ class InformeController extends Controller
         $informe = Informe::with(['reporte.tarea', 'reporte.user'])
             ->where('id', $id)
             ->whereHas('reporte', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('id_usuario', $userId);
             })
             ->firstOrFail();
 
@@ -209,7 +209,7 @@ class InformeController extends Controller
         $informe = Informe::with(['reporte'])
             ->where('id', $id)
             ->whereHas('reporte', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('id_usuario', $userId);
             })
             ->firstOrFail();
 
@@ -241,7 +241,7 @@ class InformeController extends Controller
         $informe = Informe::with(['reporte'])
             ->where('id', $id)
             ->whereHas('reporte', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('id_usuario', $userId);
             })
             ->firstOrFail();
 
@@ -269,7 +269,7 @@ class InformeController extends Controller
         $informe = Informe::with(['reporte'])
             ->where('id', $id)
             ->whereHas('reporte', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('id_usuario', $userId);
             })
             ->firstOrFail();
 

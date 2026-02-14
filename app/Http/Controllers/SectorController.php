@@ -16,7 +16,7 @@ class SectorController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->rol !== 'admin') {
+        if (!$user->esAdministrador()) {
             abort(403, 'No tienes permiso para administrar sectores.');
         }
 
@@ -35,7 +35,7 @@ class SectorController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->rol !== 'admin') {
+        if (!$user->esAdministrador()) {
             abort(403, 'No tienes permiso para crear sectores.');
         }
 
@@ -51,7 +51,7 @@ class SectorController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->rol !== 'admin') {
+        if (!$user->esAdministrador()) {
             abort(403, 'No tienes permiso para crear sectores.');
         }
 
@@ -75,7 +75,7 @@ class SectorController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->rol !== 'admin') {
+        if (!$user->esAdministrador()) {
             abort(403, 'No tienes permiso para editar sectores.');
         }
 
@@ -91,7 +91,7 @@ class SectorController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->rol !== 'admin') {
+        if (!$user->esAdministrador()) {
             abort(403, 'No tienes permiso para editar sectores.');
         }
 
@@ -115,7 +115,7 @@ class SectorController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->rol !== 'admin') {
+        if (!$user->esAdministrador()) {
             abort(403, 'No tienes permiso para eliminar sectores.');
         }
 

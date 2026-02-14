@@ -288,7 +288,7 @@
                 </tr>
                 <tr>
                     <td class="label">Elaborado por:</td>
-                    <td>{{ $informe->reporte->user->nombre_completo }} ({{ $informe->reporte->user->rut }})</td>
+                    <td>{{ $informe->reporte->user->nombre_completo }} ({{ $informe->reporte->user->run }})</td>
                 </tr>
                 <tr>
                     <td class="label">Sucursal:</td>
