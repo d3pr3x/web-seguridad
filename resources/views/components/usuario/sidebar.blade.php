@@ -12,13 +12,13 @@
     <nav class="flex-grow-1 overflow-auto py-2">
         <ul class="nav flex-column px-2">
             <li class="nav-item">
-                <a href="{{ route($homeRoute) }}" class="nav-link d-flex align-items-center py-2 rounded {{ $isHomeActive ? 'active' : '' }}" style="{{ $isHomeActive ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
+                <a href="{{ route($homeRoute) }}" class="nav-link d-flex align-items-center py-2 rounded {{ $isHomeActive ? 'active' : '' }}" style="{{ $isHomeActive ? 'color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
                     <i class="fas fa-home me-2" style="width: 1.25rem;"></i>
                     <span>Inicio</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('ingresos.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'active' : '' }}" style="{{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
+                <a href="{{ route('ingresos.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'active' : '' }}" style="{{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
                     <i class="fas fa-qrcode me-2" style="width: 1.25rem;"></i>
                     <span>Control de acceso</span>
                 </a>
@@ -26,7 +26,7 @@
 
             @if(auth()->user()->esUsuario() || auth()->user()->esSupervisorUsuario())
             <li class="nav-item">
-                <a href="{{ route('usuario.perfil.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.perfil.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.perfil.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
+                <a href="{{ route('usuario.perfil.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.perfil.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.perfil.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
                     <i class="fas fa-user me-2" style="width: 1.25rem;"></i>
                     <span>Mi perfil</span>
                 </a>
@@ -39,7 +39,7 @@
                 </a>
                 <div class="collapse {{ request()->routeIs('usuario.reportes.*') ? 'show' : '' }}" id="sidebar-mis-reportes">
                     <ul class="nav flex-column ms-4 ps-2 border-start border-secondary">
-                        <li class="nav-item"><a href="{{ route('usuario.reportes.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('usuario.reportes.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.reportes.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Ver mis reportes</a></li>
+                        <li class="nav-item"><a href="{{ route('usuario.reportes.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('usuario.reportes.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.reportes.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Ver mis reportes</a></li>
                     </ul>
                 </div>
             </li>
@@ -52,13 +52,13 @@
                 </a>
                 <div class="collapse {{ request()->routeIs('usuario.documentos.*') ? 'show' : '' }}" id="sidebar-mis-documentos">
                     <ul class="nav flex-column ms-4 ps-2 border-start border-secondary">
-                        <li class="nav-item"><a href="{{ route('usuario.documentos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('usuario.documentos.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.documentos.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Ver mis documentos</a></li>
+                        <li class="nav-item"><a href="{{ route('usuario.documentos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('usuario.documentos.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.documentos.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Ver mis documentos</a></li>
                     </ul>
                 </div>
             </li>
             @endif
             <li class="nav-item">
-                <a href="{{ route('usuario.ronda.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.ronda.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.ronda.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
+                <a href="{{ route('usuario.ronda.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.ronda.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.ronda.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
                     <i class="fas fa-route me-2" style="width: 1.25rem;"></i>
                     <span>Rondas QR</span>
                 </a>
@@ -75,11 +75,11 @@
                 </a>
                 <div class="collapse {{ request()->routeIs(['admin.reportes-especiales.*', 'admin.rondas.reporte', 'admin.reportes-diarios', 'admin.reporte-sucursal']) ? 'show' : '' }}" id="sidebar-reportes-admin">
                     <ul class="nav flex-column ms-4 ps-2 border-start border-secondary">
-                        <li class="nav-item"><a href="{{ route('admin.reportes-especiales.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.reportes-especiales.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-especiales.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Todos los reportes</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.rondas.reporte') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.rondas.reporte') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.reporte') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Reporte escaneos QR</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.reportes-especiales.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.reportes-especiales.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-especiales.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Todos los reportes</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.rondas.reporte') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.rondas.reporte') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.reporte') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Reporte escaneos QR</a></li>
                     @if(auth()->user()->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.reportes-diarios') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.reportes-diarios') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-diarios') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Reportes diarios</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.reporte-sucursal') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.reporte-sucursal') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reporte-sucursal') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Reporte por sucursal</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.reportes-diarios') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.reportes-diarios') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-diarios') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Reportes diarios</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.reporte-sucursal') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.reporte-sucursal') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reporte-sucursal') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Reporte por sucursal</a></li>
                     @endif
                     </ul>
                 </div>
@@ -93,13 +93,13 @@
                 <div class="collapse {{ request()->routeIs(['admin.usuarios.*', 'admin.documentos.*', 'admin.novedades.*', 'supervisor.documentos.*']) ? 'show' : '' }}" id="sidebar-usuarios-docs">
                     <ul class="nav flex-column ms-4 ps-2 border-start border-secondary">
                         @if(auth()->user()->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Usuarios</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Usuarios</a></li>
                         @endif
                         @if(config('app.show_documentos_guardias'))
-                        <li class="nav-item"><a href="{{ auth()->user()->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Aprobar documentos</a></li>
+                        <li class="nav-item"><a href="{{ auth()->user()->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Aprobar documentos</a></li>
                         @endif
                     @if(auth()->user()->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Novedades</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Novedades</a></li>
                     @endif
                     </ul>
                 </div>
@@ -116,10 +116,10 @@
                 </a>
                 <div class="collapse {{ request()->routeIs(['admin.dispositivos.*', 'admin.ubicaciones.*', 'admin.sectores.*', 'admin.rondas.*']) && !request()->routeIs('admin.rondas.reporte') ? 'show' : '' }}" id="sidebar-gestion">
                     <ul class="nav flex-column ms-4 ps-2 border-start border-secondary">
-                        <li class="nav-item"><a href="{{ route('admin.dispositivos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.dispositivos.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.dispositivos.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Dispositivos</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.ubicaciones.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.ubicaciones.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.ubicaciones.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Ubicaciones</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.sectores.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.sectores.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.sectores.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Sectores</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.rondas.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.rondas.index') || request()->routeIs('admin.rondas.show') || request()->routeIs('admin.rondas.create') || request()->routeIs('admin.rondas.edit') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.index') || request()->routeIs('admin.rondas.show') || request()->routeIs('admin.rondas.create') || request()->routeIs('admin.rondas.edit') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Puntos de ronda (QR)</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.dispositivos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.dispositivos.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.dispositivos.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Dispositivos</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.ubicaciones.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.ubicaciones.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.ubicaciones.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Ubicaciones</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.sectores.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.sectores.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.sectores.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Sectores</a></li>
+                        <li class="nav-item"><a href="{{ route('admin.rondas.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.rondas.index') || request()->routeIs('admin.rondas.show') || request()->routeIs('admin.rondas.create') || request()->routeIs('admin.rondas.edit') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.index') || request()->routeIs('admin.rondas.show') || request()->routeIs('admin.rondas.create') || request()->routeIs('admin.rondas.edit') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Puntos de ronda (QR)</a></li>
                     </ul>
                 </div>
             </li>
