@@ -281,12 +281,16 @@ class IngresosController extends Controller
             $logPath = $dir . '/' . $prefix . '.txt';
             Storage::disk('local')->put($logPath, $request->input('log'));
         }
+        $imageFile = basename($imagePath);
+        $logFile = $logPath ? basename($logPath) : null;
         return response()->json([
-            'ok'    => true,
-            'image' => $imagePath,
-            'log'   => $logPath,
-            'download_image' => route('ingresos.debug-download', ['file' => basename($imagePath)]),
-            'download_log'   => $logPath ? route('ingresos.debug-download', ['file' => basename($logPath)]) : null,
+            'ok'              => true,
+            'image'           => $imagePath,
+            'log'             => $logPath,
+            'filename_image'  => $imageFile,
+            'filename_log'    => $logFile,
+            'download_image'  => route('ingresos.debug-download', ['file' => $imageFile]),
+            'download_log'    => $logFile ? route('ingresos.debug-download', ['file' => $logFile]) : null,
         ]);
     }
 

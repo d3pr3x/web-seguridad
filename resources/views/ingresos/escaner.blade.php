@@ -73,13 +73,24 @@
                             <div id="debug-qr-fallo" class="p-3 bg-amber-50 border-t border-amber-200 hidden">
                                 <p class="text-sm font-medium text-amber-800 mb-2">Debug (cuando falla la detección)</p>
                                 <div class="flex flex-wrap gap-2">
-                                    <a id="debug-descargar-qr" href="#" class="text-sm text-blue-600 hover:underline">Descargar imagen capturada</a>
+                                    <a id="debug-descargar-qr" href="#" class="text-sm text-blue-600 hover:underline">Descargar imagen</a>
                                     <button type="button" id="debug-copiar-log-qr" class="text-sm text-blue-600 hover:underline">Copiar log</button>
-                                    <a id="debug-ver-imagen-qr" href="#" target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline">Ver imagen en nueva pestaña</a>
-                                    <button type="button" id="debug-enviar-servidor-qr" class="text-sm text-blue-600 hover:underline">Enviar al servidor (Docker)</button>
+                                    <a id="debug-ver-imagen-qr" href="#" target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline">Ver imagen</a>
+                                    <button type="button" id="debug-enviar-servidor-qr" class="text-sm text-blue-600 hover:underline font-medium">Enviar al servidor (Docker)</button>
                                 </div>
-                                <p id="debug-servidor-msg" class="text-xs mt-2 hidden"></p>
-                                <p class="text-xs text-gray-500 mt-2">Prueba la imagen en <code class="bg-gray-200 px-1">/qr-decode-test.html</code>. Desde el servidor: <code class="bg-gray-200 px-1">/ingresos/debug-download/NOMBRE_ARCHIVO</code></p>
+                                <div id="debug-servidor-msg" class="mt-3 hidden">
+                                    <p class="text-sm font-medium text-emerald-800 mb-2">Guardado en servidor. Copia estos nombres para análisis:</p>
+                                    <div class="bg-gray-100 rounded p-2 font-mono text-sm mb-2">
+                                        <p><strong>Imagen:</strong> <code id="debug-filename-image"></code></p>
+                                        <p><strong>Log:</strong> <code id="debug-filename-log"></code></p>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button type="button" id="debug-copiar-nombres" class="text-sm text-blue-600 hover:underline">Copiar nombres</button>
+                                        <a id="debug-link-descargar-imagen" href="#" class="text-sm text-blue-600 hover:underline">Descargar imagen</a>
+                                        <a id="debug-link-descargar-log" href="#" class="text-sm text-blue-600 hover:underline">Descargar log</a>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Pega los nombres de archivo en el chat con la IA para analizar imagen y log y mejorar la detección.</p>
                             </div>
                         </details>
                     </div>
@@ -627,9 +638,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (btnEnviar && canvasCedula && canvasCedula.width > 0) {
                     btnEnviar.onclick = function() {
                         btnEnviar.disabled = true;
-                        if (msgServidor) { msgServidor.classList.remove('hidden'); msgServidor.textContent = 'Enviando…'; msgServidor.className = 'text-xs mt-2'; }
+                        if (msgServidor) { msgServidor.classList.remove('hidden'); msgServidor.innerHTML = '<p class="text-sm">Enviando…</p>'; }
                         canvasCedula.toBlob(function(blob) {
-                            if (!blob) { if (msgServidor) msgServidor.textContent = 'Error al obtener imagen.'; btnEnviar.disabled = false; return; }
+                            if (!blob) { if (msgServidor) msgServidor.innerHTML = '<p class="text-sm text-red-600">Error al obtener imagen.</p>'; btnEnviar.disabled = false; return; }
                             var fd = new FormData();
                             fd.append('image', blob, 'captura.png');
                             fd.append('log', logQR ? logQR.textContent : '');
@@ -638,13 +649,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                 .then(function(r) { return r.json(); })
                                 .then(function(data) {
                                     if (msgServidor) {
+                                        var fnImg = data.filename_image || 'captura.png';
+                                        var fnLog = data.filename_log || '';
+                                        var textoCopiar = 'Imagen: ' + fnImg + (fnLog ? '\nLog: ' + fnLog : '');
                                         msgServidor.classList.remove('hidden');
-                                        msgServidor.innerHTML = 'Guardado en el servidor. <a class="underline" href="' + (data.download_image || '') + '" download>Descargar imagen</a>' + (data.download_log ? ' | <a class="underline" href="' + data.download_log + '" download>Descargar log</a>' : '');
+                                        msgServidor.innerHTML = '<p class="text-sm font-medium text-emerald-800 mb-2">Guardado en servidor. Copia estos nombres para análisis:</p><div class="bg-gray-100 rounded p-2 font-mono text-sm mb-2"><p><strong>Imagen:</strong> <code>' + fnImg + '</code></p>' + (fnLog ? '<p><strong>Log:</strong> <code>' + fnLog + '</code></p>' : '') + '</div><div class="flex flex-wrap gap-2"><button type="button" id="debug-copiar-nombres-btn" class="text-sm text-blue-600 hover:underline">Copiar nombres</button><a href="' + (data.download_image || '#') + '" download="' + fnImg + '" class="text-sm text-blue-600 hover:underline">Descargar imagen</a>' + (data.download_log ? '<a href="' + data.download_log + '" download="' + fnLog + '" class="text-sm text-blue-600 hover:underline">Descargar log</a>' : '') + '</div>';
+                                        var btnCopiar = document.getElementById('debug-copiar-nombres-btn');
+                                        if (btnCopiar) btnCopiar.onclick = function() { navigator.clipboard.writeText(textoCopiar).then(function() { alert('Nombres copiados. Pégalos en el chat con la IA.'); }).catch(function() { alert('No se pudo copiar.'); }); };
                                     }
                                     btnEnviar.disabled = false;
                                 })
                                 .catch(function(e) {
-                                    if (msgServidor) { msgServidor.classList.remove('hidden'); msgServidor.textContent = 'Error: ' + (e.message || 'no se pudo enviar'); }
+                                    if (msgServidor) msgServidor.innerHTML = '<p class="text-sm text-red-600">Error: ' + (e.message || 'no se pudo enviar') + '</p>';
                                     btnEnviar.disabled = false;
                                 });
                         }, 'image/png', 1);
