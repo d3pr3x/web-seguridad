@@ -7,6 +7,7 @@ use App\Models\Blacklist;
 use App\Rules\ChileRut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class IngresosController extends Controller
 {
@@ -260,5 +261,48 @@ class IngresosController extends Controller
         $rut = $this->normalizarRut($parts[0]);
         $nombre = $parts[1] ?? '';
         return ['rut' => $rut, 'nombre' => $nombre];
+    }
+
+    /**
+     * Guardar imagen y log de debug cuando falla la detección QR (para análisis).
+     * POST con: image (archivo), log (texto). Devuelve rutas para descargar desde el servidor.
+     */
+    public function debugCaptura(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|file|image|max:10240',
+            'log'   => 'nullable|string|max:10000',
+        ]);
+        $dir = 'debug-qr';
+        $prefix = 'captura-' . now()->format('Ymd-His');
+        $imagePath = $request->file('image')->storeAs($dir, $prefix . '.png', 'local');
+        $logPath = null;
+        if ($request->filled('log')) {
+            $logPath = $dir . '/' . $prefix . '.txt';
+            Storage::disk('local')->put($logPath, $request->input('log'));
+        }
+        return response()->json([
+            'ok'    => true,
+            'image' => $imagePath,
+            'log'   => $logPath,
+            'download_image' => route('ingresos.debug-download', ['file' => basename($imagePath)]),
+            'download_log'   => $logPath ? route('ingresos.debug-download', ['file' => basename($logPath)]) : null,
+        ]);
+    }
+
+    /**
+     * Descargar archivo de debug (imagen o log) guardado en storage/app/debug-qr/.
+     */
+    public function debugDownload(string $file)
+    {
+        $path = 'debug-qr/' . $file;
+        if (!Storage::disk('local')->exists($path)) {
+            abort(404);
+        }
+        $mime = str_ends_with(strtolower($file), '.txt') ? 'text/plain' : 'image/png';
+        return response(Storage::disk('local')->get($path), 200, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'attachment; filename="' . $file . '"',
+        ]);
     }
 }

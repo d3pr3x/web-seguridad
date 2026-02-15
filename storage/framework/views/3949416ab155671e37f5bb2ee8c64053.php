@@ -279,17 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajeCapturaCedula.textContent = 'Procesando…';
         mensajeCapturaCedula.classList.remove('hidden');
         requestAnimationFrame(function() {
-        var maxLado = 1920;
-        if (w > maxLado || h > maxLado) {
-            var scale = Math.min(maxLado / w, maxLado / h);
-            w = Math.round(w * scale);
-            h = Math.round(h * scale);
-        }
-        canvasCedula.width = w;
-        canvasCedula.height = h;
-        var ctx = canvasCedula.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(videoCedula, 0, 0, w, h);
-        escribirLogQR('2. Imagen capturada (' + w + '×' + h + ' px)');
         function terminar() {
             mensajeCapturaCedula.classList.add('hidden');
             mensajeCapturaCedula.textContent = '';
@@ -304,6 +293,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parts.length >= 2) escribirLogQR('   Nombre: ' + parts.slice(1).join(' '));
             escribirLogQR('--- Listo.');
             terminar();
+        }
+        function dibujarCanvas() {
+            var maxLado = 2560;
+            var cw = w, ch = h;
+            if (w > maxLado || h > maxLado) {
+                var scale = Math.min(maxLado / w, maxLado / h);
+                cw = Math.round(w * scale);
+                ch = Math.round(h * scale);
+            }
+            canvasCedula.width = cw;
+            canvasCedula.height = ch;
+            var ctx = canvasCedula.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(videoCedula, 0, 0, w, h, 0, 0, cw, ch);
+            w = cw;
+            h = ch;
+            escribirLogQR('2. Imagen capturada (' + w + '×' + h + ' px)');
         }
         function decodificarConJsQR(canvasEl) {
             try {
@@ -515,7 +520,23 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y vuelva a capturar.');
             terminar();
         }
-        setTimeout(intentarDecodificar, 100);
+        function continuarConCanvas() {
+            requestAnimationFrame(function() {
+                dibujarCanvas();
+                setTimeout(intentarDecodificar, 80);
+            });
+        }
+        escribirLogQR('2. Probando lectura directa del video (móvil)…');
+        if (typeof QrScanner !== 'undefined') {
+            if (!QrScanner.WORKER_PATH) QrScanner.WORKER_PATH = 'https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner-worker.min.js';
+            QrScanner.scanImage(videoCedula).then(function(r) {
+                var decoded = typeof r === 'string' ? r : (r && r.data) || null;
+                if (decoded) { exitoQR(decoded); return; }
+                continuarConCanvas();
+            }).catch(function() { continuarConCanvas(); });
+        } else {
+            continuarConCanvas();
+        }
         });
     }
     if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);

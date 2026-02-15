@@ -70,6 +70,17 @@
                         <details class="mt-4 border border-gray-200 rounded-lg overflow-hidden">
                             <summary class="px-4 py-3 bg-gray-50 font-medium text-gray-800 cursor-pointer select-none">Ver proceso de captura (consola)</summary>
                             <div id="log-qr" class="p-3 bg-gray-900 text-green-400 text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap break-all"></div>
+                            <div id="debug-qr-fallo" class="p-3 bg-amber-50 border-t border-amber-200 hidden">
+                                <p class="text-sm font-medium text-amber-800 mb-2">Debug (cuando falla la detección)</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <a id="debug-descargar-qr" href="#" class="text-sm text-blue-600 hover:underline">Descargar imagen capturada</a>
+                                    <button type="button" id="debug-copiar-log-qr" class="text-sm text-blue-600 hover:underline">Copiar log</button>
+                                    <a id="debug-ver-imagen-qr" href="#" target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline">Ver imagen en nueva pestaña</a>
+                                    <button type="button" id="debug-enviar-servidor-qr" class="text-sm text-blue-600 hover:underline">Enviar al servidor (Docker)</button>
+                                </div>
+                                <p id="debug-servidor-msg" class="text-xs mt-2 hidden"></p>
+                                <p class="text-xs text-gray-500 mt-2">Prueba la imagen en <code class="bg-gray-200 px-1">/qr-decode-test.html</code>. Desde el servidor: <code class="bg-gray-200 px-1">/ingresos/debug-download/NOMBRE_ARCHIVO</code></p>
+                            </div>
                         </details>
                     </div>
                 </div>
@@ -198,14 +209,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var mensajeCapturaCedula = document.getElementById('mensaje-captura-cedula');
     var logQR = document.getElementById('log-qr');
+    var debugQrFallo = document.getElementById('debug-qr-fallo');
     function escribirLogQR(linea) {
-        if (!logQR) return;
         var t = new Date().toLocaleTimeString('es-CL', { hour12: false });
-        logQR.textContent += '[' + t + '] ' + linea + '\n';
-        logQR.scrollTop = logQR.scrollHeight;
+        var texto = '[' + t + '] ' + linea;
+        if (logQR) {
+            logQR.textContent += texto + '\n';
+            logQR.scrollTop = logQR.scrollHeight;
+        }
+        try { console.log('[QR]', linea); } catch (e) {}
     }
     function limpiarLogQR() {
         if (logQR) logQR.textContent = '';
+        if (debugQrFallo) debugQrFallo.classList.add('hidden');
     }
     function capturarYLeerQR() {
         if (!videoCedula.srcObject || videoCedula.readyState < 2) {
@@ -254,6 +270,13 @@ document.addEventListener('DOMContentLoaded', function() {
             w = cw;
             h = ch;
             escribirLogQR('2. Imagen capturada (' + w + '×' + h + ' px)');
+            try {
+                var id = ctx.getImageData(0, 0, cw, ch);
+                var d = id.data, sum = 0, n = d.length / 4;
+                for (var i = 0; i < d.length; i += 4) sum += 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+                var lum = n ? Math.round(sum / n) : 0;
+                escribirLogQR('   Diagnóstico: luminosidad media = ' + lum + ' (0=negro, 255=blanco; óptimo ~100-180)');
+            } catch (e) {}
         }
         function decodificarConJsQR(canvasEl) {
             try {
@@ -462,7 +485,59 @@ document.addEventListener('DOMContentLoaded', function() {
         function falloQR() {
             escribirLogQR('4. No se detectó QR en la imagen.');
             escribirLogQR('--- Fallo.');
-            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y vuelva a capturar.');
+            if (debugQrFallo) {
+                debugQrFallo.classList.remove('hidden');
+                var descarga = document.getElementById('debug-descargar-qr');
+                var verImg = document.getElementById('debug-ver-imagen-qr');
+                var nombre = 'captura-qr-' + new Date().toISOString().slice(0,19).replace(/[-:T]/g,'') + '.png';
+                if (canvasCedula && canvasCedula.width > 0) {
+                    canvasCedula.toBlob(function(blob) {
+                        if (blob && descarga) {
+                            descarga.href = URL.createObjectURL(blob);
+                            descarga.download = nombre;
+                        }
+                    }, 'image/png', 1);
+                    try {
+                        verImg.href = canvasCedula.toDataURL('image/png');
+                        verImg.target = '_blank';
+                    } catch (e) {}
+                }
+                var btnCopiar = document.getElementById('debug-copiar-log-qr');
+                if (btnCopiar && logQR) {
+                    btnCopiar.onclick = function() {
+                        navigator.clipboard.writeText(logQR.textContent || '').then(function() { alert('Log copiado.'); }).catch(function() { alert('No se pudo copiar.'); });
+                    };
+                }
+                var btnEnviar = document.getElementById('debug-enviar-servidor-qr');
+                var msgServidor = document.getElementById('debug-servidor-msg');
+                if (btnEnviar && canvasCedula && canvasCedula.width > 0) {
+                    btnEnviar.onclick = function() {
+                        btnEnviar.disabled = true;
+                        if (msgServidor) { msgServidor.classList.remove('hidden'); msgServidor.textContent = 'Enviando…'; msgServidor.className = 'text-xs mt-2'; }
+                        canvasCedula.toBlob(function(blob) {
+                            if (!blob) { if (msgServidor) msgServidor.textContent = 'Error al obtener imagen.'; btnEnviar.disabled = false; return; }
+                            var fd = new FormData();
+                            fd.append('image', blob, 'captura.png');
+                            fd.append('log', logQR ? logQR.textContent : '');
+                            var url = '{{ route("ingresos.debug-captura") }}';
+                            fetch(url, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' } })
+                                .then(function(r) { return r.json(); })
+                                .then(function(data) {
+                                    if (msgServidor) {
+                                        msgServidor.classList.remove('hidden');
+                                        msgServidor.innerHTML = 'Guardado en el servidor. <a class="underline" href="' + (data.download_image || '') + '" download>Descargar imagen</a>' + (data.download_log ? ' | <a class="underline" href="' + data.download_log + '" download>Descargar log</a>' : '');
+                                    }
+                                    btnEnviar.disabled = false;
+                                })
+                                .catch(function(e) {
+                                    if (msgServidor) { msgServidor.classList.remove('hidden'); msgServidor.textContent = 'Error: ' + (e.message || 'no se pudo enviar'); }
+                                    btnEnviar.disabled = false;
+                                });
+                        }, 'image/png', 1);
+                    };
+                }
+            }
+            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y vuelva a capturar. Puede descargar la imagen desde «Ver proceso de captura».');
             terminar();
         }
         function continuarConCanvas() {

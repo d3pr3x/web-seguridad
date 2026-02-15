@@ -70,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('ingresos')->name('ingresos.')->group(function () {
         Route::get('/', [IngresosController::class, 'index'])->name('index');
         Route::get('/escaner', [IngresosController::class, 'escaner'])->name('escaner');
+        Route::post('/debug-captura', [IngresosController::class, 'debugCaptura'])->name('debug-captura');
+        Route::get('/debug-download/{file}', [IngresosController::class, 'debugDownload'])->name('debug-download')->where('file', '[a-zA-Z0-9._-]+');
         Route::get('/{id}/qr-salida', [IngresosController::class, 'qrSalida'])->name('qr-salida');
         Route::get('/{id}', [IngresosController::class, 'show'])->name('show');
         Route::post('/', [IngresosController::class, 'store'])->name('store');
