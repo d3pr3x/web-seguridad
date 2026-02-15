@@ -41,12 +41,12 @@
             <div id="panel-peatonal" class="tab-panel">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
                     <div class="p-6">
-                        <p class="text-sm text-gray-500 mb-3">Encuadre el QR de la cédula y pulse «Capturar y leer QR».</p>
+                        <p class="text-sm text-gray-500 mb-3">Encuadre el código de la cédula (QR en cédula nueva, PDF417 en cédula antigua) y pulse «Capturar y leer».</p>
                         <div id="lector-cedula" class="bg-gray-900 rounded overflow-hidden mb-2">
                             <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[400px] object-cover block"></video>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
                             <button type="button" id="btn-capturar-cedula" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
-                                Capturar y leer QR
+                                Capturar y leer
                             </button>
                         </div>
                         <canvas id="canvas-cedula" style="display:none"></canvas>
@@ -376,9 +376,16 @@ document.addEventListener('DOMContentLoaded', function() {
             c.getContext('2d').putImageData(img, 0, 0);
             return c;
         }
-        function decodificarConBarcodeDetector(canvasEl) {
+        function decodificarConBarcodeDetector(canvasEl, formatos) {
             if (typeof BarcodeDetector === 'undefined') return Promise.resolve(null);
-            return new BarcodeDetector({ formats: ['qr_code'] }).detect(canvasEl)
+            formatos = formatos || ['qr_code', 'pdf417'];
+            var detector;
+            try {
+                detector = new BarcodeDetector({ formats: formatos });
+            } catch (e) {
+                try { detector = new BarcodeDetector({ formats: ['qr_code'] }); } catch (e2) { return Promise.resolve(null); }
+            }
+            return detector.detect(canvasEl)
                 .then(function(barcodes) { return barcodes.length ? barcodes[0].rawValue : null; })
                 .catch(function() { return null; });
         }
@@ -674,12 +681,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (runMatch) {
             rutInput.value = formatearRut(runMatch[1].trim());
         }
-        var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
+        var parts = decodedText.split(/[\|@\n\r\t;]/).map(function(p) { return p.trim(); }).filter(Boolean);
         if (parts.length >= 2) {
             if (!runMatch) rutInput.value = formatearRut(parts[0]);
             nombreInput.value = parts.slice(1).join(' ').trim();
         } else if (parts.length === 1 && !runMatch && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
             rutInput.value = formatearRut(parts[0]);
+        }
+        if (!rutInput.value) {
+            var rutEnTexto = decodedText.match(/\b(\d{7,8}[-]?[0-9kK])\b/i);
+            if (rutEnTexto) rutInput.value = formatearRut(rutEnTexto[1]);
         }
     }
 
