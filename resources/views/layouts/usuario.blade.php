@@ -37,13 +37,13 @@
         .portal-layout div.flex-1,
         .portal-layout div[class*="flex-grow-1"] { background: var(--app-surface); min-height: 100vh; }
 
-        /* Contenedor del contenido: tarjeta clara, proporciones ordenadas */
+        /* Contenedor del contenido: sin caja (fondo beige continuo) */
         .portal-layout div.flex-1 > div.container,
         .portal-layout div[class*="flex-grow-1"] > div.container {
-            background: var(--app-card);
-            border: 1px solid var(--app-border);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
             padding: 1rem;
             margin: 0.75rem;
         }
@@ -70,11 +70,12 @@
             border-radius: 10px;
         }
 
-        /* Tarjetas internas: borde y sombra suave coherentes */
+        /* Tarjetas internas: tono crema y borde coherente (sin blanco) */
         .portal-layout div.flex-1 .bg-white.rounded-lg,
         .portal-layout div.flex-1 .bg-white.rounded-xl,
         .portal-layout div.flex-1 .rounded-xl.border {
-            border-color: var(--app-border) !important;
+            background: var(--app-card) !important;
+            border: 1px solid var(--app-border) !important;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         .portal-layout div.flex-1 .shadow-md { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }

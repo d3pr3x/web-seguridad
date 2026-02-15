@@ -19,9 +19,9 @@
             --app-font: 'DM Sans', system-ui, sans-serif;
             --app-primary: #0f766e;
             --app-primary-hover: #0d9488;
-            --app-surface: #f8fafc;
-            --app-card: #ffffff;
-            --app-border: #e2e8f0;
+            --app-surface: #f0ebe3;
+            --app-card: #f9f6f1;
+            --app-border: #e5dfd6;
             --app-text: #1e293b;
             --app-text-muted: #64748b;
             --app-nav-bg: #0f172a;
