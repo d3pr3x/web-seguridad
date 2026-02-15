@@ -24,7 +24,7 @@
                     <i class="fas fa-qrcode me-2" style="width: 1.25rem;"></i><span>Control de acceso</span>
                 </a>
             </li>
-            @if(auth()->user()->esUsuario() || auth()->user()->esSupervisorUsuario())
+            @if(auth()->user()->esUsuario() || auth()->user()->esSupervisorUsuario() || auth()->user()->esUsuarioSupervisor())
             <li class="nav-item">
                 <a href="{{ route('usuario.perfil.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.perfil.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.perfil.*') ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
                     <i class="fas fa-user me-2" style="width: 1.25rem;"></i><span>Mi perfil</span>

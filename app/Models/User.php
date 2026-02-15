@@ -134,7 +134,7 @@ class User extends Authenticatable
 
     public function esSupervisor()
     {
-        return $this->rol && in_array($this->rol->slug, ['SUPERVISOR', 'SUPERVISOR_USUARIO']);
+        return $this->rol && in_array($this->rol->slug, ['SUPERVISOR', 'SUPERVISOR_USUARIO', 'USUARIO_SUPERVISOR']);
     }
 
     public function getNombrePerfilAttribute()
@@ -145,6 +145,11 @@ class User extends Authenticatable
     public function esSupervisorUsuario()
     {
         return $this->rol && $this->rol->slug === 'SUPERVISOR_USUARIO';
+    }
+
+    public function esUsuarioSupervisor()
+    {
+        return $this->rol && $this->rol->slug === 'USUARIO_SUPERVISOR';
     }
 
     public function esUsuario()

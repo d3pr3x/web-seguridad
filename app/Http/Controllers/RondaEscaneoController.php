@@ -115,7 +115,7 @@ class RondaEscaneoController extends Controller
             ]);
         }
 
-        $target = $user->esUsuario() || $user->esSupervisorUsuario()
+        $target = $user->esUsuario() || $user->esSupervisorUsuario() || $user->esUsuarioSupervisor()
             ? route('usuario.ronda.index')
             : ($user->esAdministrador() ? route('administrador.index') : route('supervisor.index'));
 

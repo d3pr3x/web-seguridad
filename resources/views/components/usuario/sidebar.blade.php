@@ -24,7 +24,7 @@
                 </a>
             </li>
 
-            @if(auth()->user()->esUsuario() || auth()->user()->esSupervisorUsuario())
+            @if(auth()->user()->esUsuario() || auth()->user()->esSupervisorUsuario() || auth()->user()->esUsuarioSupervisor())
             <li class="nav-item">
                 <a href="{{ route('usuario.perfil.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.perfil.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.perfil.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
                     <i class="fas fa-user me-2" style="width: 1.25rem;"></i>
