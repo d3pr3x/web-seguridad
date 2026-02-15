@@ -45,9 +45,14 @@
                         <div id="lector-cedula" class="bg-gray-900 rounded overflow-hidden mb-2">
                             <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[400px] object-cover block"></video>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
-                            <button type="button" id="btn-capturar-cedula" class="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
-                                Capturar y leer
-                            </button>
+                            <div class="flex flex-col gap-2 mt-2">
+                                <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
+                                    Capturar y leer
+                                </button>
+                                <button type="button" id="btn-capturar-cedula-reintentar" class="w-full py-2.5 border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium rounded-lg transition hidden">
+                                    Capturar de nuevo (reintentar)
+                                </button>
+                            </div>
                         </div>
                         <canvas id="canvas-cedula" style="display:none"></canvas>
                         <canvas id="canvas-cedula-espejo" style="display:none"></canvas>
@@ -201,11 +206,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function iniciarLectorCedula() {
         if (videoCedula.srcObject) return;
-        var constraints = { video: { facingMode: 'environment' }, audio: false };
+        var constraints = {
+            video: {
+                facingMode: 'environment',
+                width: { ideal: 1280, min: 640 },
+                height: { ideal: 720, min: 480 }
+            },
+            audio: false
+        };
         navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
             streamCedula = stream;
             videoCedula.srcObject = stream;
             return videoCedula.play();
+        }).catch(function() {
+            return navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            }).then(function(stream) {
+                streamCedula = stream;
+                videoCedula.srcObject = stream;
+                return videoCedula.play();
+            });
         }).catch(function() {
             return navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
                 streamCedula = stream;
@@ -251,13 +272,28 @@ document.addEventListener('DOMContentLoaded', function() {
         btnCapturarCedula.disabled = true;
         mensajeCapturaCedula.textContent = 'Procesando…';
         mensajeCapturaCedula.classList.remove('hidden');
+        var btnReintentar = document.getElementById('btn-capturar-cedula-reintentar');
+        if (btnReintentar) btnReintentar.classList.remove('hidden');
         requestAnimationFrame(function() {
         var lumActual = 0;
+        var captureTimeoutId = setTimeout(function() {
+            terminar();
+            mensajeCapturaCedula.textContent = 'Tiempo agotado. Puede intentar de nuevo.';
+            mensajeCapturaCedula.classList.remove('hidden');
+            setTimeout(function() {
+                mensajeCapturaCedula.classList.add('hidden');
+                mensajeCapturaCedula.textContent = '';
+            }, 4000);
+        }, 90000);
         function terminar() {
+            clearTimeout(captureTimeoutId);
+            if (typeof window._terminarCapturaCedula === 'function') window._terminarCapturaCedula = null;
             mensajeCapturaCedula.classList.add('hidden');
             mensajeCapturaCedula.textContent = '';
             btnCapturarCedula.disabled = false;
+            if (btnReintentar) btnReintentar.classList.add('hidden');
         }
+        window._terminarCapturaCedula = terminar;
         function exitoQR(decodedText) {
             escribirLogQR('4. QR obtenido: ' + (decodedText.length > 60 ? decodedText.slice(0, 60) + '…' : decodedText));
             onScanCedula(decodedText);
@@ -265,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (runMatch) escribirLogQR('5. RUT extraído: ' + formatearRut(runMatch[1].trim()));
             var parts = decodedText.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
             if (parts.length >= 2) escribirLogQR('   Nombre: ' + parts.slice(1).join(' '));
+            else if (nombreInput && nombreInput.value) escribirLogQR('   Nombre: ' + nombreInput.value);
             escribirLogQR('--- Listo.');
             terminar();
         }
@@ -814,6 +851,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 return decodificarConBarcodeDetector(canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6));
             }).then(function(decoded) {
                 if (decoded) { exitoQR(decoded); return; }
+                escribirLogQR('3a0c2. Probando BarcodeDetector solo PDF417 (cédula antigua)…');
+                return decodificarConBarcodeDetector(canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6), ['pdf417']);
+            }).then(function(decoded) {
+                if (decoded) { exitoQR(decoded); return; }
+                return decodificarConBarcodeDetector(canvasRecorteIzquierdo(canvasCedula, 0.4), ['pdf417']);
+            }).then(function(decoded) {
+                if (decoded) { exitoQR(decoded); return; }
                 if (typeof QrScanner !== 'undefined') {
                     escribirLogQR('3a0b. Probando QrScanner…');
                     return QrScanner.scanImage(canvasCedula).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
@@ -835,8 +879,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 return decodificarConZXing(canvasEscalar(cSupIzq, 3));
             }).then(function(decoded) {
                 if (decoded) { exitoQR(decoded); return; }
+                escribirLogQR('3a0e. Imagen de baja resolución: probando 2x/3x y BarcodeDetector…');
+                var w2 = Math.min(w * 2, 1920), h2 = Math.min(h * 2, 1920);
+                var cBig = document.createElement('canvas');
+                cBig.width = w2; cBig.height = h2;
+                var ctxBig = cBig.getContext('2d');
+                ctxBig.imageSmoothingEnabled = true;
+                ctxBig.imageSmoothingQuality = 'high';
+                ctxBig.drawImage(canvasCedula, 0, 0, w, h, 0, 0, w2, h2);
+                return decodificarConBarcodeDetector(cBig).then(function(d) {
+                    if (d) return d;
+                    if (typeof QrScanner !== 'undefined') {
+                        return QrScanner.scanImage(cBig).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
+                    }
+                    return null;
+                }).then(function(d) {
+                    if (d) return d;
+                    if (w * h < 500000) {
+                        var w3 = Math.min(w * 3, 1920), h3 = Math.min(h * 3, 1920);
+                        var cBig3 = document.createElement('canvas');
+                        cBig3.width = w3; cBig3.height = h3;
+                        var ctx3 = cBig3.getContext('2d');
+                        ctx3.imageSmoothingEnabled = true;
+                        ctx3.imageSmoothingQuality = 'high';
+                        ctx3.drawImage(canvasCedula, 0, 0, w, h, 0, 0, w3, h3);
+                        var dJs = decodificarConJsQR(cBig3);
+                        if (dJs) return dJs;
+                        return decodificarConBarcodeDetector(cBig3);
+                    }
+                    return null;
+                });
+            }).then(function(decoded) {
+                if (decoded) { exitoQR(decoded); return; }
                 seguirConJsQR();
-            }).catch(function() { seguirConJsQR(); });
+            }).catch(function() {
+                try { seguirConJsQR(); } catch (e) { falloQR(); }
+            }).catch(falloQR);
         }
         function procesarConArchivo(blob, blobContraste, blobIzq, blobBrillo, blobSupIzq) {
             var file = new File([blob], 'captura.png', { type: 'image/png' });
@@ -975,7 +1053,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                 }
             }
-            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y vuelva a capturar. Puede descargar la imagen desde «Ver proceso de captura».');
+            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y pulse «Capturar de nuevo» para intentar con otra imagen. Puede descargar la imagen desde «Ver proceso de captura».');
             terminar();
         }
         function continuarConCanvas() {
@@ -999,16 +1077,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);
     if (btnCapturarCedula) btnCapturarCedula.disabled = true;
+    var btnCapturarCedulaReintentar = document.getElementById('btn-capturar-cedula-reintentar');
+    if (btnCapturarCedulaReintentar) {
+        btnCapturarCedulaReintentar.addEventListener('click', function() {
+            if (typeof window._terminarCapturaCedula === 'function') {
+                window._terminarCapturaCedula();
+            }
+        });
+    }
+
+    function extraerParametroUrl(texto, param) {
+        var regex = new RegExp('[?&]' + param + '=([^&\\s]+)', 'i');
+        var m = texto.match(regex);
+        if (!m) return '';
+        try {
+            return decodeURIComponent(m[1].replace(/\+/g, ' ')).trim();
+        } catch (e) {
+            return m[1].replace(/\+/g, ' ').trim();
+        }
+    }
 
     function onScanCedula(decodedText) {
         var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
         if (runMatch) {
             rutInput.value = formatearRut(runMatch[1].trim());
+            var nombreUrl = extraerParametroUrl(decodedText, 'NOMBRE') || extraerParametroUrl(decodedText, 'NOMBRES') || extraerParametroUrl(decodedText, 'NAME');
+            if (nombreUrl) nombreInput.value = nombreUrl;
         }
         var parts = decodedText.split(/[\|@\n\r\t;]/).map(function(p) { return p.trim(); }).filter(Boolean);
         if (parts.length >= 2) {
             if (!runMatch) rutInput.value = formatearRut(parts[0]);
-            nombreInput.value = parts.slice(1).join(' ').trim();
+            var nombrePartes = parts.slice(1).join(' ').trim();
+            if (nombrePartes) nombreInput.value = nombrePartes;
         } else if (parts.length === 1 && !runMatch && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
             rutInput.value = formatearRut(parts[0]);
         }
