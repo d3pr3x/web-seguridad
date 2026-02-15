@@ -7,7 +7,6 @@
 <aside class="d-none d-lg-flex flex-column position-fixed top-0 start-0 h-100 z-30 overflow-hidden" style="width: 256px; background: var(--app-sidebar);">
     <div class="p-3 border-bottom" style="border-color: rgba(148,163,184,0.2) !important;">
         <p class="mb-0 small fw-semibold text-white text-truncate" title="Portal {{ auth()->user()->nombre_perfil }}">Portal {{ auth()->user()->nombre_perfil }}</p>
-        <p class="mb-0 small text-truncate" style="color: var(--app-sidebar-text);" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</p>
     </div>
     <nav class="flex-grow-1 overflow-auto py-2">
         <ul class="nav flex-column px-2">

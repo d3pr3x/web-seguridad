@@ -1,5 +1,5 @@
-<!-- Menú Móvil (solo visible en móvil) - Fondo oscuro, texto claro y legible -->
-<div id="sideMenu" class="d-lg-none position-fixed top-0 end-0 h-100 z-50 overflow-hidden transition-all duration-300 shadow side-menu-mobile" style="width: 280px; max-width: 85vw; transform: translateX(100%);">
+<!-- Menú Móvil (solo visible en móvil) - Abre por la izquierda, igual que la barra en escritorio -->
+<div id="sideMenu" class="d-lg-none position-fixed top-0 start-0 h-100 z-50 overflow-hidden transition-all duration-300 shadow side-menu-mobile" style="width: 280px; max-width: 85vw; transform: translateX(-100%);">
     <div class="p-3 border-bottom d-flex align-items-center justify-content-between side-menu-header" style="border-color: rgba(226,232,240,0.25) !important;">
         <h2 class="mb-0 fw-bold" style="color: #f8fafc; font-size: 1.1rem;">Menú</h2>
         <button type="button" onclick="toggleMenu()" class="btn btn-link p-2 text-decoration-none rounded" style="color: #f1f5f9;">
@@ -127,7 +127,7 @@
         </ul>
     </div>
 </div>
-<div id="menuOverlay" class="d-lg-none position-fixed top-0 start-0 w-100 h-100 z-40 bg-black bg-opacity-50" style="display: none;" onclick="toggleMenu()"></div>
+<div id="menuOverlay" class="d-lg-none position-fixed top-0 start-0 w-100 h-100 z-40 bg-black bg-opacity-50" style="display: none; left: 0;" onclick="toggleMenu()"></div>
 <style>
 /* Menú móvil: fondo oscuro forzado (evitar que Bootstrap o temas pinten de claro) */
 #sideMenu.side-menu-mobile,
