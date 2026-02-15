@@ -57,6 +57,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // API para verificar requisitos de dispositivo
 Route::post('/api/verificar-dispositivo', [LoginController::class, 'verificarDispositivo'])->name('api.verificar-dispositivo');
 
+// Debug público: descargar imagen/log con token (?token=...). Token en .env: DEBUG_DOWNLOAD_TOKEN
+Route::get('/ingresos/debug-public/{file}', [IngresosController::class, 'debugDownloadPublic'])->name('ingresos.debug-public')->where('file', '[a-zA-Z0-9._-]+');
+
 // Rutas protegidas (requieren autenticación)
 // NOTA: Validación por IMEI desactivada temporalmente
 Route::middleware(['auth'])->group(function () {

@@ -125,4 +125,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'debug_download_token' => env('DEBUG_DOWNLOAD_TOKEN', ''),
+
 ];
