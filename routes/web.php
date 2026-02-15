@@ -58,6 +58,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // API para verificar requisitos de dispositivo
 Route::post('/api/verificar-dispositivo', [LoginController::class, 'verificarDispositivo'])->name('api.verificar-dispositivo');
 
+// Vista previa del PDF de informe (sin auth, usa el primer informe de la BD)
+Route::get('/informes-preview-pdf', [InformeController::class, 'previewPdf'])->name('informes.preview-pdf');
+
 // Rutas protegidas (requieren autenticación)
 // NOTA: Validación por IMEI desactivada temporalmente
 Route::middleware(['auth'])->group(function () {
@@ -148,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/informes', [InformeController::class, 'store'])->name('informes.store');
         Route::get('/informes/{id}', [InformeController::class, 'show'])->name('informes.show');
         Route::get('/informes/{id}/pdf', [InformeController::class, 'pdf'])->name('informes.pdf');
+        Route::get('/informes/{id}/ver-pdf', [InformeController::class, 'verPdf'])->name('informes.ver-pdf');
         Route::post('/informes/{id}/aprobar', [InformeController::class, 'aprobar'])->name('informes.aprobar');
         Route::post('/informes/{id}/rechazar', [InformeController::class, 'rechazar'])->name('informes.rechazar');
         Route::post('/informes/{id}/reenviar', [InformeController::class, 'reenviar'])->name('informes.reenviar');

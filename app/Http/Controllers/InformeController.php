@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Reporte;
 use App\Models\Informe;
@@ -158,12 +159,95 @@ class InformeController extends Controller
             })
             ->firstOrFail();
 
-        // Dividir fotografías en hojas de 4
-        $fotografiasPorHoja = array_chunk($informe->fotografias, 4);
-        
-        $pdf = Pdf::loadView('informes.pdf', compact('informe', 'fotografiasPorHoja'));
-        
+        $pdf = Pdf::loadView('informes.pdf', compact('informe'));
+        $pdf->setPaper('letter', 'portrait');
+
         return $pdf->download('informe_incidente_' . $informe->numero_informe . '.pdf');
+    }
+
+    /**
+     * Ver PDF del informe en el navegador (inline)
+     */
+    public function verPdf($id)
+    {
+        $userId = Auth::id();
+        $informe = Informe::with(['reporte.tarea', 'reporte.user'])
+            ->where('id', $id)
+            ->whereHas('reporte', function($query) use ($userId) {
+                $query->where('id_usuario', $userId);
+            })
+            ->firstOrFail();
+
+        $pdf = Pdf::loadView('informes.pdf', compact('informe'));
+        $pdf->setPaper('letter', 'portrait');
+
+        return $pdf->stream('informe_incidente_' . $informe->numero_informe . '.pdf', ['Attachment' => false]);
+    }
+
+    /**
+     * Vista previa del PDF (usa el primer informe de la BD o datos de demostración)
+     */
+    public function previewPdf()
+    {
+        $informe = Informe::with(['reporte.tarea', 'reporte.user'])->orderBy('id')->first();
+        if (!$informe) {
+            $informe = $this->informeDemo();
+        }
+        $pdf = Pdf::loadView('informes.pdf', compact('informe'));
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream('informe_incidente_' . $informe->numero_informe . '.pdf', ['Attachment' => false]);
+    }
+
+    /**
+     * Objeto informe de demostración (sin BD) para previsualizar el PDF
+     */
+    private function informeDemo(): object
+    {
+        $fecha = Carbon::parse('2026-02-06')->locale('es');
+        $user = (object) ['nombre_completo' => 'Supervisor'];
+        $tarea = (object) ['nombre' => 'Delito en turno'];
+        $reporte = (object) [
+            'user' => $user,
+            'tarea' => $tarea,
+        ];
+        $informe = (object) [
+            'numero_informe' => 43,
+            'created_at' => $fecha,
+            'reporte' => $reporte,
+            'aprobado_por' => 'Administrador de Contrato',
+            'fecha_aprobacion' => $fecha,
+            'descripcion' => "Siendo las 15.24 horas de hoy viernes 06 de febrero de 2026, File 324 San Bernardo oriente, cuadrícula 1, individuos desconocidos fracturan ventana de SUV, sustrayendo dos mochilas con un notebook y ropa.\n\nGuardia activa protocolos de seguridad y llamado a Carabineros.",
+            'fotografias' => $this->primeraImagenDemo(),
+            'acciones_inmediatas' => [
+                'Personal de seguridad activa protocolos de seguridad.',
+                'Se aplica protocolo de contención de víctimas.',
+                'Carabineros no se constituye.',
+                'Se realiza encargo a las demás Estaciones para prevenir otros incidentes.',
+                'Se solicita respaldo de imágenes.',
+            ],
+            'conclusiones' => [
+                'Se establece modus operandi robo mediante fractura de ventana.',
+                'Existe señalética que aconseja no dejar bolsos al interior de los vehículos.',
+                'Carabineros no se constituye.',
+                'Se refuerzan protocolos de seguridad a nuestros Guardias.',
+            ],
+        ];
+        return $informe;
+    }
+
+    private function primeraImagenDemo(): array
+    {
+        $dir = storage_path('app/public/reportes');
+        if (!is_dir($dir)) {
+            return [];
+        }
+        $files = array_values(array_diff(scandir($dir), ['.', '..']));
+        foreach ($files as $file) {
+            if (preg_match('/\.(jpe?g|png|gif|webp)$/i', $file)) {
+                return ['reportes/' . $file];
+            }
+        }
+        return [];
     }
 
     /**
