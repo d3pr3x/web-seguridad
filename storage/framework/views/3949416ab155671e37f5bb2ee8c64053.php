@@ -313,6 +313,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 return code ? code.data : null;
             } catch (e) { return null; }
         }
+        function canvasConMasContraste(srcCanvas) {
+            var c = document.createElement('canvas');
+            c.width = srcCanvas.width;
+            c.height = srcCanvas.height;
+            var ctx = srcCanvas.getContext('2d');
+            var img = ctx.getImageData(0, 0, c.width, c.height);
+            var d = img.data;
+            var lums = [];
+            for (var i = 0; i < d.length; i += 4) {
+                lums.push(0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2]);
+            }
+            lums.sort(function(a,b) { return a - b; });
+            var p2 = lums[Math.floor(lums.length * 0.02)] || 0;
+            var p98 = lums[Math.floor(lums.length * 0.98)] || 255;
+            var span = p98 - p2 || 1;
+            for (i = 0; i < d.length; i += 4) {
+                var L = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+                var v = Math.round((L - p2) * 255 / span);
+                v = v < 0 ? 0 : v > 255 ? 255 : v;
+                d[i] = d[i+1] = d[i+2] = v;
+            }
+            var ctxOut = c.getContext('2d');
+            ctxOut.putImageData(img, 0, 0);
+            return c;
+        }
         function intentarDecodificar() {
             escribirLogQR('3. Decodificando QR (jsQR, imagen original)…');
             var decoded = decodificarConJsQR(canvasCedula);
@@ -328,9 +353,15 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx2.setTransform(1, 0, 0, 1, 0, 0);
             decoded = decodificarConJsQR(c2);
             if (decoded) { exitoQR(decoded); return; }
-            if (w <= 800 && h <= 600) {
-                escribirLogQR('3b. Probando con imagen 2x (más resolución)…');
-                var w2 = w * 2, h2 = h * 2;
+            escribirLogQR('3b. Probando con más contraste (cédula)…');
+            var cContraste = canvasConMasContraste(canvasCedula);
+            decoded = decodificarConJsQR(cContraste);
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasConMasContraste(c2));
+            if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3c. Probando con imagen 2x (más resolución)…');
+            var w2 = Math.min(w * 2, 1920), h2 = Math.min(h * 2, 1920);
+            if (w2 > w || h2 > h) {
                 var cBig = document.createElement('canvas');
                 cBig.width = w2;
                 cBig.height = h2;
@@ -340,24 +371,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctxBig.drawImage(canvasCedula, 0, 0, w, h, 0, 0, w2, h2);
                 decoded = decodificarConJsQR(cBig);
                 if (decoded) { exitoQR(decoded); return; }
+                decoded = decodificarConJsQR(canvasConMasContraste(cBig));
+                if (decoded) { exitoQR(decoded); return; }
             }
-            escribirLogQR('3c. Probando con Html5Qrcode (archivo)…');
+            escribirLogQR('3d. Probando con Html5Qrcode (archivo)…');
             canvasCedula.toBlob(function(blob) {
                 if (!blob) {
                     var dataUrl = canvasCedula.toDataURL('image/png');
                     fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(b) {
-                        procesarConArchivo(b);
+                        procesarConArchivo(b, null);
                     }).catch(falloQR);
                     return;
                 }
-                procesarConArchivo(blob);
+                var cContrasteBlob = canvasConMasContraste(canvasCedula);
+                cContrasteBlob.toBlob(function(blobContraste) {
+                    procesarConArchivo(blob, blobContraste);
+                }, 'image/png', 1);
             }, 'image/png', 1);
         }
-        function procesarConArchivo(blob) {
+        function procesarConArchivo(blob, blobContraste) {
             var file = new File([blob], 'captura.png', { type: 'image/png' });
             var scanner = new Html5Qrcode('dummy-cedula');
-            scanner.scanFile(file, false).then(exitoQR).catch(function(err) {
-                escribirLogQR('3d. Html5Qrcode falló, reintento con imagen espejo (archivo)…');
+            function intentarConEspejo() {
+                escribirLogQR('3e. Reintento con imagen espejo (archivo)…');
                 var c2 = document.getElementById('canvas-cedula-espejo');
                 c2.width = w;
                 c2.height = h;
@@ -372,6 +408,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         new Html5Qrcode('dummy-cedula').scanFile(file2, false).then(exitoQR).catch(falloQR);
                     } else falloQR();
                 }, 'image/png', 1);
+            }
+            scanner.scanFile(file, false).then(exitoQR).catch(function() {
+                if (blobContraste) {
+                    escribirLogQR('3e. Reintento con imagen con más contraste (archivo)…');
+                    var fileC = new File([blobContraste], 'captura-contraste.png', { type: 'image/png' });
+                    new Html5Qrcode('dummy-cedula').scanFile(fileC, false).then(exitoQR).catch(intentarConEspejo);
+                } else intentarConEspejo();
             });
         }
         function falloQR() {
