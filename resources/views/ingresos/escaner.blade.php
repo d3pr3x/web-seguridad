@@ -1097,6 +1097,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function buscarPersonaPorRut() {
+        var rut = (rutInput.value || rutManual.value || '').replace(/\s/g, '');
+        if (rut.length < 8) return;
+        var url = '{{ route("ingresos.buscar-persona") }}?rut=' + encodeURIComponent(rut);
+        fetch(url, { method: 'GET', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.found && data.nombre && !nombreInput.value) nombreInput.value = data.nombre;
+            })
+            .catch(function() {});
+    }
+
     function onScanCedula(decodedText) {
         var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
         if (runMatch) {
@@ -1116,6 +1128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var rutEnTexto = decodedText.match(/\b(\d{7,8}[-]?[0-9kK])\b/i);
             if (rutEnTexto) rutInput.value = formatearRut(rutEnTexto[1]);
         }
+        if (rutInput.value && !nombreInput.value) setTimeout(buscarPersonaPorRut, 150);
     }
 
     function formatearRut(val) {
@@ -1124,7 +1137,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return r.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + r.slice(-1);
     }
 
-    rutManual.addEventListener('input', function() { rutInput.value = formatearRut(this.value); });
+    rutManual.addEventListener('input', function() {
+        rutInput.value = formatearRut(this.value);
+        clearTimeout(window._timeoutBuscarPersona);
+        window._timeoutBuscarPersona = setTimeout(buscarPersonaPorRut, 400);
+    });
     nombreManual.addEventListener('input', function() { nombreInput.value = this.value; });
 
     function detenerCedula() {

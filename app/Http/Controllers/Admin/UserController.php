@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Persona;
 use App\Models\RolUsuario;
 use App\Models\User;
 use App\Models\Sucursal;
@@ -76,6 +77,10 @@ class UserController extends Controller
 
         User::create($validated);
 
+        Persona::registrarOActualizar($validated['run'], $validated['nombre_completo'], [
+            'sucursal_id' => $validated['sucursal_id'],
+        ]);
+
         return redirect()->route('admin.usuarios.index')
             ->with('success', 'Usuario creado correctamente.');
     }
@@ -112,9 +117,16 @@ class UserController extends Controller
         if (!empty($validated['password'] ?? null)) {
             $validated['clave'] = Hash::make($validated['password']);
         }
-        unset($validated['password'], $validated['password_confirmation'] ?? null);
+        unset($validated['password']);
+        if (isset($validated['password_confirmation'])) {
+            unset($validated['password_confirmation']);
+        }
 
         $usuario->update($validated);
+
+        Persona::registrarOActualizar($validated['run'], $validated['nombre_completo'], [
+            'sucursal_id' => $validated['sucursal_id'],
+        ]);
 
         return redirect()->route('admin.usuarios.index')
             ->with('success', 'Usuario actualizado correctamente.');

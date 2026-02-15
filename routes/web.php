@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\RondaReporteController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\IngresosController;
 use App\Http\Controllers\BlacklistController;
+use App\Http\Controllers\PersonasController;
 
 // Ruta principal - redirigir según autenticación y rol
 Route::get('/', function () {
@@ -73,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('ingresos')->name('ingresos.')->group(function () {
         Route::get('/', [IngresosController::class, 'index'])->name('index');
         Route::get('/escaner', [IngresosController::class, 'escaner'])->name('escaner');
+        Route::get('/buscar-persona', [IngresosController::class, 'buscarPersona'])->name('buscar-persona');
         Route::post('/debug-captura', [IngresosController::class, 'debugCaptura'])->name('debug-captura');
         Route::get('/debug-download/{file}', [IngresosController::class, 'debugDownload'])->name('debug-download')->where('file', '[a-zA-Z0-9._-]+');
         Route::get('/{id}/qr-salida', [IngresosController::class, 'qrSalida'])->name('qr-salida');
@@ -85,6 +87,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/blacklist', [BlacklistController::class, 'store'])->name('blacklist.store');
     Route::delete('/blacklist/{id}', [BlacklistController::class, 'destroy'])->name('blacklist.destroy');
     Route::patch('/blacklist/{id}/toggle', [BlacklistController::class, 'toggle'])->name('blacklist.toggle');
+
+    Route::get('/personas', [PersonasController::class, 'index'])->name('personas.index');
+    Route::get('/personas/crear', [PersonasController::class, 'create'])->name('personas.create');
+    Route::post('/personas', [PersonasController::class, 'store'])->name('personas.store');
+    Route::get('/personas/{id}/editar', [PersonasController::class, 'edit'])->name('personas.edit');
+    Route::put('/personas/{id}', [PersonasController::class, 'update'])->name('personas.update');
+    Route::delete('/personas/{id}', [PersonasController::class, 'destroy'])->name('personas.destroy');
 
     // Rutas que requieren verificación de sucursal
     Route::middleware(['verificar.sucursal'])->group(function () {

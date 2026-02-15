@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ingreso;
 use App\Models\Blacklist;
+use App\Models\Persona;
 use App\Rules\ChileRut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +46,28 @@ class IngresosController extends Controller
     public function escaner()
     {
         return view('ingresos.escaner');
+    }
+
+    /**
+     * API: buscar persona por RUT para completar nombre en el escáner (base de personas).
+     */
+    public function buscarPersona(Request $request)
+    {
+        $rut = $request->query('rut');
+        if (!$rut || strlen(trim($rut)) < 8) {
+            return response()->json(['found' => false]);
+        }
+        $persona = Persona::buscarPorRut(trim($rut));
+        if (!$persona) {
+            return response()->json(['found' => false]);
+        }
+        return response()->json([
+            'found' => true,
+            'nombre' => $persona->nombre,
+            'telefono' => $persona->telefono,
+            'email' => $persona->email,
+            'empresa' => $persona->empresa,
+        ]);
     }
 
     /**
@@ -97,6 +120,10 @@ class IngresosController extends Controller
                 }
             })
             ->first();
+
+        if ($rut && trim($nombre) !== '') {
+            Persona::registrarOActualizar($rut, trim($nombre));
+        }
 
         if ($blacklistHit) {
             $ingreso = Ingreso::create([
