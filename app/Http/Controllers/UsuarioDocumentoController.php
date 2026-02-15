@@ -29,7 +29,7 @@ class UsuarioDocumentoController extends Controller
         // Obtener documentos pendientes
         $documentosPendientes = $user->documentosPersonales()
             ->whereIn('estado', ['pendiente', 'rechazado'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('creado_en', 'desc')
             ->get();
         
         return view('usuario.documentos.index', compact('tiposDocumentos', 'documentosAprobados', 'documentosPendientes'));

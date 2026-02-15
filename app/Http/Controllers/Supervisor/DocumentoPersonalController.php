@@ -27,7 +27,7 @@ class DocumentoPersonalController extends Controller
             $query->where('id_usuario', $request->id_usuario);
         }
         
-        $documentos = $query->orderBy('created_at', 'desc')->paginate(20);
+        $documentos = $query->orderBy('creado_en', 'desc')->paginate(20);
         
         $estadisticas = [
             'pendientes' => DocumentoPersonal::where('estado', 'pendiente')->count(),
@@ -109,7 +109,7 @@ class DocumentoPersonalController extends Controller
     {
         $documentos = $user->documentosPersonales()
             ->orderBy('tipo_documento')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('creado_en', 'desc')
             ->get();
         
         $tiposDocumentos = [

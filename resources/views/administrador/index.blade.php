@@ -21,15 +21,15 @@
             @endif
 
             <!-- Información de Usuario (solo móvil) -->
-            <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6 overflow-hidden">
-                <div class="flex items-center min-w-0">
-                    <div class="bg-teal-100 rounded-full p-3 mr-4 shrink-0">
-                        <i class="fas fa-user text-teal-600 text-xl"></i>
+            <div class="lg:hidden bg-white rounded-lg shadow-sm border border-gray-100 p-3 mb-4 overflow-hidden">
+                <div class="flex items-center min-w-0 gap-3">
+                    <div class="bg-teal-100 rounded-full p-2 shrink-0">
+                        <i class="fas fa-user text-teal-600 text-base"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h2 class="text-lg font-bold text-gray-800 truncate" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</h2>
-                        <p class="text-sm text-gray-600 truncate">{{ auth()->user()->nombre_perfil }}</p>
-                        <p class="text-sm text-gray-600 truncate">{{ auth()->user()->nombre_sucursal }}</p>
+                        <h2 class="text-base font-bold text-gray-800 truncate" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</h2>
+                        <p class="text-xs text-gray-600 truncate">{{ auth()->user()->nombre_perfil }}</p>
+                        <p class="text-xs text-gray-600 truncate">{{ auth()->user()->nombre_sucursal }}</p>
                     </div>
                 </div>
             </div>

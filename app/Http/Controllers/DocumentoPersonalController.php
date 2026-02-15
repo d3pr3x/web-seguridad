@@ -28,7 +28,7 @@ class DocumentoPersonalController extends Controller
         }
         
         // Obtener documentos
-        $documentos = $query->orderBy('created_at', 'desc')->paginate(20);
+        $documentos = $query->orderBy('creado_en', 'desc')->paginate(20);
         
         // Estadísticas
         $estadisticas = [
@@ -125,7 +125,7 @@ class DocumentoPersonalController extends Controller
     {
         $documentos = $user->documentosPersonales()
             ->orderBy('tipo_documento')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('creado_en', 'desc')
             ->get();
         
         $tiposDocumentos = [
