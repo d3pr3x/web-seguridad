@@ -1,13 +1,13 @@
 <!-- Menú Móvil (solo visible en móvil) - Fondo oscuro, texto claro y legible -->
-<div id="sideMenu" class="d-lg-none position-fixed top-0 end-0 h-100 z-50 overflow-hidden transition-all duration-300 shadow side-menu-mobile" style="width: 280px; max-width: 85vw; background: #0f172a; transform: translateX(100%);">
-    <div class="p-3 border-bottom d-flex align-items-center justify-content-between" style="border-color: rgba(226,232,240,0.25) !important;">
+<div id="sideMenu" class="d-lg-none position-fixed top-0 end-0 h-100 z-50 overflow-hidden transition-all duration-300 shadow side-menu-mobile" style="width: 280px; max-width: 85vw; transform: translateX(100%);">
+    <div class="p-3 border-bottom d-flex align-items-center justify-content-between side-menu-header" style="border-color: rgba(226,232,240,0.25) !important;">
         <h2 class="mb-0 fw-bold" style="color: #f8fafc; font-size: 1.1rem;">Menú</h2>
         <button type="button" onclick="toggleMenu()" class="btn btn-link p-2 text-decoration-none rounded" style="color: #f1f5f9;">
             <i class="fas fa-times" style="font-size: 1.25rem;"></i>
         </button>
     </div>
-    <div class="flex-grow-1 overflow-auto py-2 px-2">
-        <ul class="nav flex-column">
+    <div class="flex-grow-1 overflow-auto py-2 px-2 side-menu-body">
+        <ul class="nav flex-column side-menu-nav">
             @php
                 $homeRoute = auth()->user()->esAdministrador()
                     ? 'administrador.index'
@@ -125,7 +125,14 @@
 </div>
 <div id="menuOverlay" class="d-lg-none position-fixed top-0 start-0 w-100 h-100 z-40 bg-black bg-opacity-50" style="display: none;" onclick="toggleMenu()"></div>
 <style>
-/* Menú móvil: contraste alto, texto siempre legible */
+/* Menú móvil: fondo oscuro forzado (evitar que Bootstrap o temas pinten de claro) */
+#sideMenu.side-menu-mobile,
+#sideMenu.side-menu-mobile .side-menu-header,
+#sideMenu.side-menu-mobile .side-menu-body,
+#sideMenu.side-menu-mobile .side-menu-nav,
+#sideMenu.side-menu-mobile ul.nav { background: #0f172a !important; }
+#sideMenu.side-menu-mobile .nav-item { background: transparent !important; }
+/* Contraste alto: texto claro sobre fondo oscuro */
 .side-menu-mobile .nav-link { text-decoration: none !important; }
 .side-menu-mobile .side-menu-link,
 .side-menu-mobile .side-menu-link span,
@@ -135,11 +142,11 @@
 .side-menu-mobile .side-menu-link:hover i.fas { background: rgba(51,65,85,0.6) !important; color: #f8fafc !important; }
 .side-menu-mobile .side-menu-link.active,
 .side-menu-mobile .side-menu-link.active span,
-.side-menu-mobile .side-menu-link.active i.fas { color: #5eead4 !important; }
+.side-menu-mobile .side-menu-link.active i.fas { color: #5eead4 !important; background: rgba(15, 118, 110, 0.3) !important; }
 .side-menu-mobile .side-menu-sublink,
 .side-menu-mobile .side-menu-sublink span { color: #cbd5e1 !important; font-size: 0.9rem !important; }
 .side-menu-mobile .side-menu-sublink:hover { color: #f1f5f9 !important; background: rgba(51,65,85,0.4) !important; }
-.side-menu-mobile .side-menu-sublink.active { color: #5eead4 !important; }
+.side-menu-mobile .side-menu-sublink.active { color: #5eead4 !important; background: rgba(15, 118, 110, 0.25) !important; }
 .side-menu-mobile .side-menu-toggle,
 .side-menu-mobile .side-menu-toggle span,
 .side-menu-mobile .side-menu-toggle i.fas { color: #e2e8f0 !important; }

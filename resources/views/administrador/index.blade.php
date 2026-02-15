@@ -8,7 +8,7 @@
         <x-usuario.header />
         <x-usuario.mobile-menu />
 
-        <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl min-w-0 w-full">
             @if(session('success'))
             <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
                 <p class="font-medium"><i class="fas fa-check-circle mr-2"></i>{{ session('success') }}</p>
@@ -21,15 +21,15 @@
             @endif
 
             <!-- Información de Usuario (solo móvil) -->
-            <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6">
-                <div class="flex items-center">
-                    <div class="bg-teal-100 rounded-full p-3 mr-4">
+            <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6 overflow-hidden">
+                <div class="flex items-center min-w-0">
+                    <div class="bg-teal-100 rounded-full p-3 mr-4 shrink-0">
                         <i class="fas fa-user text-teal-600 text-xl"></i>
                     </div>
-                    <div class="flex-1">
-                        <h2 class="text-lg font-bold text-gray-800">{{ auth()->user()->nombre_completo }}</h2>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_perfil }}</p>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_sucursal }}</p>
+                    <div class="flex-1 min-w-0">
+                        <h2 class="text-lg font-bold text-gray-800 truncate" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</h2>
+                        <p class="text-sm text-gray-600 truncate">{{ auth()->user()->nombre_perfil }}</p>
+                        <p class="text-sm text-gray-600 truncate">{{ auth()->user()->nombre_sucursal }}</p>
                     </div>
                 </div>
             </div>
