@@ -41,11 +41,17 @@
                 <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
                     <div class="p-4 pb-6 flex flex-col gap-4">
                         {{-- 1. Cámara (arriba en DOM = se ve arriba tras scroll) --}}
-                        <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden order-first">
+                        <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden order-first relative">
+                            <div id="overlay-activar-cedula" class="absolute inset-0 bg-gray-900 flex flex-col items-center justify-center gap-4 p-6 z-10">
+                                <p class="text-gray-300 text-center text-sm">Para escanear la cédula se usará la cámara. El navegador pedirá permiso solo cuando usted lo active.</p>
+                                <button type="button" id="btn-activar-camara-cedula" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
+                                    Activar cámara
+                                </button>
+                            </div>
                             <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block"></video>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
                             <div class="flex flex-col gap-2 p-3">
-                                <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
+                                <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50" disabled>
                                     Capturar y leer
                                 </button>
                                 <button type="button" id="btn-capturar-cedula-reintentar" class="w-full py-2.5 border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium rounded-lg transition hidden">
