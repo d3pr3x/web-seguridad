@@ -130,10 +130,25 @@
         .portal-layout .portal-link-desc { font-size: 0.75rem !important; }
         .portal-layout .portal-link { min-height: 2.25rem; }
         .portal-layout .portal-link + .portal-link { margin-top: 0; }
+
+        /* Responsive: evitar scroll horizontal y ajustar contenido en móvil */
+        .portal-layout { overflow-x: hidden; }
+        .portal-layout .flex-1 { min-width: 0; max-width: 100%; }
+        @media (max-width: 768px) {
+            .portal-layout div.flex-1 > div.container,
+            .portal-layout div[class*="flex-grow-1"] > div.container {
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+                padding: 0.75rem 1rem;
+                max-width: 100%;
+            }
+        }
+        /* Tablas: scroll horizontal en móvil */
+        .overflow-x-auto { -webkit-overflow-scrolling: touch; }
     </style>
     @stack('styles')
 </head>
-<body class="portal-layout bg-slate-50">
+<body class="portal-layout bg-slate-50 overflow-x-hidden">
     @yield('content')
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -36,30 +36,30 @@
                 <div class="p-5">
                     <form action="{{ route('blacklist.store') }}" method="post" class="flex flex-wrap gap-4 items-end">
                         @csrf
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">RUT <span class="text-red-500">*</span></label>
                             <input type="text" name="rut" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition rut-input" style="border-color: var(--app-border);" placeholder="12.345.678-9" required maxlength="12">
                             @error('rut')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
-                        <div class="min-w-[120px]">
+                        <div class="w-full sm:w-auto sm:min-w-[120px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Patente (opcional)</label>
                             <input type="text" name="patente" class="w-full px-3 py-2.5 rounded-lg border uppercase text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" placeholder="ABCD12" maxlength="7">
                             @error('patente')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
-                        <div class="flex-1 min-w-[180px]">
+                        <div class="w-full sm:flex-1 sm:min-w-[180px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Motivo <span class="text-red-500">*</span></label>
                             <input type="text" name="motivo" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" placeholder="Motivo" required maxlength="500" value="{{ old('motivo') }}">
                             @error('motivo')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Fecha inicio</label>
                             <input type="date" name="fecha_inicio" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ old('fecha_inicio', date('Y-m-d')) }}" required>
                         </div>
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Fecha fin (opcional)</label>
                             <input type="date" name="fecha_fin" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ old('fecha_fin') }}">
                         </div>
-                        <button type="submit" class="px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm bg-red-600 hover:bg-red-700">Agregar</button>
+                        <button type="submit" class="w-full sm:w-auto px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm bg-red-600 hover:bg-red-700">Agregar</button>
                     </form>
                 </div>
             </div>

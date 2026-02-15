@@ -60,15 +60,15 @@
                 </div>
                 <div class="p-5">
                     <form method="get" action="{{ route('ingresos.index') }}" class="flex flex-wrap gap-4 items-end">
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Desde</label>
                             <input type="date" name="fecha_desde" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ request('fecha_desde') }}">
                         </div>
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Hasta</label>
                             <input type="date" name="fecha_hasta" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ request('fecha_hasta') }}">
                         </div>
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Tipo</label>
                             <select name="tipo" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);">
                                 <option value="">Todos</option>
@@ -76,7 +76,7 @@
                                 <option value="vehicular" {{ request('tipo') === 'vehicular' ? 'selected' : '' }}>Vehicular</option>
                             </select>
                         </div>
-                        <div class="min-w-[140px]">
+                        <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Estado</label>
                             <select name="estado" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);">
                                 <option value="">Todos</option>
@@ -85,7 +85,7 @@
                                 <option value="bloqueado" {{ request('estado') === 'bloqueado' ? 'selected' : '' }}>Bloqueado</option>
                             </select>
                         </div>
-                        <button type="submit" class="px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm hover:shadow" style="background: var(--app-primary);">
+                        <button type="submit" class="w-full sm:w-auto px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm hover:shadow" style="background: var(--app-primary);">
                             Filtrar
                         </button>
                     </form>

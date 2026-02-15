@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Sistema de Seguridad')</title>
     
@@ -157,6 +157,7 @@
             }
             .table-responsive {
                 font-size: 0.875rem;
+                -webkit-overflow-scrolling: touch;
             }
             .btn-group-sm .btn {
                 padding: 0.25rem 0.5rem;
@@ -194,7 +195,7 @@
     
     @stack('styles')
 </head>
-<body>
+<body class="overflow-x-hidden">
     @auth
     <nav class="navbar navbar-expand-lg navbar-dark" style="background: var(--app-nav-bg);">
         <div class="container">

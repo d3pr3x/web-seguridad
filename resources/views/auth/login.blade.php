@@ -3,8 +3,8 @@
 @section('title', 'Iniciar Sesión')
 
 @section('content')
-<div class="row justify-content-center py-4">
-    <div class="col-md-6 col-lg-4">
+<div class="row justify-content-center py-3 py-md-4 px-2">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
         <div class="card shadow-sm border-0">
             <div class="card-body p-5">
                 <div class="text-center mb-4">
