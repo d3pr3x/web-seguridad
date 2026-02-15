@@ -7,6 +7,7 @@ use App\Models\Reporte;
 use App\Models\User;
 use App\Models\Tarea;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Crea un reporte e informe de demostración para poder ver el PDF.
@@ -23,9 +24,8 @@ class InformeDemoSeeder extends Seeder
             return;
         }
 
-        $reporte = Reporte::create([
+        $datosReporte = [
             'id_usuario' => $user->id_usuario,
-            'user_id' => $user->id_usuario,
             'tarea_id' => $tarea->id,
             'datos' => [
                 'acciones' => 'Guardia activa protocolos de seguridad y llamado a Carabineros.',
@@ -34,7 +34,11 @@ class InformeDemoSeeder extends Seeder
             ],
             'imagenes' => $this->primeraImagenReporte(),
             'estado' => 'completado',
-        ]);
+        ];
+        if (Schema::hasColumn('reportes', 'user_id')) {
+            $datosReporte['user_id'] = $user->id_usuario;
+        }
+        $reporte = Reporte::create($datosReporte);
 
         $fotografias = $reporte->imagenes ?? [];
 

@@ -13,6 +13,10 @@ class Reporte extends Model
             if ($reporte->id_usuario !== null && Schema::hasColumn($reporte->getTable(), 'user_id')) {
                 $reporte->user_id = $reporte->id_usuario;
             }
+            // No intentar guardar user_id si la columna no existe (p. ej. en algunas BD)
+            if (! Schema::hasColumn($reporte->getTable(), 'user_id') && array_key_exists('user_id', $reporte->getAttributes())) {
+                $reporte->offsetUnset('user_id');
+            }
         });
     }
 
