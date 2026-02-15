@@ -19,9 +19,9 @@
             --app-font: 'DM Sans', system-ui, sans-serif;
             --app-primary: #0f766e;
             --app-primary-hover: #0d9488;
-            --app-surface: #f8fafc;
-            --app-card: #ffffff;
-            --app-border: #e2e8f0;
+            --app-surface: #f0ebe3;
+            --app-card: #f9f6f1;
+            --app-border: #e5dfd6;
             --app-text: #1e293b;
             --app-text-muted: #64748b;
             --app-sidebar: #0f172a;
@@ -29,7 +29,8 @@
             --app-sidebar-active: rgba(15, 118, 110, 0.15);
             --app-sidebar-active-text: #0d9488;
         }
-        body { font-family: var(--app-font); background: var(--app-surface); }
+        body { font-family: var(--app-font); background: var(--app-surface) !important; }
+        .portal-layout .bg-gray-100 { background: var(--app-surface) !important; }
 
         /* Área principal: mismo tono que el sistema (armonía con header y menú) */
         .portal-layout .min-h-screen { background: var(--app-surface); }
@@ -148,7 +149,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="portal-layout bg-slate-50 overflow-x-hidden">
+<body class="portal-layout overflow-x-hidden">
     @yield('content')
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
