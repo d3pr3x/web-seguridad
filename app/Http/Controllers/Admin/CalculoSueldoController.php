@@ -18,6 +18,9 @@ class CalculoSueldoController extends Controller
      */
     public function index(Request $request)
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         $mes = $request->get('mes', Carbon::now()->format('Y-m'));
         $sucursalId = $request->get('sucursal_id');
         $sueldoBase = $request->get('sueldo_base', 50000); // Sueldo base diario

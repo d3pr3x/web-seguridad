@@ -41,6 +41,7 @@
                     </ul>
                 </div>
             </li>
+            @if(config('app.show_documentos_guardias'))
             <li class="nav-item">
                 <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-mis-documentos">
                     <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
@@ -52,6 +53,7 @@
                     </ul>
                 </div>
             </li>
+            @endif
             <li class="nav-item">
                 <a href="{{ route('usuario.ronda.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.ronda.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.ronda.*') ? 'background: rgba(15, 118, 110, 0.25); color: #5eead4;' : 'color: #e2e8f0;' }}">
                     <i class="fas fa-route me-2" style="width: 1.25rem;"></i><span>Rondas QR</span>
@@ -86,7 +88,9 @@
                         @if(auth()->user()->esAdministrador())
                         <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'background: rgba(15, 118, 110, 0.25); color: #5eead4;' : 'color: #cbd5e1;' }}">Usuarios</a></li>
                         @endif
+                        @if(config('app.show_documentos_guardias'))
                         <li class="nav-item"><a href="{{ auth()->user()->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'background: rgba(15, 118, 110, 0.25); color: #5eead4;' : 'color: #cbd5e1;' }}">Aprobar documentos</a></li>
+                        @endif
                         @if(auth()->user()->esAdministrador())
                         <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'background: rgba(15, 118, 110, 0.25); color: #5eead4;' : 'color: #cbd5e1;' }}">Novedades</a></li>
                         @endif
@@ -157,6 +161,12 @@
 #sideMenu.show { transform: translateX(0) !important; }
 .side-menu-mobile .collapse.show { visibility: visible !important; }
 .side-menu-mobile .collapse .nav-link { opacity: 1 !important; visibility: visible !important; }
+/* Sin fondo al hacer clic o tap (eliminar highlight); la página actual (.active) conserva su fondo */
+.side-menu-mobile .nav-link:active:not(.active),
+.side-menu-mobile .nav-link:focus:not(.active) { background: transparent !important; box-shadow: none !important; }
+.side-menu-mobile .nav-link { -webkit-tap-highlight-color: transparent; }
+.side-menu-mobile .side-menu-link.active,
+.side-menu-mobile .side-menu-sublink.active { -webkit-tap-highlight-color: transparent; }
 </style>
 <script>
 function toggleMenu() {

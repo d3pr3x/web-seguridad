@@ -43,6 +43,7 @@
                     </ul>
                 </div>
             </li>
+            @if(config('app.show_documentos_guardias'))
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.documentos.*') ? '' : 'collapsed' }}" style="color: #cbd5e1;" data-bs-toggle="collapse" data-bs-target="#sidebar-mis-documentos" aria-expanded="{{ request()->routeIs('usuario.documentos.*') ? 'true' : 'false' }}">
                     <i class="fas fa-chevron-right me-2 sidebar-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
@@ -55,6 +56,7 @@
                     </ul>
                 </div>
             </li>
+            @endif
             <li class="nav-item">
                 <a href="{{ route('usuario.ronda.index') }}" class="nav-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.ronda.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.ronda.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #cbd5e1;' }}">
                     <i class="fas fa-route me-2" style="width: 1.25rem;"></i>
@@ -93,7 +95,9 @@
                         @if(auth()->user()->esAdministrador())
                         <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Usuarios</a></li>
                         @endif
+                        @if(config('app.show_documentos_guardias'))
                         <li class="nav-item"><a href="{{ auth()->user()->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Aprobar documentos</a></li>
+                        @endif
                     @if(auth()->user()->esAdministrador())
                         <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Novedades</a></li>
                     @endif

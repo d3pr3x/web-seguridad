@@ -13,6 +13,9 @@ class DiaTrabajadoController extends Controller
      */
     public function index()
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         $usuario = auth()->user();
         $mesActual = Carbon::now()->format('Y-m');
         
@@ -31,6 +34,9 @@ class DiaTrabajadoController extends Controller
      */
     public function create()
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         return view('dias-trabajados.create');
     }
 
@@ -39,6 +45,9 @@ class DiaTrabajadoController extends Controller
      */
     public function store(Request $request)
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         $request->validate([
             'fecha' => 'required|date',
             'ponderacion' => 'required|numeric|min:0.1|max:3.0',
@@ -71,6 +80,9 @@ class DiaTrabajadoController extends Controller
      */
     public function edit($id)
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         $diaTrabajado = DiaTrabajado::where('id', $id)
             ->where('id_usuario', auth()->id())
             ->firstOrFail();
@@ -83,6 +95,9 @@ class DiaTrabajadoController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         $request->validate([
             'fecha' => 'required|date',
             'ponderacion' => 'required|numeric|min:0.1|max:3.0',
@@ -117,6 +132,9 @@ class DiaTrabajadoController extends Controller
      */
     public function destroy($id)
     {
+        if (!config('app.show_calculo_sueldos')) {
+            abort(403, 'Función no habilitada.');
+        }
         $diaTrabajado = DiaTrabajado::where('id', $id)
             ->where('id_usuario', auth()->id())
             ->firstOrFail();

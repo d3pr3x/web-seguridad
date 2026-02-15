@@ -127,4 +127,10 @@ return [
 
     'debug_download_token' => env('DEBUG_DOWNLOAD_TOKEN', ''),
 
+    /* Documentos de guardias: en false no se muestra en menús ni enlaces. Poner true para volver a habilitar. */
+    'show_documentos_guardias' => false,
+
+    /* Cálculo de sueldos / días trabajados: en false no se muestra en menús ni enlaces. Poner true cuando la función esté habilitada. */
+    'show_calculo_sueldos' => false,
+
 ];

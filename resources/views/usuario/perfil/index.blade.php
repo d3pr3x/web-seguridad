@@ -210,6 +210,7 @@
                 </div>
             </div>
 
+            @if(config('app.show_documentos_guardias'))
             <!-- Documentos Personales -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
                 <div class="p-6">
@@ -294,6 +295,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Cambiar Contraseña -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden">

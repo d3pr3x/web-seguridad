@@ -20,20 +20,6 @@
             </div>
             @endif
 
-            <!-- Información de Usuario (solo móvil): bloque compacto, no domina la pantalla -->
-            <div class="lg:hidden w-full max-w-full bg-white rounded-lg shadow-sm border border-gray-100 py-2.5 px-3 mb-3 overflow-hidden">
-                <div class="flex items-center min-w-0 gap-2.5">
-                    <div class="bg-teal-100 rounded-full p-1.5 shrink-0 flex items-center justify-center">
-                        <i class="fas fa-user text-teal-600 text-sm"></i>
-                    </div>
-                    <div class="flex-1 min-w-0 overflow-hidden">
-                        <p class="text-sm font-semibold text-gray-800 truncate leading-tight" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</p>
-                        <p class="text-xs text-gray-600 truncate leading-tight">{{ auth()->user()->nombre_perfil }}</p>
-                        <p class="text-xs text-gray-500 truncate leading-tight">{{ auth()->user()->nombre_sucursal }}</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Título (escritorio) -->
             <div class="hidden lg:block mb-6">
                 <p class="text-xs text-gray-500 uppercase tracking-wider mb-0">Panel de control</p>
@@ -53,6 +39,7 @@
                             <p class="text-teal-100 text-sm mt-1">Aprobaciones y revisión</p>
                         </div>
                         <div class="p-4 space-y-3">
+                            @if(config('app.show_documentos_guardias'))
                             <a href="{{ route('admin.documentos.index') }}" class="block">
                                 <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
                                     <div class="flex items-center justify-between">
@@ -64,6 +51,7 @@
                                     </div>
                                 </div>
                             </a>
+                            @endif
                             <a href="{{ route('admin.novedades.index') }}" class="block">
                                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
                                     <div class="flex items-center justify-between">

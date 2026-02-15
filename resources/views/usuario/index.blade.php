@@ -28,22 +28,6 @@
         </div>
         @endif
 
-            <!-- Información de Usuario (solo móvil): bloque compacto -->
-            <div class="lg:hidden w-full max-w-full bg-white rounded-lg shadow-sm border border-gray-100 py-2.5 px-3 mb-3 overflow-hidden">
-                <div class="flex items-center min-w-0 gap-2.5">
-                    <div class="bg-blue-100 rounded-full p-1.5 shrink-0 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0 overflow-hidden">
-                        <p class="text-sm font-semibold text-gray-800 truncate leading-tight" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</p>
-                        <p class="text-xs text-gray-600 truncate leading-tight">RUN: {{ auth()->user()->run }}</p>
-                        <p class="text-xs text-gray-500 truncate leading-tight">{{ auth()->user()->nombre_sucursal }}</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Grid de Secciones - Solo REPORTES -->
             <div class="grid grid-cols-1 gap-6">
                 {{-- Temporalmente comentado - Sección NOVEDADES --}}
@@ -153,14 +137,14 @@
                 <div>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <!-- Header de Sección -->
-                        <div class="bg-gradient-to-r from-red-500 to-red-600 p-4">
+                        <div class="bg-gradient-to-r from-red-600 to-red-700 p-4">
                             <h2 class="text-xl font-bold text-white flex items-center">
                                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                                 </svg>
                                 Reportes
                             </h2>
-                            <p class="text-red-100 text-sm mt-1">Situaciones críticas que requieren atención</p>
+                            <p class="text-red-50 text-sm mt-1">Situaciones críticas que requieren atención</p>
                         </div>
 
                         <!-- Reportes Especiales -->
