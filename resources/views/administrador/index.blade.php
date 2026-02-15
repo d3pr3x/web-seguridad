@@ -20,16 +20,16 @@
             </div>
             @endif
 
-            <!-- Información de Usuario (solo móvil) -->
-            <div class="lg:hidden bg-white rounded-lg shadow-sm border border-gray-100 p-3 mb-4 overflow-hidden">
-                <div class="flex items-center min-w-0 gap-3">
-                    <div class="bg-teal-100 rounded-full p-2 shrink-0">
-                        <i class="fas fa-user text-teal-600 text-base"></i>
+            <!-- Información de Usuario (solo móvil): bloque compacto, no domina la pantalla -->
+            <div class="lg:hidden w-full max-w-full bg-white rounded-lg shadow-sm border border-gray-100 py-2.5 px-3 mb-3 overflow-hidden">
+                <div class="flex items-center min-w-0 gap-2.5">
+                    <div class="bg-teal-100 rounded-full p-1.5 shrink-0 flex items-center justify-center">
+                        <i class="fas fa-user text-teal-600 text-sm"></i>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <h2 class="text-base font-bold text-gray-800 truncate" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</h2>
-                        <p class="text-xs text-gray-600 truncate">{{ auth()->user()->nombre_perfil }}</p>
-                        <p class="text-xs text-gray-600 truncate">{{ auth()->user()->nombre_sucursal }}</p>
+                    <div class="flex-1 min-w-0 overflow-hidden">
+                        <p class="text-sm font-semibold text-gray-800 truncate leading-tight" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</p>
+                        <p class="text-xs text-gray-600 truncate leading-tight">{{ auth()->user()->nombre_perfil }}</p>
+                        <p class="text-xs text-gray-500 truncate leading-tight">{{ auth()->user()->nombre_sucursal }}</p>
                     </div>
                 </div>
             </div>

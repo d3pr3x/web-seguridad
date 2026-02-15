@@ -14,7 +14,7 @@
         <x-usuario.mobile-menu />
 
         <!-- Contenido Principal -->
-        <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl min-w-0 w-full">
         <!-- Mensajes de éxito/error -->
         @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
@@ -28,18 +28,18 @@
         </div>
         @endif
 
-            <!-- Información de Usuario (solo móvil) -->
-            <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6">
-                <div class="flex items-center">
-                    <div class="bg-blue-100 rounded-full p-3 mr-4">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Información de Usuario (solo móvil): bloque compacto -->
+            <div class="lg:hidden w-full max-w-full bg-white rounded-lg shadow-sm border border-gray-100 py-2.5 px-3 mb-3 overflow-hidden">
+                <div class="flex items-center min-w-0 gap-2.5">
+                    <div class="bg-blue-100 rounded-full p-1.5 shrink-0 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                     </div>
-                    <div class="flex-1">
-                        <h2 class="text-lg font-bold text-gray-800">{{ auth()->user()->nombre_completo }}</h2>
-                        <p class="text-sm text-gray-600">RUN: {{ auth()->user()->run }}</p>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->nombre_sucursal }}</p>
+                    <div class="flex-1 min-w-0 overflow-hidden">
+                        <p class="text-sm font-semibold text-gray-800 truncate leading-tight" title="{{ auth()->user()->nombre_completo }}">{{ auth()->user()->nombre_completo }}</p>
+                        <p class="text-xs text-gray-600 truncate leading-tight">RUN: {{ auth()->user()->run }}</p>
+                        <p class="text-xs text-gray-500 truncate leading-tight">{{ auth()->user()->nombre_sucursal }}</p>
                     </div>
                 </div>
             </div>
