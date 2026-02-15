@@ -2,14 +2,12 @@
 
 @push('styles')
 <style>
-    #lector-cedula { width: 100%; min-height: 400px; position: relative; }
-    #lector-cedula video { width: 100% !important; max-height: 400px; object-fit: cover; display: block; }
-    #video-patente { width: 100%; max-height: 300px; object-fit: cover; }
+    #lector-cedula { width: 100%; position: relative; }
+    #lector-cedula video { width: 100% !important; max-height: 50vh; min-height: 220px; object-fit: cover; display: block; }
+    #video-patente { width: 100%; max-height: 40vh; object-fit: cover; }
     #canvas { display: none; }
     @media (max-width: 768px) {
-        #lector-cedula { min-height: 320px; }
-        #lector-cedula video { max-height: 320px; }
-        #video-patente { max-height: 260px; }
+        #lector-cedula video { min-height: 200px; max-height: 45vh; }
     }
 </style>
 @endpush
@@ -39,65 +37,45 @@
             </div>
 
             <div id="panel-peatonal" class="tab-panel">
+                {{-- Orden para móvil: de arriba a abajo = cámara, RUT, Nombre. Al cargar se hace scroll al final para ver de abajo hacia arriba: Nombre, RUT, cámara. --}}
                 <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
-                    <div class="p-6">
-                        <p class="text-sm text-gray-500 mb-3">Encuadre el código de la cédula (QR en cédula nueva, PDF417 en cédula antigua) y pulse «Capturar y leer».</p>
-                        <div id="lector-cedula" class="bg-gray-900 rounded overflow-hidden mb-2">
-                            <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[400px] object-cover block"></video>
+                    <div class="p-4 pb-6 flex flex-col gap-4">
+                        {{-- 1. Cámara (arriba en DOM = se ve arriba tras scroll) --}}
+                        <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden order-first">
+                            <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block"></video>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
-                            <div class="flex flex-col gap-2 mt-2">
+                            <div class="flex flex-col gap-2 p-3">
                                 <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50">
                                     Capturar y leer
                                 </button>
                                 <button type="button" id="btn-capturar-cedula-reintentar" class="w-full py-2.5 border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium rounded-lg transition hidden">
-                                    Capturar de nuevo (reintentar)
+                                    Capturar de nuevo
                                 </button>
                             </div>
                         </div>
                         <canvas id="canvas-cedula" style="display:none"></canvas>
                         <canvas id="canvas-cedula-espejo" style="display:none"></canvas>
                         <div id="dummy-cedula" style="width:1px;height:1px;overflow:hidden;position:absolute;opacity:0;pointer-events:none;"></div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
-                                <input type="text" id="rut" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 rut-input" placeholder="12.345.678-9" maxlength="12" readonly>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                                <input type="text" id="nombre" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100" placeholder="Nombre completo" maxlength="100" readonly>
+
+                        {{-- 2. RUT obtenido --}}
+                        <div class="order-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
+                            <input type="text" id="rut" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-gray-50 rut-input text-gray-800" placeholder="Se obtiene al escanear" maxlength="12" readonly>
+                        </div>
+                        {{-- 3. Nombre --}}
+                        <div class="order-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                            <input type="text" id="nombre" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-800" placeholder="Se completa al escanear o manual" maxlength="100" readonly>
+                        </div>
+
+                        {{-- 4. Ingreso manual (solo si falla la captura) --}}
+                        <div id="ingreso-manual-peatonal" class="order-4 hidden border-t border-gray-200 pt-4 mt-2">
+                            <p class="text-sm text-amber-700 mb-3">No se detectó el código. Ingrese manualmente:</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <input type="text" id="rut-manual" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg rut-input" placeholder="RUT">
+                                <input type="text" id="nombre-manual" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg" placeholder="Nombre">
                             </div>
                         </div>
-                        <p class="text-sm text-gray-500 mb-2">Si el escáner no detecta, ingrese manualmente:</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" id="rut-manual" class="w-full px-3 py-2 border border-gray-300 rounded-lg rut-input" placeholder="RUT manual">
-                            <input type="text" id="nombre-manual" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Nombre manual">
-                        </div>
-                        <details class="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                            <summary class="px-4 py-3 bg-gray-50 font-medium text-gray-800 cursor-pointer select-none">Ver proceso de captura (consola)</summary>
-                            <div id="log-qr" class="p-3 bg-gray-900 text-green-400 text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap break-all"></div>
-                            <div id="debug-qr-fallo" class="p-3 bg-amber-50 border-t border-amber-200 hidden">
-                                <p class="text-sm font-medium text-amber-800 mb-2">Debug (cuando falla la detección)</p>
-                                <div class="flex flex-wrap gap-2">
-                                    <a id="debug-descargar-qr" href="#" class="text-sm text-blue-600 hover:underline">Descargar imagen</a>
-                                    <button type="button" id="debug-copiar-log-qr" class="text-sm text-blue-600 hover:underline">Copiar log</button>
-                                    <a id="debug-ver-imagen-qr" href="#" target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline">Ver imagen</a>
-                                    <button type="button" id="debug-enviar-servidor-qr" class="text-sm text-blue-600 hover:underline font-medium">Enviar al servidor (Docker)</button>
-                                </div>
-                                <div id="debug-servidor-msg" class="mt-3 hidden">
-                                    <p class="text-sm font-medium text-emerald-800 mb-2">Guardado en servidor. Copia estos nombres para análisis:</p>
-                                    <div class="bg-gray-100 rounded p-2 font-mono text-sm mb-2">
-                                        <p><strong>Imagen:</strong> <code id="debug-filename-image"></code></p>
-                                        <p><strong>Log:</strong> <code id="debug-filename-log"></code></p>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2">
-                                        <button type="button" id="debug-copiar-nombres" class="text-sm text-blue-600 hover:underline">Copiar nombres</button>
-                                        <a id="debug-link-descargar-imagen" href="#" class="text-sm text-blue-600 hover:underline">Descargar imagen</a>
-                                        <a id="debug-link-descargar-log" href="#" class="text-sm text-blue-600 hover:underline">Descargar log</a>
-                                    </div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-2">Pega los nombres de archivo en el chat con la IA para analizar imagen y log y mejorar la detección.</p>
-                            </div>
-                        </details>
                     </div>
                 </div>
             </div>
@@ -122,15 +100,11 @@
                                 <input type="text" id="conductor-rut" class="w-full px-3 py-2 border border-gray-300 rounded-lg rut-input" placeholder="12.345.678-9">
                             </div>
                         </div>
-                        <details class="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                            <summary class="px-4 py-3 bg-gray-50 font-medium text-gray-800 cursor-pointer select-none">Ver proceso de captura (consola)</summary>
-                            <div id="log-patente" class="p-3 bg-gray-900 text-green-400 text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap break-all"></div>
-                        </details>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div id="bloque-registrar" class="bg-white rounded-lg shadow-md overflow-hidden hidden">
                 <div class="p-4">
                     <input type="hidden" id="tipo-actual" value="peatonal">
                     <button type="button" id="btn-registrar" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
@@ -161,9 +135,36 @@
 document.addEventListener('DOMContentLoaded', function() {
     const tipoActual = document.getElementById('tipo-actual');
     const btnRegistrar = document.getElementById('btn-registrar');
+    const bloqueRegistrar = document.getElementById('bloque-registrar');
     const alertaResultado = document.getElementById('alerta-resultado');
     const qrSalidaContainer = document.getElementById('qr-salida-container');
     const qrSalidaImg = document.getElementById('qr-salida-img');
+
+    function scrollAlFinalEscaner() {
+        requestAnimationFrame(function() {
+            var panel = document.getElementById('panel-peatonal');
+            if (panel && !panel.classList.contains('hidden')) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
+    }
+
+    function actualizarVisibilidadRegistrar() {
+        var tipo = tipoActual.value;
+        var mostrar = false;
+        if (tipo === 'peatonal') {
+            var rut = (document.getElementById('rut').value || document.getElementById('rut-manual').value || '').trim();
+            mostrar = rut.length >= 8;
+        } else {
+            var patente = (document.getElementById('patente-result').value || '').trim();
+            mostrar = patente.length >= 5;
+        }
+        if (bloqueRegistrar) {
+            var estabaOculta = bloqueRegistrar.classList.contains('hidden');
+            bloqueRegistrar.classList.toggle('hidden', !mostrar);
+            if (mostrar && estabaOculta) bloqueRegistrar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
 
     function switchTab(tab) {
         tipoActual.value = tab;
@@ -179,6 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.tab-panel').forEach(function(panel) {
             panel.classList.toggle('hidden', panel.id !== 'panel-' + tab);
         });
+        actualizarVisibilidadRegistrar();
+        if (tab === 'peatonal') setTimeout(scrollAlFinalEscaner, 300);
         if (tab === 'vehicular') {
             detenerCedula();
             iniciarCamaraPatente();
@@ -241,21 +244,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var mensajeCapturaCedula = document.getElementById('mensaje-captura-cedula');
-    var logQR = document.getElementById('log-qr');
-    var debugQrFallo = document.getElementById('debug-qr-fallo');
-    function escribirLogQR(linea) {
-        var t = new Date().toLocaleTimeString('es-CL', { hour12: false });
-        var texto = '[' + t + '] ' + linea;
-        if (logQR) {
-            logQR.textContent += texto + '\n';
-            logQR.scrollTop = logQR.scrollHeight;
-        }
-        try { console.log('[QR]', linea); } catch (e) {}
-    }
-    function limpiarLogQR() {
-        if (logQR) logQR.textContent = '';
-        if (debugQrFallo) debugQrFallo.classList.add('hidden');
-    }
+    function escribirLogQR() {}
+    function limpiarLogQR() {}
     function capturarYLeerQR() {
         if (!videoCedula.srcObject || videoCedula.readyState < 2) {
             alert('Espere a que la cámara esté lista.');
@@ -267,8 +257,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('La cámara no tiene tamaño aún. Espere un momento.');
             return;
         }
-        limpiarLogQR();
-        escribirLogQR('1. Iniciando captura…');
         btnCapturarCedula.disabled = true;
         mensajeCapturaCedula.textContent = 'Procesando…';
         mensajeCapturaCedula.classList.remove('hidden');
@@ -989,71 +977,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         function falloQR() {
-            escribirLogQR('4. No se detectó QR en la imagen.');
-            escribirLogQR('--- Fallo.');
-            if (debugQrFallo) {
-                debugQrFallo.classList.remove('hidden');
-                var descarga = document.getElementById('debug-descargar-qr');
-                var verImg = document.getElementById('debug-ver-imagen-qr');
-                var nombre = 'captura-qr-' + new Date().toISOString().slice(0,19).replace(/[-:T]/g,'') + '.png';
-                if (canvasCedula && canvasCedula.width > 0) {
-                    canvasCedula.toBlob(function(blob) {
-                        if (blob && descarga) {
-                            descarga.href = URL.createObjectURL(blob);
-                            descarga.download = nombre;
-                        }
-                    }, 'image/png', 1);
-                    try {
-                        verImg.href = canvasCedula.toDataURL('image/png');
-                        verImg.target = '_blank';
-                    } catch (e) {}
-                }
-                var btnCopiar = document.getElementById('debug-copiar-log-qr');
-                if (btnCopiar && logQR) {
-                    btnCopiar.onclick = function() {
-                        navigator.clipboard.writeText(logQR.textContent || '').then(function() { alert('Log copiado.'); }).catch(function() { alert('No se pudo copiar.'); });
-                    };
-                }
-                var btnEnviar = document.getElementById('debug-enviar-servidor-qr');
-                var msgServidor = document.getElementById('debug-servidor-msg');
-                if (btnEnviar && canvasCedula && canvasCedula.width > 0) {
-                    btnEnviar.onclick = function() {
-                        btnEnviar.disabled = true;
-                        if (msgServidor) { msgServidor.classList.remove('hidden'); msgServidor.innerHTML = '<p class="text-sm">Enviando…</p>'; }
-                        canvasCedula.toBlob(function(blob) {
-                            if (!blob) { if (msgServidor) msgServidor.innerHTML = '<p class="text-sm text-red-600">Error al obtener imagen.</p>'; btnEnviar.disabled = false; return; }
-                            var fd = new FormData();
-                            fd.append('image', blob, 'captura.png');
-                            fd.append('log', logQR ? logQR.textContent : '');
-                            var url = '{{ route("ingresos.debug-captura") }}';
-                            fetch(url, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' } })
-                                .then(function(r) { return r.json(); })
-                                .then(function(data) {
-                                    if (msgServidor) {
-                                        var fnImg = data.filename_image || 'captura.png';
-                                        var fnLog = data.filename_log || '';
-                                        var textoCopiar = 'Imagen: ' + fnImg + (fnLog ? '\nLog: ' + fnLog : '');
-                                        var urlLog = data.url_publica_log || '';
-                                        var urlImg = data.url_publica_imagen || '';
-                                        var html = '<p class="text-sm font-medium text-emerald-800 mb-2">Guardado en servidor.</p><div class="bg-gray-100 rounded p-2 font-mono text-sm mb-2"><p><strong>Imagen:</strong> <code>' + fnImg + '</code></p>' + (fnLog ? '<p><strong>Log:</strong> <code>' + fnLog + '</code></p>' : '') + (urlLog ? '<p class="mt-2 text-xs"><strong>URL para IA:</strong> <a href="' + urlLog + '" target="_blank" class="break-all">' + urlLog + '</a></p>' : '') + '</div><div class="flex flex-wrap gap-2"><button type="button" id="debug-copiar-nombres-btn" class="text-sm text-blue-600 hover:underline">Copiar nombres</button>' + (urlLog ? '<button type="button" id="debug-copiar-url-btn" class="text-sm text-blue-600 hover:underline">Copiar URL log (para IA)</button>' : '') + '<a href="' + (data.download_image || '#') + '" download="' + fnImg + '" class="text-sm text-blue-600 hover:underline">Descargar imagen</a>' + (data.download_log ? '<a href="' + data.download_log + '" download="' + fnLog + '" class="text-sm text-blue-600 hover:underline">Descargar log</a>' : '') + '</div>' + (!urlLog ? '<p class="text-xs text-amber-700 mt-2">Añade <code>DEBUG_DOWNLOAD_TOKEN=tu_token</code> en .env para generar URLs que la IA pueda leer.</p>' : '');
-                                        msgServidor.classList.remove('hidden');
-                                        msgServidor.innerHTML = html;
-                                        var btnCopiar = document.getElementById('debug-copiar-nombres-btn');
-                                        if (btnCopiar) btnCopiar.onclick = function() { navigator.clipboard.writeText(textoCopiar).then(function() { alert('Nombres copiados.'); }).catch(function() { alert('No se pudo copiar.'); }); };
-                                        var btnUrl = document.getElementById('debug-copiar-url-btn');
-                                        if (btnUrl && urlLog) btnUrl.onclick = function() { navigator.clipboard.writeText(urlLog).then(function() { alert('URL copiada. Pégala en el chat con la IA para que pueda analizar el log.'); }).catch(function() { alert('No se pudo copiar.'); }); };
-                                    }
-                                    btnEnviar.disabled = false;
-                                })
-                                .catch(function(e) {
-                                    if (msgServidor) msgServidor.innerHTML = '<p class="text-sm text-red-600">Error: ' + (e.message || 'no se pudo enviar') + '</p>';
-                                    btnEnviar.disabled = false;
-                                });
-                        }, 'image/png', 1);
-                    };
-                }
-            }
-            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y pulse «Capturar de nuevo» para intentar con otra imagen. Puede descargar la imagen desde «Ver proceso de captura».');
+            var manualSection = document.getElementById('ingreso-manual-peatonal');
+            if (manualSection) manualSection.classList.remove('hidden');
+            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y pulse «Capturar de nuevo» o ingrese RUT y nombre manualmente.');
             terminar();
         }
         function continuarConCanvas() {
@@ -1129,6 +1055,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rutEnTexto) rutInput.value = formatearRut(rutEnTexto[1]);
         }
         if (rutInput.value && !nombreInput.value) setTimeout(buscarPersonaPorRut, 150);
+        actualizarVisibilidadRegistrar();
     }
 
     function formatearRut(val) {
@@ -1139,6 +1066,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     rutManual.addEventListener('input', function() {
         rutInput.value = formatearRut(this.value);
+        actualizarVisibilidadRegistrar();
         clearTimeout(window._timeoutBuscarPersona);
         window._timeoutBuscarPersona = setTimeout(buscarPersonaPorRut, 400);
     });
@@ -1219,6 +1147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     var match = text.match(/([A-Z]{4}\d{2}|[A-Z]{3}\d{3})/);
                     if (match) {
                         patenteResult.value = match[1];
+                        actualizarVisibilidadRegistrar();
                         escribirLogPatente('5. Patente detectada: ' + match[1]);
                         escribirLogPatente('--- Listo.');
                     } else {
@@ -1269,6 +1198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     if (tipo === 'peatonal') { rutInput.value = ''; nombreInput.value = ''; rutManual.value = ''; nombreManual.value = ''; }
                     else { patenteResult.value = ''; document.getElementById('conductor-rut').value = ''; }
+                    actualizarVisibilidadRegistrar();
                 }
             })
             .catch(function(err) {
@@ -1285,6 +1215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function iniciarCuandoVisible() {
         if (tabPeatonal && !tabPeatonal.classList.contains('hidden')) {
             iniciarLectorCedula();
+            setTimeout(scrollAlFinalEscaner, 600);
         } else {
             setTimeout(iniciarCuandoVisible, 200);
         }

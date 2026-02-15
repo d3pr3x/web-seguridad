@@ -58,9 +58,6 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // API para verificar requisitos de dispositivo
 Route::post('/api/verificar-dispositivo', [LoginController::class, 'verificarDispositivo'])->name('api.verificar-dispositivo');
 
-// Debug público: descargar imagen/log con token (?token=...). Token en .env: DEBUG_DOWNLOAD_TOKEN
-Route::get('/ingresos/debug-public/{file}', [IngresosController::class, 'debugDownloadPublic'])->name('ingresos.debug-public')->where('file', '[a-zA-Z0-9._-]+');
-
 // Rutas protegidas (requieren autenticación)
 // NOTA: Validación por IMEI desactivada temporalmente
 Route::middleware(['auth'])->group(function () {
@@ -75,8 +72,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [IngresosController::class, 'index'])->name('index');
         Route::get('/escaner', [IngresosController::class, 'escaner'])->name('escaner');
         Route::get('/buscar-persona', [IngresosController::class, 'buscarPersona'])->name('buscar-persona');
-        Route::post('/debug-captura', [IngresosController::class, 'debugCaptura'])->name('debug-captura');
-        Route::get('/debug-download/{file}', [IngresosController::class, 'debugDownload'])->name('debug-download')->where('file', '[a-zA-Z0-9._-]+');
         Route::get('/{id}/qr-salida', [IngresosController::class, 'qrSalida'])->name('qr-salida');
         Route::get('/{id}', [IngresosController::class, 'show'])->name('show');
         Route::post('/', [IngresosController::class, 'store'])->name('store');

@@ -8,7 +8,6 @@ use App\Models\Persona;
 use App\Rules\ChileRut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class IngresosController extends Controller
 {
@@ -290,76 +289,4 @@ class IngresosController extends Controller
         return ['rut' => $rut, 'nombre' => $nombre];
     }
 
-    /**
-     * Guardar imagen y log de debug cuando falla la detección QR (para análisis).
-     * POST con: image (archivo), log (texto). Devuelve rutas para descargar desde el servidor.
-     */
-    public function debugCaptura(Request $request)
-    {
-        $request->validate([
-            'image' => 'required|file|image|max:10240',
-            'log'   => 'nullable|string|max:10000',
-        ]);
-        $dir = 'debug-qr';
-        $prefix = 'captura-' . now()->format('Ymd-His');
-        $imagePath = $request->file('image')->storeAs($dir, $prefix . '.png', 'local');
-        $logPath = null;
-        if ($request->filled('log')) {
-            $logPath = $dir . '/' . $prefix . '.txt';
-            Storage::disk('local')->put($logPath, $request->input('log'));
-        }
-        $imageFile = basename($imagePath);
-        $logFile = $logPath ? basename($logPath) : null;
-        $token = config('app.debug_download_token');
-        $baseUrl = url('/ingresos/debug-public');
-        return response()->json([
-            'ok'              => true,
-            'image'           => $imagePath,
-            'log'             => $logPath,
-            'filename_image'  => $imageFile,
-            'filename_log'    => $logFile,
-            'download_image'  => route('ingresos.debug-download', ['file' => $imageFile]),
-            'download_log'    => $logFile ? route('ingresos.debug-download', ['file' => $logFile]) : null,
-            'url_publica_log' => $token && $logFile ? $baseUrl . '/' . $logFile . '?token=' . $token : null,
-            'url_publica_imagen' => $token && $imageFile ? $baseUrl . '/' . $imageFile . '?token=' . $token : null,
-        ]);
-    }
-
-    /**
-     * Descargar archivo de debug (imagen o log) guardado en storage/app/debug-qr/.
-     */
-    public function debugDownload(string $file)
-    {
-        $path = 'debug-qr/' . $file;
-        if (!Storage::disk('local')->exists($path)) {
-            abort(404);
-        }
-        $mime = str_ends_with(strtolower($file), '.txt') ? 'text/plain' : 'image/png';
-        return response(Storage::disk('local')->get($path), 200, [
-            'Content-Type' => $mime,
-            'Content-Disposition' => 'attachment; filename="' . $file . '"',
-        ]);
-    }
-
-    /**
-     * Descargar archivo de debug sin autenticación (con token en query).
-     * Uso: /ingresos/debug-public/captura-xxx.txt?token=TU_TOKEN
-     * Token en .env: DEBUG_DOWNLOAD_TOKEN=tu_token_secreto
-     */
-    public function debugDownloadPublic(Request $request, string $file)
-    {
-        $token = config('app.debug_download_token');
-        if (empty($token) || $request->query('token') !== $token) {
-            abort(403, 'Token inválido');
-        }
-        $path = 'debug-qr/' . $file;
-        if (!Storage::disk('local')->exists($path)) {
-            abort(404);
-        }
-        $mime = str_ends_with(strtolower($file), '.txt') ? 'text/plain' : 'image/png';
-        return response(Storage::disk('local')->get($path), 200, [
-            'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . $file . '"',
-        ]);
-    }
 }
