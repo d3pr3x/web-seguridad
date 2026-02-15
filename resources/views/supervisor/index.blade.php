@@ -4,7 +4,7 @@
 <div class="min-h-screen bg-gray-100 flex">
     <x-usuario.sidebar />
 
-    <div class="flex-1 lg:ml-64">
+    <div class="flex-1 lg:mr-64">
         <x-usuario.header />
         <x-usuario.mobile-menu />
 

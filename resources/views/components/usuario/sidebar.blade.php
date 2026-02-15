@@ -4,7 +4,7 @@
         : (auth()->user()->esSupervisor() ? 'supervisor.index' : 'usuario.index');
                 $isHomeActive = request()->routeIs($homeRoute);
             @endphp
-<aside class="d-none d-lg-flex flex-column position-fixed top-0 start-0 h-100 z-30 overflow-hidden" style="width: 256px; background: var(--app-sidebar);">
+<aside class="d-none d-lg-flex flex-column position-fixed top-0 end-0 h-100 z-30 overflow-hidden" style="width: 256px; background: var(--app-sidebar);">
     <div class="p-3 border-bottom" style="border-color: rgba(148,163,184,0.2) !important;">
         <p class="mb-0 small fw-semibold text-white text-truncate" title="Portal {{ auth()->user()->nombre_perfil }}">Portal {{ auth()->user()->nombre_perfil }}</p>
     </div>

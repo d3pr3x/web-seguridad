@@ -6,7 +6,7 @@
     <x-usuario.sidebar />
 
     <!-- Contenido principal -->
-    <div class="flex-1 lg:ml-64">
+    <div class="flex-1 lg:mr-64">
         <!-- Headers -->
         <x-usuario.header />
 
