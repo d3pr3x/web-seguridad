@@ -1,5 +1,5 @@
 <?php $__env->startSection('content'); ?>
-<div class="min-h-screen flex">
+<div class="min-h-screen bg-gray-100 flex">
     <?php if (isset($component)) { $__componentOriginal43bea641c2438270a49238c99ecefb58 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal43bea641c2438270a49238c99ecefb58 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.usuario.sidebar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -20,6 +20,7 @@
 <?php $component = $__componentOriginal43bea641c2438270a49238c99ecefb58; ?>
 <?php unset($__componentOriginal43bea641c2438270a49238c99ecefb58); ?>
 <?php endif; ?>
+
     <div class="flex-1 lg:ml-64">
         <?php if (isset($component)) { $__componentOriginal68a91bba458c966ce613394dc1ac6078 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal68a91bba458c966ce613394dc1ac6078 = $attributes; } ?>
@@ -64,104 +65,163 @@
 
         <div class="container mx-auto px-4 py-6 max-w-7xl">
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
-            <div class="mb-3 px-3 py-2 rounded-2 border font-medium" style="font-size: 0.8125rem; background: rgba(15, 118, 110, 0.08); border-color: rgba(15, 118, 110, 0.25); color: #0f766e;">
-                <i class="fas fa-check-circle me-2"></i><?php echo e(session('success')); ?>
-
+            <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
+                <p class="font-medium"><i class="fas fa-check-circle mr-2"></i><?php echo e(session('success')); ?></p>
             </div>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
-            <div class="mb-3 px-3 py-2 rounded-2 border font-medium" style="font-size: 0.8125rem; background: rgba(220, 38, 38, 0.08); border-color: rgba(220, 38, 38, 0.25); color: #b91c1c;">
-                <i class="fas fa-exclamation-circle me-2"></i><?php echo e(session('error')); ?>
-
+            <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                <p class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i><?php echo e(session('error')); ?></p>
             </div>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-            <!-- Info usuario (solo móvil) -->
-            <div class="lg:hidden bg-white rounded-2 border p-3 mb-4 shadow-sm portal-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: var(--app-sidebar-active); color: var(--app-sidebar-active-text); font-size: 0.85rem;">
-                        <i class="fas fa-user"></i>
+            <!-- Información de Usuario (solo móvil) -->
+            <div class="lg:hidden bg-white rounded-lg shadow-md p-4 mb-6">
+                <div class="flex items-center">
+                    <div class="bg-teal-100 rounded-full p-3 mr-4">
+                        <i class="fas fa-user text-teal-600 text-xl"></i>
                     </div>
-                    <div class="min-w-0">
-                        <p class="mb-0 fw-semibold text-dark" style="font-size: 0.9rem;"><?php echo e(auth()->user()->nombre_completo); ?></p>
-                        <p class="mb-0 text-secondary" style="font-size: 0.75rem;"><?php echo e(auth()->user()->nombre_perfil); ?> · <?php echo e(auth()->user()->nombre_sucursal); ?></p>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-bold text-gray-800"><?php echo e(auth()->user()->nombre_completo); ?></h2>
+                        <p class="text-sm text-gray-600"><?php echo e(auth()->user()->nombre_perfil); ?></p>
+                        <p class="text-sm text-gray-600"><?php echo e(auth()->user()->nombre_sucursal); ?></p>
                     </div>
                 </div>
             </div>
 
             <!-- Título (escritorio) -->
-            <div class="d-none d-lg-block mb-3">
-                <p class="mb-0 small text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Panel de control</p>
-                <h1 class="h5 mb-0 mt-0 fw-bold" style="color: var(--app-text); font-size: 1.1rem;">Resumen</h1>
+            <div class="hidden lg:block mb-6">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-0">Panel de control</p>
+                <h1 class="text-xl font-bold text-gray-800 mt-0">Resumen</h1>
             </div>
 
             <!-- Secciones -->
-            <div class="row g-3">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Supervisión -->
-                <div class="col-12 col-lg-6">
-                    <div class="portal-card h-100 rounded-3 overflow-hidden border shadow-sm">
-                        <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2" style="background: var(--app-surface); border-color: var(--app-border) !important;">
-                            <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 portal-card-icon" style="width: 32px; height: 32px; background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);">
-                                <i class="fas fa-clipboard-check" style="font-size: 0.8rem;"></i>
-                            </div>
-                            <div>
-                                <h2 class="mb-0 fw-bold portal-card-title" style="color: var(--app-text); font-size: 0.95rem;">Supervisión</h2>
-                                <p class="mb-0 portal-card-subtitle text-secondary">Aprobaciones y revisión</p>
-                            </div>
+                <div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-r from-teal-500 to-teal-600 p-4">
+                            <h2 class="text-xl font-bold text-white flex items-center">
+                                <i class="fas fa-clipboard-check mr-2"></i>
+                                Supervisión
+                            </h2>
+                            <p class="text-teal-100 text-sm mt-1">Aprobaciones y revisión</p>
                         </div>
-                        <div class="p-2">
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = [
-                                ['route' => 'admin.documentos.index', 'title' => 'Aprobar Documentos', 'desc' => 'Revisar documentos personales', 'icon' => 'fa-file-alt'],
-                                ['route' => 'admin.novedades.index', 'title' => 'Todas las Novedades', 'desc' => 'Historial completo de novedades', 'icon' => 'fa-bell'],
-                                ['route' => 'admin.reportes-especiales.index', 'title' => 'Todos los Reportes', 'desc' => 'Historial completo de reportes', 'icon' => 'fa-chart-bar'],
-                            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <a href="<?php echo e(route($item['route'])); ?>" class="portal-link d-flex align-items-center gap-2 px-2 py-2 rounded-2 text-decoration-none">
-                                <span class="portal-link-icon rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; background: var(--app-surface); color: var(--app-text-muted); font-size: 0.75rem;">
-                                    <i class="fas <?php echo e($item['icon']); ?>"></i>
-                                </span>
-                                <div class="min-w-0 flex-grow-1">
-                                    <span class="fw-semibold d-block portal-link-title" style="color: var(--app-text); font-size: 0.875rem;"><?php echo e($item['title']); ?></span>
-                                    <span class="portal-link-desc text-secondary" style="font-size: 0.75rem;"><?php echo e($item['desc']); ?></span>
+                        <div class="p-4 space-y-3">
+                            <a href="<?php echo e(route('admin.documentos.index')); ?>" class="block">
+                                <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-teal-800">Aprobar Documentos</h3>
+                                            <p class="text-sm text-teal-600">Revisar documentos personales</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-teal-500"></i>
+                                    </div>
                                 </div>
-                                <i class="fas fa-chevron-right flex-shrink-0 text-secondary" style="font-size: 0.7rem;"></i>
                             </a>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            <a href="<?php echo e(route('admin.novedades.index')); ?>" class="block">
+                                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-indigo-800">Todas las Novedades</h3>
+                                            <p class="text-sm text-indigo-600">Historial completo de novedades</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-indigo-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="<?php echo e(route('admin.reportes-especiales.index')); ?>" class="block">
+                                <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-r-lg hover:bg-pink-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-pink-800">Todos los Reportes</h3>
+                                            <p class="text-sm text-pink-600">Historial completo de reportes</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-pink-500"></i>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Administración -->
-                <div class="col-12 col-lg-6">
-                    <div class="portal-card h-100 rounded-3 overflow-hidden border shadow-sm">
-                        <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2" style="background: var(--app-surface); border-color: var(--app-border) !important;">
-                            <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 portal-card-icon" style="width: 32px; height: 32px; background: var(--app-sidebar-active); color: var(--app-sidebar-active-text);">
-                                <i class="fas fa-cog" style="font-size: 0.8rem;"></i>
-                            </div>
-                            <div>
-                                <h2 class="mb-0 fw-bold portal-card-title" style="color: var(--app-text); font-size: 0.95rem;">Administración</h2>
-                                <p class="mb-0 portal-card-subtitle text-secondary">Herramientas administrativas</p>
-                            </div>
+                <div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
+                            <h2 class="text-xl font-bold text-white flex items-center">
+                                <i class="fas fa-cog mr-2"></i>
+                                Administración
+                            </h2>
+                            <p class="text-slate-200 text-sm mt-1">Herramientas administrativas</p>
                         </div>
-                        <div class="p-2">
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = [
-                                ['route' => 'admin.usuarios.index', 'title' => 'Gestión de Usuarios', 'desc' => 'Ver, crear y editar usuarios', 'icon' => 'fa-users'],
-                                ['route' => 'admin.reportes-diarios', 'title' => 'Reportes Diarios', 'desc' => 'Ver reportes del sistema', 'icon' => 'fa-calendar-day'],
-                                ['route' => 'admin.reporte-sucursal', 'title' => 'Reporte por Sucursal', 'desc' => 'Análisis por ubicación', 'icon' => 'fa-building'],
-                                ['route' => 'admin.dispositivos.index', 'title' => 'Gestión de Dispositivos', 'desc' => 'Control de navegadores permitidos', 'icon' => 'fa-laptop'],
-                                ['route' => 'admin.ubicaciones.index', 'title' => 'Gestión de Ubicaciones', 'desc' => 'Zonas de acceso permitidas', 'icon' => 'fa-map-marker-alt'],
-                                ['route' => 'admin.sectores.index', 'title' => 'Gestión de Sectores', 'desc' => 'Configurar zonas', 'icon' => 'fa-th-large'],
-                            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <a href="<?php echo e(route($item['route'])); ?>" class="portal-link d-flex align-items-center gap-2 px-2 py-2 rounded-2 text-decoration-none">
-                                <span class="portal-link-icon rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; background: var(--app-surface); color: var(--app-text-muted); font-size: 0.75rem;">
-                                    <i class="fas <?php echo e($item['icon']); ?>"></i>
-                                </span>
-                                <div class="min-w-0 flex-grow-1">
-                                    <span class="fw-semibold d-block portal-link-title" style="color: var(--app-text); font-size: 0.875rem;"><?php echo e($item['title']); ?></span>
-                                    <span class="portal-link-desc text-secondary" style="font-size: 0.75rem;"><?php echo e($item['desc']); ?></span>
+                        <div class="p-4 space-y-3">
+                            <a href="<?php echo e(route('admin.usuarios.index')); ?>" class="block">
+                                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg hover:bg-blue-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-blue-800">Gestión de Usuarios</h3>
+                                            <p class="text-sm text-blue-600">Ver, crear y editar usuarios</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-blue-500"></i>
+                                    </div>
                                 </div>
-                                <i class="fas fa-chevron-right flex-shrink-0 text-secondary" style="font-size: 0.7rem;"></i>
                             </a>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            <a href="<?php echo e(route('admin.reportes-diarios')); ?>" class="block">
+                                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hover:bg-green-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-green-800">Reportes Diarios</h3>
+                                            <p class="text-sm text-green-600">Ver reportes del sistema</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-green-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="<?php echo e(route('admin.reporte-sucursal')); ?>" class="block">
+                                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-purple-800">Reporte por Sucursal</h3>
+                                            <p class="text-sm text-purple-600">Análisis por ubicación</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-purple-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="<?php echo e(route('admin.dispositivos.index')); ?>" class="block">
+                                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg hover:bg-orange-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-orange-800">Gestión de Dispositivos</h3>
+                                            <p class="text-sm text-orange-600">Control de navegadores permitidos</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-orange-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="<?php echo e(route('admin.ubicaciones.index')); ?>" class="block">
+                                <div class="bg-cyan-50 border-l-4 border-cyan-500 p-4 rounded-r-lg hover:bg-cyan-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-cyan-800">Gestión de Ubicaciones</h3>
+                                            <p class="text-sm text-cyan-600">Zonas de acceso permitidas</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-cyan-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="<?php echo e(route('admin.sectores.index')); ?>" class="block">
+                                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg hover:bg-amber-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-amber-800">Gestión de Sectores</h3>
+                                            <p class="text-sm text-amber-600">Configurar zonas</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-amber-500"></i>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
