@@ -148,6 +148,7 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://unpkg.com/@zxing/browser@0.1.5/umd/zxing-browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="{{ asset('js/rut-formatter.js') }}"></script>
@@ -320,6 +321,17 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.drawImage(srcCanvas, 0, 0, c.width, c.height, 0, 0, c.width, c.height);
             return c;
         }
+        function canvasEscalar(srcCanvas, factor) {
+            factor = factor != null ? factor : 2;
+            var c = document.createElement('canvas');
+            c.width = Math.min(1920, Math.round(srcCanvas.width * factor));
+            c.height = Math.min(1920, Math.round(srcCanvas.height * factor));
+            var ctx = c.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(srcCanvas, 0, 0, srcCanvas.width, srcCanvas.height, 0, 0, c.width, c.height);
+            return c;
+        }
         function canvasRotar(srcCanvas, grados) {
             var c = document.createElement('canvas');
             var rad = grados * Math.PI / 180;
@@ -434,6 +446,20 @@ document.addEventListener('DOMContentLoaded', function() {
             c.getContext('2d').putImageData(img, 0, 0);
             return c;
         }
+        function decodificarConZXing(canvasEl) {
+            if (typeof ZXingBrowser === 'undefined' || !ZXingBrowser.BrowserQRCodeReader) return Promise.resolve(null);
+            return new Promise(function(resolve) {
+                var img = new Image();
+                img.onload = function() {
+                    try {
+                        var reader = new ZXingBrowser.BrowserQRCodeReader();
+                        reader.decodeFromImage(img).then(function(result) { resolve(result ? result.text : null); }).catch(function() { resolve(null); });
+                    } catch (e) { resolve(null); }
+                };
+                img.onerror = function() { resolve(null); };
+                img.src = canvasEl.toDataURL('image/png');
+            });
+        }
         function decodificarConBarcodeDetector(canvasEl, formatos) {
             if (typeof BarcodeDetector === 'undefined') return Promise.resolve(null);
             formatos = formatos || ['qr_code', 'pdf417'];
@@ -476,6 +502,24 @@ document.addEventListener('DOMContentLoaded', function() {
             if (decoded) { exitoQR(decoded); return; }
             decoded = decodificarConJsQR(canvasConMasContraste(cSupIzq));
             if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3a0b. Escalando recorte 3x y 4x (QR pequeño)…');
+            decoded = decodificarConJsQR(canvasEscalar(cSupIzq, 3));
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasEscalar(cSupIzq, 4));
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasConMasContraste(canvasEscalar(cSupIzq, 3)));
+            if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3a0c. Probando ZXing en recorte escalado…');
+            decodificarConZXing(canvasEscalar(cSupIzq, 3)).then(function(d) {
+                if (d) { exitoQR(d); return; }
+                return decodificarConZXing(cSupIzq);
+            }).then(function(d) {
+                if (d) { exitoQR(d); return; }
+                return decodificarConZXing(canvasConMasContraste(cSupIzq));
+            }).then(function(d) {
+                if (d) { exitoQR(d); return; }
+                (function continuarFlujoJsQR() {
+            var decoded;
             if (lumActual < 100) {
                 decoded = decodificarConJsQR(canvasBrillar(cSupIzq, 2.5, 30));
                 if (decoded) { exitoQR(decoded); return; }
@@ -595,6 +639,123 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 'image/png', 1);
                 }, 'image/png', 1);
             }, 'image/png', 1);
+                })();
+            }).catch(function() {
+                (function() {
+                    escribirLogQR('3a0c. Probando ZXing en recorte escalado…');
+                    var cSupIzq = canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6);
+                    var cIzq40 = canvasRecorteIzquierdo(canvasCedula, 0.4);
+                    seguirConJsQRSync(cSupIzq, cIzq40);
+                })();
+            });
+            return;
+        }
+        function seguirConJsQRSync(cSupIzq, cIzq40) {
+            var decoded;
+            escribirLogQR('3a. Probando recorte zona izquierda…');
+            decoded = decodificarConJsQR(cIzq40);
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasRecorteIzquierdo(canvasCedula, 0.35));
+            if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3b. Probando imagen espejo…');
+            var c2 = document.getElementById('canvas-cedula-espejo');
+            c2.width = w; c2.height = h;
+            var ctx2 = c2.getContext('2d');
+            ctx2.translate(w, 0); ctx2.scale(-1, 1);
+            ctx2.drawImage(canvasCedula, 0, 0);
+            ctx2.setTransform(1, 0, 0, 1, 0, 0);
+            decoded = decodificarConJsQR(c2);
+            if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3b2. Probando rotaciones…');
+            for (var rot = 0; rot < 3; rot++) {
+                var cRot = canvasRotar(canvasCedula, [90, -90, 180][rot]);
+                decoded = decodificarConJsQR(cRot);
+                if (decoded) { exitoQR(decoded); return; }
+                decoded = decodificarConJsQR(canvasRecorteSuperiorIzquierdo(cRot, 0.55, 0.6));
+                if (decoded) { exitoQR(decoded); return; }
+            }
+            escribirLogQR('3b3. Probando con afilado…');
+            decoded = decodificarConJsQR(canvasAfilar(canvasCedula, 0.4));
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasAfilar(cSupIzq, 0.4));
+            if (decoded) { exitoQR(decoded); return; }
+            if (lumActual < 100) {
+                decoded = decodificarConJsQR(canvasAfilar(canvasBrillar(cSupIzq, 2.2, 25), 0.3));
+                if (decoded) { exitoQR(decoded); return; }
+            }
+            escribirLogQR('3c. Probando con más contraste…');
+            var cContraste = canvasConMasContraste(canvasCedula);
+            decoded = decodificarConJsQR(cContraste);
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasConMasContraste(c2));
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasConMasContraste(cIzq40));
+            if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3c2. Probando binarizado…');
+            var umbrales = lumActual < 100 ? [70, 85, 100, 115, 128, 140] : [128, 140, 110];
+            for (var ub = 0; ub < umbrales.length; ub++) {
+                decoded = decodificarConJsQR(canvasBinarizar(cIzq40, umbrales[ub]));
+                if (decoded) { exitoQR(decoded); return; }
+            }
+            if (lumActual < 100) {
+                var cBrilloIzq = canvasBrillar(cIzq40, 2.0, 30);
+                for (var ub2 = 0; ub2 < 4; ub2++) {
+                    decoded = decodificarConJsQR(canvasBinarizar(cBrilloIzq, [90, 110, 130, 150][ub2]));
+                    if (decoded) { exitoQR(decoded); return; }
+                }
+            }
+            escribirLogQR('3d. Recorte izquierdo 2x…');
+            var cIzq2x = document.createElement('canvas');
+            cIzq2x.width = Math.min(cIzq40.width * 2, 1920);
+            cIzq2x.height = Math.min(h * 2, 1920);
+            var ctxIzq2 = cIzq2x.getContext('2d');
+            ctxIzq2.imageSmoothingEnabled = true;
+            ctxIzq2.imageSmoothingQuality = 'high';
+            ctxIzq2.drawImage(cIzq40, 0, 0, cIzq40.width, cIzq40.height, 0, 0, cIzq2x.width, cIzq2x.height);
+            decoded = decodificarConJsQR(cIzq2x);
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasConMasContraste(cIzq2x));
+            if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3e. Imagen completa 2x…');
+            var w2 = Math.min(w * 2, 1920), h2 = Math.min(h * 2, 1920);
+            if (w2 > w || h2 > h) {
+                var cBig = document.createElement('canvas');
+                cBig.width = w2; cBig.height = h2;
+                var ctxBig = cBig.getContext('2d');
+                ctxBig.imageSmoothingEnabled = true;
+                ctxBig.imageSmoothingQuality = 'high';
+                ctxBig.drawImage(canvasCedula, 0, 0, w, h, 0, 0, w2, h2);
+                decoded = decodificarConJsQR(cBig);
+                if (decoded) { exitoQR(decoded); return; }
+                decoded = decodificarConJsQR(canvasConMasContraste(cBig));
+                if (decoded) { exitoQR(decoded); return; }
+                if (lumActual < 100) {
+                    decoded = decodificarConJsQR(canvasBrillar(cBig, 2.0, 30));
+                    if (decoded) { exitoQR(decoded); return; }
+                }
+            }
+            escribirLogQR('3f. Html5Qrcode (archivo)…');
+            canvasCedula.toBlob(function(blob) {
+                if (!blob) {
+                    var dataUrl = canvasCedula.toDataURL('image/png');
+                    fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(b) { procesarConArchivo(b, null, null, null, null); }).catch(falloQR);
+                    return;
+                }
+                var cContrasteBlob = canvasConMasContraste(canvasCedula);
+                var cBrilloBlob = lumActual < 100 ? canvasBrillar(canvasCedula, 2.2, 25) : null;
+                var cSupIzqBlob = canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6);
+                cContrasteBlob.toBlob(function(blobContraste) {
+                    cIzq40.toBlob(function(blobIzq) {
+                        cSupIzqBlob.toBlob(function(blobSupIzq) {
+                            if (cBrilloBlob) {
+                                cBrilloBlob.toBlob(function(b) { procesarConArchivo(blob, blobContraste, blobIzq, b, blobSupIzq); }, 'image/png', 1);
+                            } else {
+                                procesarConArchivo(blob, blobContraste, blobIzq, null, blobSupIzq);
+                            }
+                        }, 'image/png', 1);
+                    }, 'image/png', 1);
+                }, 'image/png', 1);
+            }, 'image/png', 1);
         }
             function probarImagenesMejoradas() {
                 if (lumActual >= 100) return Promise.resolve(null);
@@ -630,6 +791,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         return QrScanner.scanImage(cGamma).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
                     }
                     return null;
+                }).then(function(d) {
+                    if (d) return d;
+                    return decodificarConZXing(cSupIzqBrillo);
+                }).then(function(d) {
+                    if (d) return d;
+                    return decodificarConZXing(canvasEscalar(cSupIzq, 3));
                 });
             }
             escribirLogQR('3. Probando BarcodeDetector (nativo)…');
@@ -658,6 +825,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     return QrScanner.scanImage(canvasRecorteIzquierdo(canvasCedula, 0.4)).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
                 }
                 return null;
+            }).then(function(decoded) {
+                if (decoded) { exitoQR(decoded); return; }
+                escribirLogQR('3a0d. Probando ZXing…');
+                return decodificarConZXing(canvasCedula);
+            }).then(function(decoded) {
+                if (decoded) { exitoQR(decoded); return; }
+                var cSupIzq = canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6);
+                return decodificarConZXing(canvasEscalar(cSupIzq, 3));
             }).then(function(decoded) {
                 if (decoded) { exitoQR(decoded); return; }
                 seguirConJsQR();
