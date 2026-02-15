@@ -309,6 +309,53 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.drawImage(srcCanvas, 0, 0, c.width, sh, 0, 0, c.width, sh);
             return c;
         }
+        function canvasRecorteSuperiorIzquierdo(srcCanvas, fracAncho, fracAlto) {
+            fracAncho = fracAncho != null ? fracAncho : 0.55;
+            fracAlto = fracAlto != null ? fracAlto : 0.6;
+            var c = document.createElement('canvas');
+            var sw = srcCanvas.width, sh = srcCanvas.height;
+            c.width = Math.max(100, Math.round(sw * fracAncho));
+            c.height = Math.max(100, Math.round(sh * fracAlto));
+            var ctx = c.getContext('2d');
+            ctx.drawImage(srcCanvas, 0, 0, c.width, c.height, 0, 0, c.width, c.height);
+            return c;
+        }
+        function canvasRotar(srcCanvas, grados) {
+            var c = document.createElement('canvas');
+            var rad = grados * Math.PI / 180;
+            var cos = Math.abs(Math.cos(rad)), sin = Math.abs(Math.sin(rad));
+            c.width = Math.round(srcCanvas.width * cos + srcCanvas.height * sin);
+            c.height = Math.round(srcCanvas.width * sin + srcCanvas.height * cos);
+            var ctx = c.getContext('2d');
+            ctx.translate(c.width / 2, c.height / 2);
+            ctx.rotate(rad);
+            ctx.drawImage(srcCanvas, -srcCanvas.width / 2, -srcCanvas.height / 2);
+            return c;
+        }
+        function canvasAfilar(srcCanvas, factor) {
+            factor = factor != null ? factor : 0.3;
+            var c = document.createElement('canvas');
+            c.width = srcCanvas.width;
+            c.height = srcCanvas.height;
+            var ctx = srcCanvas.getContext('2d');
+            var img = ctx.getImageData(0, 0, c.width, c.height);
+            var d = img.data, w = c.width, h = c.height;
+            for (var y = 1; y < h - 1; y++) {
+                for (var x = 1; x < w - 1; x++) {
+                    var i = (y * w + x) * 4;
+                    var ctr = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+                    var top = 0.299 * d[((y-1)*w+x)*4] + 0.587 * d[((y-1)*w+x)*4+1] + 0.114 * d[((y-1)*w+x)*4+2];
+                    var bot = 0.299 * d[((y+1)*w+x)*4] + 0.587 * d[((y+1)*w+x)*4+1] + 0.114 * d[((y+1)*w+x)*4+2];
+                    var left = 0.299 * d[(y*w+(x-1))*4] + 0.587 * d[(y*w+(x-1))*4+1] + 0.114 * d[(y*w+(x-1))*4+2];
+                    var right = 0.299 * d[(y*w+(x+1))*4] + 0.587 * d[(y*w+(x+1))*4+1] + 0.114 * d[(y*w+(x+1))*4+2];
+                    var v = Math.round(ctr + factor * (4 * ctr - top - bot - left - right));
+                    v = v < 0 ? 0 : v > 255 ? 255 : v;
+                    d[i] = d[i+1] = d[i+2] = v;
+                }
+            }
+            c.getContext('2d').putImageData(img, 0, 0);
+            return c;
+        }
         function canvasBinarizar(srcCanvas, umbral) {
             var c = document.createElement('canvas');
             c.width = srcCanvas.width;
@@ -410,12 +457,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 var cBrillo = canvasBrillar(canvasCedula, 2.2, 25);
                 decoded = decodificarConJsQR(cBrillo);
                 if (decoded) { exitoQR(decoded); return; }
+                if (lumActual < 85) {
+                    escribirLogQR('3a1b. Muy oscura: brillo 2.8x + 35…');
+                    decoded = decodificarConJsQR(canvasBrillar(canvasCedula, 2.8, 35));
+                    if (decoded) { exitoQR(decoded); return; }
+                }
                 escribirLogQR('3a2. Imagen oscura: jsQR con gamma 1.8…');
                 decoded = decodificarConJsQR(canvasGamma(canvasCedula, 1.8));
                 if (decoded) { exitoQR(decoded); return; }
                 decoded = decodificarConJsQR(canvasBrillar(canvasCedula, 1.8, 40));
                 if (decoded) { exitoQR(decoded); return; }
                 decoded = decodificarConJsQR(canvasGamma(cBrillo, 1.3));
+                if (decoded) { exitoQR(decoded); return; }
+            }
+            escribirLogQR('3a0. Recorte superior izquierdo (QR cédula nueva)…');
+            var cSupIzq = canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6);
+            decoded = decodificarConJsQR(cSupIzq);
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasConMasContraste(cSupIzq));
+            if (decoded) { exitoQR(decoded); return; }
+            if (lumActual < 100) {
+                decoded = decodificarConJsQR(canvasBrillar(cSupIzq, 2.5, 30));
                 if (decoded) { exitoQR(decoded); return; }
             }
             escribirLogQR('3a. Probando recorte zona izquierda (QR cédula)…');
@@ -435,6 +497,24 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx2.setTransform(1, 0, 0, 1, 0, 0);
             decoded = decodificarConJsQR(c2);
             if (decoded) { exitoQR(decoded); return; }
+            escribirLogQR('3b2. Probando rotaciones (card inclinada)…');
+            for (var rot = 0; rot < 3; rot++) {
+                var grados = [90, -90, 180][rot];
+                var cRot = canvasRotar(canvasCedula, grados);
+                decoded = decodificarConJsQR(cRot);
+                if (decoded) { exitoQR(decoded); return; }
+                decoded = decodificarConJsQR(canvasRecorteSuperiorIzquierdo(cRot, 0.55, 0.6));
+                if (decoded) { exitoQR(decoded); return; }
+            }
+            escribirLogQR('3b3. Probando con afilado…');
+            decoded = decodificarConJsQR(canvasAfilar(canvasCedula, 0.4));
+            if (decoded) { exitoQR(decoded); return; }
+            decoded = decodificarConJsQR(canvasAfilar(cSupIzq, 0.4));
+            if (decoded) { exitoQR(decoded); return; }
+            if (lumActual < 100) {
+                decoded = decodificarConJsQR(canvasAfilar(canvasBrillar(cSupIzq, 2.2, 25), 0.3));
+                if (decoded) { exitoQR(decoded); return; }
+            }
             escribirLogQR('3c. Probando con más contraste (cédula)…');
             var cContraste = canvasConMasContraste(canvasCedula);
             decoded = decodificarConJsQR(cContraste);
@@ -493,38 +573,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!blob) {
                     var dataUrl = canvasCedula.toDataURL('image/png');
                     fetch(dataUrl).then(function(r) { return r.blob(); }).then(function(b) {
-                        procesarConArchivo(b, null, null, null);
+                        procesarConArchivo(b, null, null, null, null);
                     }).catch(falloQR);
                     return;
                 }
                 var cContrasteBlob = canvasConMasContraste(canvasCedula);
                 var cBrilloBlob = lumActual < 100 ? canvasBrillar(canvasCedula, 2.2, 25) : null;
+                var cSupIzq = canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6);
                 cContrasteBlob.toBlob(function(blobContraste) {
                     cIzq40.toBlob(function(blobIzq) {
-                        var blobBrillo = null;
-                        if (cBrilloBlob) {
-                            cBrilloBlob.toBlob(function(b) {
-                                procesarConArchivo(blob, blobContraste, blobIzq, b);
-                            }, 'image/png', 1);
-                        } else {
-                            procesarConArchivo(blob, blobContraste, blobIzq, null);
-                        }
+                        cSupIzq.toBlob(function(blobSupIzq) {
+                            var blobBrillo = null;
+                            if (cBrilloBlob) {
+                                cBrilloBlob.toBlob(function(b) {
+                                    procesarConArchivo(blob, blobContraste, blobIzq, b, blobSupIzq);
+                                }, 'image/png', 1);
+                            } else {
+                                procesarConArchivo(blob, blobContraste, blobIzq, null, blobSupIzq);
+                            }
+                        }, 'image/png', 1);
                     }, 'image/png', 1);
                 }, 'image/png', 1);
             }, 'image/png', 1);
         }
             function probarImagenesMejoradas() {
                 if (lumActual >= 100) return Promise.resolve(null);
-                escribirLogQR('3x. Imagen oscura (lum=' + lumActual + '): probando brillo y gamma…');
+                escribirLogQR('3x. Imagen oscura (lum=' + lumActual + '): probando brillo, gamma y recorte superior-izq…');
                 var cBrillo = canvasBrillar(canvasCedula, 2.2, 25);
                 var cGamma = canvasGamma(canvasCedula, 1.8);
+                var cSupIzq = canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6);
+                var cSupIzqBrillo = canvasBrillar(cSupIzq, 2.5, 30);
                 return decodificarConBarcodeDetector(cBrillo).then(function(d) {
                     if (d) return d;
                     return decodificarConBarcodeDetector(cGamma);
                 }).then(function(d) {
                     if (d) return d;
+                    return decodificarConBarcodeDetector(cSupIzq);
+                }).then(function(d) {
+                    if (d) return d;
+                    return decodificarConBarcodeDetector(cSupIzqBrillo);
+                }).then(function(d) {
+                    if (d) return d;
                     if (typeof QrScanner !== 'undefined') {
                         return QrScanner.scanImage(cBrillo).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
+                    }
+                    return null;
+                }).then(function(d) {
+                    if (d) return d;
+                    if (typeof QrScanner !== 'undefined') {
+                        return QrScanner.scanImage(cSupIzqBrillo).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
                     }
                     return null;
                 }).then(function(d) {
@@ -546,6 +643,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 return decodificarConBarcodeDetector(canvasRecorteIzquierdo(canvasCedula, 0.4));
             }).then(function(decoded) {
                 if (decoded) { exitoQR(decoded); return; }
+                escribirLogQR('3a0c. Probando BarcodeDetector en recorte superior-izq…');
+                return decodificarConBarcodeDetector(canvasRecorteSuperiorIzquierdo(canvasCedula, 0.55, 0.6));
+            }).then(function(decoded) {
+                if (decoded) { exitoQR(decoded); return; }
                 if (typeof QrScanner !== 'undefined') {
                     escribirLogQR('3a0b. Probando QrScanner…');
                     return QrScanner.scanImage(canvasCedula).then(function(r) { return typeof r === 'string' ? r : (r && r.data) || null; }).catch(function() { return null; });
@@ -562,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 seguirConJsQR();
             }).catch(function() { seguirConJsQR(); });
         }
-        function procesarConArchivo(blob, blobContraste, blobIzq, blobBrillo) {
+        function procesarConArchivo(blob, blobContraste, blobIzq, blobBrillo, blobSupIzq) {
             var file = new File([blob], 'captura.png', { type: 'image/png' });
             var scanner = new Html5Qrcode('dummy-cedula');
             function intentarConEspejo() {
@@ -586,7 +687,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (blobIzq) {
                     escribirLogQR('3g2. Reintento con recorte izquierdo (archivo)…');
                     var fileIzq = new File([blobIzq], 'captura-izq.png', { type: 'image/png' });
-                    new Html5Qrcode('dummy-cedula').scanFile(fileIzq, false).then(exitoQR).catch(intentarConEspejo);
+                    new Html5Qrcode('dummy-cedula').scanFile(fileIzq, false).then(exitoQR).catch(intentarSupIzq);
+                } else intentarSupIzq();
+            }
+            function intentarSupIzq() {
+                if (blobSupIzq) {
+                    escribirLogQR('3g2b. Reintento con recorte superior-izq (archivo)…');
+                    var fileSupIzq = new File([blobSupIzq], 'captura-supizq.png', { type: 'image/png' });
+                    new Html5Qrcode('dummy-cedula').scanFile(fileSupIzq, false).then(exitoQR).catch(intentarConEspejo);
                 } else intentarConEspejo();
             }
             scanner.scanFile(file, false).then(exitoQR).catch(function() {
@@ -594,6 +702,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     escribirLogQR('3g0. Reintento con imagen con brillo (archivo)…');
                     var fileB = new File([blobBrillo], 'captura-brillo.png', { type: 'image/png' });
                     new Html5Qrcode('dummy-cedula').scanFile(fileB, false).then(exitoQR).catch(function() {
+                        if (blobSupIzq) {
+                            escribirLogQR('3g0b. Reintento con recorte superior-izq (archivo)…');
+                            var fileSupIzq = new File([blobSupIzq], 'captura-supizq.png', { type: 'image/png' });
+                            new Html5Qrcode('dummy-cedula').scanFile(fileSupIzq, false).then(exitoQR).catch(function() {
+                                if (blobContraste) {
+                                    escribirLogQR('3g. Reintento con imagen con más contraste (archivo)…');
+                                    var fileC = new File([blobContraste], 'captura-contraste.png', { type: 'image/png' });
+                                    new Html5Qrcode('dummy-cedula').scanFile(fileC, false).then(exitoQR).catch(intentarRecorteIzq);
+                                } else intentarRecorteIzq();
+                            });
+                        } else if (blobContraste) {
+                            escribirLogQR('3g. Reintento con imagen con más contraste (archivo)…');
+                            var fileC = new File([blobContraste], 'captura-contraste.png', { type: 'image/png' });
+                            new Html5Qrcode('dummy-cedula').scanFile(fileC, false).then(exitoQR).catch(intentarRecorteIzq);
+                        } else intentarRecorteIzq();
+                    });
+                } else if (blobSupIzq) {
+                    escribirLogQR('3g0b. Reintento con recorte superior-izq (archivo)…');
+                    var fileSupIzq = new File([blobSupIzq], 'captura-supizq.png', { type: 'image/png' });
+                    new Html5Qrcode('dummy-cedula').scanFile(fileSupIzq, false).then(exitoQR).catch(function() {
                         if (blobContraste) {
                             escribirLogQR('3g. Reintento con imagen con más contraste (archivo)…');
                             var fileC = new File([blobContraste], 'captura-contraste.png', { type: 'image/png' });
