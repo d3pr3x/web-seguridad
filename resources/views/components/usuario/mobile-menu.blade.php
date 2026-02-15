@@ -143,27 +143,28 @@
 .side-menu-mobile .side-menu-link i.fas { color: #e2e8f0 !important; }
 .side-menu-mobile .side-menu-link:hover,
 .side-menu-mobile .side-menu-link:hover span,
-.side-menu-mobile .side-menu-link:hover i.fas { background: rgba(51,65,85,0.6) !important; color: #f8fafc !important; }
+.side-menu-mobile .side-menu-link:hover i.fas { background: transparent !important; color: #f8fafc !important; }
 .side-menu-mobile .side-menu-link.active,
 .side-menu-mobile .side-menu-link.active span,
 .side-menu-mobile .side-menu-link.active i.fas { color: #5eead4 !important; background: transparent !important; }
 .side-menu-mobile .side-menu-sublink,
 .side-menu-mobile .side-menu-sublink span { color: #cbd5e1 !important; font-size: 0.9rem !important; }
-.side-menu-mobile .side-menu-sublink:hover { color: #f1f5f9 !important; background: rgba(51,65,85,0.4) !important; }
+.side-menu-mobile .side-menu-sublink:hover { color: #f1f5f9 !important; background: transparent !important; }
 .side-menu-mobile .side-menu-sublink.active { color: #5eead4 !important; background: transparent !important; }
 .side-menu-mobile .side-menu-toggle,
 .side-menu-mobile .side-menu-toggle span,
 .side-menu-mobile .side-menu-toggle i.fas { color: #e2e8f0 !important; }
 .side-menu-mobile .side-menu-toggle:hover,
-.side-menu-mobile .side-menu-toggle[aria-expanded="true"] { color: #f8fafc !important; }
+.side-menu-mobile .side-menu-toggle[aria-expanded="true"] { color: #f8fafc !important; background: transparent !important; }
 .side-menu-mobile .side-menu-toggle[data-bs-toggle="collapse"].collapsed .mobile-chevron { transform: none; }
 .side-menu-mobile .side-menu-toggle[data-bs-toggle="collapse"]:not(.collapsed) .mobile-chevron { transform: rotate(90deg); }
 #sideMenu.show { transform: translateX(0) !important; }
 .side-menu-mobile .collapse.show { visibility: visible !important; }
 .side-menu-mobile .collapse .nav-link { opacity: 1 !important; visibility: visible !important; }
-/* Sin fondo al hacer clic o tap (eliminar highlight); la página actual (.active) conserva su fondo */
-.side-menu-mobile .nav-link:active:not(.active),
-.side-menu-mobile .nav-link:focus:not(.active) { background: transparent !important; box-shadow: none !important; }
+/* Sin fondo al hacer clic, tap, hover ni focus; solo color en activo */
+.side-menu-mobile .nav-link:active,
+.side-menu-mobile .nav-link:focus,
+.side-menu-mobile .nav-link:hover { background: transparent !important; box-shadow: none !important; outline: none !important; }
 .side-menu-mobile .nav-link { -webkit-tap-highlight-color: transparent; }
 .side-menu-mobile .side-menu-link.active,
 .side-menu-mobile .side-menu-sublink.active { -webkit-tap-highlight-color: transparent; }
