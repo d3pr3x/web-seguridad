@@ -15,7 +15,7 @@
 
         <!-- Contenido Principal -->
         <div class="container mx-auto px-4 py-6 max-w-7xl">
-            <!-- Título y botón volver -->
+            <!-- Título, registrar novedad y volver -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h1 class="text-3xl font-bold text-gray-800 flex items-center">
                     <svg class="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,12 +23,19 @@
                     </svg>
                     Todas las Novedades
                 </h1>
-                <a href="{{ url('/') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Volver
-                </a>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <a href="{{ route('admin.novedades.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Registrar novedad
+                    </a>
+                    <a href="{{ route('admin.novedades.index', ['importancia' => 'importante']) }}" class="px-3 py-2 rounded-lg transition text-sm font-medium {{ request('importancia') === 'importante' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">Solo importantes</a>
+                    <a href="{{ route('admin.novedades.index', ['importancia' => 'critica']) }}" class="px-3 py-2 rounded-lg transition text-sm font-medium {{ request('importancia') === 'critica' ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">Solo críticas</a>
+                    <a href="{{ route('admin.novedades.index') }}" class="px-3 py-2 rounded-lg transition text-sm font-medium {{ !request()->hasAny(['importancia','tipo_hecho','sucursal_id','fecha_desde','fecha_hasta']) ? 'bg-indigo-100 text-indigo-800 border border-indigo-300' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">Ver todo</a>
+                    <a href="{{ url('/') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Volver
+                    </a>
+                </div>
             </div>
 
             <!-- Filtros (Punto 1: tipo hecho; Punto 15: importancia; Punto 8: Instalación) -->

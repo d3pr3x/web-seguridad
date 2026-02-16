@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Accion;
+use App\Models\Sector;
 use App\Models\Sucursal;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -85,6 +86,76 @@ class NovedadController extends Controller
             'totalAcciones',
             'accionesPorTipo'
         ));
+    }
+
+    /**
+     * Formulario para que el administrador registre una novedad/incidente (ve todo, puede crear todo).
+     */
+    public function create()
+    {
+        $sucursales = Sucursal::activas()->orderBy('nombre')->get();
+        $sectores = Sector::with('sucursal')->where('activo', true)->orderBy('sucursal_id')->orderBy('nombre')->get()->groupBy('sucursal_id');
+        $usuarios = User::orderBy('nombre_completo')->get();
+        $tipos = Accion::tipos();
+        $hechos = Accion::hechos();
+        $nivelesImportancia = Accion::nivelesImportancia();
+
+        return view('admin.novedades.create', compact(
+            'sucursales', 'sectores', 'usuarios', 'tipos', 'hechos', 'nivelesImportancia'
+        ));
+    }
+
+    /**
+     * Guardar novedad/incidente creada por el administrador.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'tipo' => 'required|in:inicio_servicio,rondas,constancias,concurrencia_autoridades,concurrencia_servicios,entrega_servicio',
+            'tipo_hecho' => 'nullable|in:incidente,observacion,informacion,delito,accidente',
+            'importancia' => 'nullable|in:cotidiana,importante,critica',
+            'sucursal_id' => 'required|exists:sucursales,id',
+            'sector_id' => 'nullable|exists:sectores,id',
+            'id_usuario' => 'nullable|exists:usuarios,id_usuario',
+            'dia' => 'required|date',
+            'hora' => 'required',
+            'novedad' => 'nullable|string',
+            'accion' => 'nullable|string',
+            'resultado' => 'nullable|string',
+            'imagenes' => 'nullable|array|max:4',
+            'imagenes.*' => 'image|mimes:jpeg,jpg,png,heic,heif|max:15360',
+        ], [
+            'imagenes.max' => 'Máximo 4 fotografías.',
+            'imagenes.*.max' => 'Cada imagen máximo 15MB.',
+        ]);
+
+        $imagenes = [];
+        if ($request->hasFile('imagenes')) {
+            foreach ($request->file('imagenes') as $imagen) {
+                $imagenes[] = $imagen->store('acciones', 'public');
+            }
+        }
+
+        // Si no se asigna usuario, se usa el admin que registra
+        $idUsuario = !empty($validated['id_usuario']) ? $validated['id_usuario'] : auth()->id();
+
+        Accion::create([
+            'id_usuario' => $idUsuario,
+            'sucursal_id' => $validated['sucursal_id'],
+            'sector_id' => $validated['sector_id'] ?? null,
+            'tipo' => $validated['tipo'],
+            'tipo_hecho' => $validated['tipo_hecho'] ?? null,
+            'importancia' => $validated['importancia'] ?? null,
+            'dia' => $validated['dia'],
+            'hora' => $validated['hora'],
+            'novedad' => $validated['novedad'] ?? null,
+            'accion' => $validated['accion'] ?? null,
+            'resultado' => $validated['resultado'] ?? null,
+            'imagenes' => $imagenes,
+        ]);
+
+        return redirect()->route('admin.novedades.index')
+            ->with('success', 'Novedad registrada correctamente. Puede filtrar por importancia para ver solo las relevantes.');
     }
 
     /**

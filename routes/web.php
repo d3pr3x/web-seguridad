@@ -239,8 +239,10 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('sectores/{sector}', [AdminSectorController::class, 'destroy'])->name('sectores.destroy');
             Route::patch('sectores/{sector}/toggle', [AdminSectorController::class, 'toggle'])->name('sectores.toggle');
             
-            // Gestión de novedades (admin)
+            // Gestión de novedades (admin): listar, crear, ver detalle, elevar a reporte
             Route::get('novedades', [AdminNovedadController::class, 'index'])->name('novedades.index');
+            Route::get('novedades/crear', [AdminNovedadController::class, 'create'])->name('novedades.create');
+            Route::post('novedades', [AdminNovedadController::class, 'store'])->name('novedades.store');
             Route::get('novedades/{accion}', [AdminNovedadController::class, 'show'])->name('novedades.show');
             Route::post('novedades/{accion}/elevar-reporte', [AdminNovedadController::class, 'elevarAReporte'])->name('novedades.elevar-reporte');
 
