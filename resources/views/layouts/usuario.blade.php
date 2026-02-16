@@ -113,6 +113,30 @@
         }
         .portal-layout .portal-card + .portal-card { margin-top: 0; }
 
+        /* Cards vista inicial (Panel de control): alto más ajustado al texto */
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .bg-gradient-to-r {
+            padding: 0.5rem 1rem;
+        }
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .bg-gradient-to-r h2 {
+            font-size: 1rem;
+        }
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .bg-gradient-to-r p {
+            margin-top: 0.15rem;
+            font-size: 0.8rem;
+        }
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .p-4.space-y-3 {
+            padding: 0.5rem 1rem;
+        }
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .space-y-3 > a > div[class*="border-l-4"] {
+            padding: 0.4rem 0.75rem;
+        }
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .space-y-3 h3 {
+            font-size: 0.9rem;
+        }
+        .portal-layout div.flex-1 .bg-white.rounded-lg:has(.bg-gradient-to-r) .space-y-3 p.text-sm {
+            font-size: 0.75rem;
+        }
+
         /* Enlaces del contenido: sin subrayado, estilo refinado */
         .portal-layout div.flex-1 > div.container a,
         .portal-layout div[class*="flex-grow-1"] > div.container a {
