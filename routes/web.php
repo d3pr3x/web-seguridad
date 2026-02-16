@@ -15,6 +15,7 @@ use App\Http\Controllers\InformeController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\AdministradorController;
+use App\Http\Controllers\InicioUnificadoController;
 use App\Http\Controllers\AccionController;
 use App\Http\Controllers\ReporteEspecialController;
 use App\Http\Controllers\SectorController;
@@ -100,6 +101,9 @@ Route::middleware(['auth'])->group(function () {
         
         // Portal de Administrador
         Route::get('/administrador', [AdministradorController::class, 'index'])->name('administrador.index');
+
+        // Vista de inicio unificada (pruebas) — una sola vista que discrimina por perfil
+        Route::get('/inicio-unificado', [InicioUnificadoController::class, 'index'])->name('inicio-unificado.index');
         
         // Portal de Usuario
         Route::prefix('usuario')->name('usuario.')->group(function () {

@@ -73,6 +73,9 @@ Sistema de reportes por sucursal similar al mostrado en la imagen, con funcional
 - `GET /admin/reporte-sucursal` - Vista principal del reporte
 - `GET /admin/reporte-sucursal/exportar` - Exportar a PDF
 
+#### **Ejemplo sin datos en la base:**
+  /informes-preview-pdf
+
 ### 📱 **Uso del Sistema**
 
 #### **Para Administradores:**
