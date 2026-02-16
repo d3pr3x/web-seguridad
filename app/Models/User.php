@@ -157,6 +157,54 @@ class User extends Authenticatable
         return $this->rol && $this->rol->slug === 'USUARIO';
     }
 
+    // ─── Accesos por perfil (5 niveles: Admin, Supervisor, Supervisor-Usuario, Usuario-Supervisor, Usuario/Guardia) ───
+
+    /** Niveles operativos: Guardia, 2do jefe, Jefe turno (Admin no ve Control de acceso, Rondas QR ni Mis reportes). */
+    public function puedeVerControlAcceso(): bool
+    {
+        return $this->esUsuario() || $this->esUsuarioSupervisor() || $this->esSupervisorUsuario();
+    }
+
+    public function puedeVerRondasQR(): bool
+    {
+        return $this->puedeVerControlAcceso();
+    }
+
+    public function puedeVerMisReportes(): bool
+    {
+        return $this->puedeVerControlAcceso();
+    }
+
+    /** Reporte por sucursal: 2do jefe, Jefe turno, Jefe contrato y Admin. */
+    public function puedeVerReporteSucursal(): bool
+    {
+        return $this->esUsuarioSupervisor() || $this->esSupervisorUsuario() || $this->esSupervisor() || $this->esAdministrador();
+    }
+
+    /** Vista Supervisión (aprobar documentos, novedades, todos los reportes): Jefe turno, Jefe contrato y Admin. */
+    public function puedeVerSupervision(): bool
+    {
+        return $this->esSupervisorUsuario() || $this->esSupervisor() || $this->esAdministrador();
+    }
+
+    /** Todos los reportes / Reporte escaneos QR: Jefe turno, Jefe contrato y Admin. */
+    public function puedeVerReportesEstadisticasCompletos(): bool
+    {
+        return $this->esSupervisorUsuario() || $this->esSupervisor() || $this->esAdministrador();
+    }
+
+    /** Reportes diarios: solo Admin. */
+    public function puedeVerReportesDiarios(): bool
+    {
+        return $this->esAdministrador();
+    }
+
+    /** Gestión (usuarios, dispositivos, ubicaciones, sectores, puntos ronda): solo Admin. */
+    public function puedeVerGestion(): bool
+    {
+        return $this->esAdministrador();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'id_usuario';

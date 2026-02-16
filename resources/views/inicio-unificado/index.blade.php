@@ -3,11 +3,7 @@
 @section('content')
 @php
     $user = auth()->user();
-    $mostrarReportesCrear = $user->esUsuario() || $user->esUsuarioSupervisor() || $user->esSupervisorUsuario();
-    $mostrarSupervision = $user->esAdministrador() || $user->esSupervisor();
-    $mostrarReportesEstadisticas = $user->esSupervisor();
-    $mostrarAdministracion = $user->esAdministrador();
-    $mostrarMiActividad = $user->esUsuario() || $user->esUsuarioSupervisor() || $user->esSupervisorUsuario();
+    $rolSlug = $user->rol->slug ?? 'USUARIO';
 @endphp
 <div class="min-h-screen bg-gray-100 flex">
     <x-usuario.sidebar />
@@ -17,9 +13,17 @@
         <x-usuario.mobile-menu />
 
         <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl min-w-0 w-full">
-            {{-- Banner de prueba --}}
+            {{-- Banner y selector de perfil (simular vista por tipo de usuario) --}}
             <div class="mb-4 p-3 bg-amber-100 border border-amber-400 text-amber-800 rounded-lg text-sm">
-                <i class="fas fa-flask me-2"></i><strong>Vista de inicio unificada (pruebas).</strong> Contenido visible según tu perfil.
+                <i class="fas fa-flask me-2"></i><strong>Vista de inicio unificada (pruebas).</strong>
+                <span class="ms-2">Ver como:</span>
+                <select id="perfil-preview" class="form-select form-select-sm d-inline-block w-auto ms-2" style="max-width: 220px;" aria-label="Cambiar tipo de usuario para previsualizar">
+                    <option value="USUARIO" {{ $rolSlug === 'USUARIO' ? 'selected' : '' }}>Guardia (Usuario)</option>
+                    <option value="USUARIO_SUPERVISOR" {{ $rolSlug === 'USUARIO_SUPERVISOR' ? 'selected' : '' }}>2º jefe (Usuario-Supervisor)</option>
+                    <option value="SUPERVISOR_USUARIO" {{ $rolSlug === 'SUPERVISOR_USUARIO' ? 'selected' : '' }}>Jefe turno (Supervisor-Usuario)</option>
+                    <option value="SUPERVISOR" {{ $rolSlug === 'SUPERVISOR' ? 'selected' : '' }}>Jefe de contrato (Supervisor)</option>
+                    <option value="ADMIN" {{ $rolSlug === 'ADMIN' ? 'selected' : '' }}>Administrador</option>
+                </select>
             </div>
 
             @if(session('success'))
@@ -38,10 +42,9 @@
                 <h1 class="text-xl font-bold text-gray-800 mt-0">Resumen</h1>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {{-- 1. Reportes (crear incidentes, denuncia, etc.) — Usuario, Usuario-Supervisor, Supervisor-Usuario --}}
-                @if($mostrarReportesCrear)
-                <div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="inicio-secciones">
+                {{-- 1. Reportes (crear) — Guardia, 2do jefe, Jefe turno --}}
+                <div class="inicio-section" data-perfiles="USUARIO USUARIO_SUPERVISOR SUPERVISOR_USUARIO">
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="bg-gradient-to-r from-red-600 to-red-700 p-4">
                             <h2 class="text-xl font-bold text-white flex items-center">
@@ -98,11 +101,9 @@
                         </div>
                     </div>
                 </div>
-                @endif
 
-                {{-- 2. Supervisión — Administrador, Supervisor --}}
-                @if($mostrarSupervision)
-                <div>
+                {{-- 2. Supervisión — Jefe turno, Jefe contrato, Admin --}}
+                <div class="inicio-section" data-perfiles="SUPERVISOR_USUARIO SUPERVISOR ADMIN">
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="bg-gradient-to-r {{ $user->esAdministrador() ? 'from-teal-500 to-teal-600' : 'from-purple-500 to-purple-600' }} p-4">
                             <h2 class="text-xl font-bold text-white flex items-center">
@@ -150,11 +151,9 @@
                         </div>
                     </div>
                 </div>
-                @endif
 
-                {{-- 3. Reportes y estadísticas — Solo Supervisor --}}
-                @if($mostrarReportesEstadisticas)
-                <div>
+                {{-- 3. Reportes y estadísticas — 2do jefe (sucursal), Jefe turno, Jefe contrato, Admin --}}
+                <div class="inicio-section" data-perfiles="USUARIO_SUPERVISOR SUPERVISOR_USUARIO SUPERVISOR ADMIN">
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
                             <h2 class="text-xl font-bold text-white flex items-center">
@@ -164,6 +163,7 @@
                             <p class="text-slate-200 text-sm mt-1">Consultas y exportación</p>
                         </div>
                         <div class="p-4 space-y-3">
+                            <div class="inicio-subitem" data-perfiles="SUPERVISOR_USUARIO SUPERVISOR ADMIN">
                             <a href="{{ route('admin.reportes-especiales.index') }}" class="block">
                                 <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
                                     <div class="flex items-center justify-between">
@@ -186,14 +186,39 @@
                                     </div>
                                 </div>
                             </a>
+                            </div>
+                            <div class="inicio-subitem" data-perfiles="USUARIO_SUPERVISOR SUPERVISOR_USUARIO SUPERVISOR ADMIN">
+                            <a href="{{ route('admin.reporte-sucursal') }}" class="block">
+                                <div class="bg-violet-50 border-l-4 border-violet-500 p-4 rounded-r-lg hover:bg-violet-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-violet-800">Reporte por sucursal</h3>
+                                            <p class="text-sm text-violet-600">Análisis por ubicación</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-violet-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            </div>
+                            <div class="inicio-subitem" data-perfiles="ADMIN">
+                            <a href="{{ route('admin.reportes-diarios') }}" class="block">
+                                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hover:bg-green-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-green-800">Reportes diarios</h3>
+                                            <p class="text-sm text-green-600">Reportes del sistema</p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-green-500"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                @endif
 
-                {{-- 4. Administración — Solo Administrador --}}
-                @if($mostrarAdministracion)
-                <div>
+                {{-- 4. Administración / Gestión — Solo Admin --}}
+                <div class="inicio-section" data-perfiles="ADMIN">
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
                             <h2 class="text-xl font-bold text-white flex items-center">
@@ -272,11 +297,9 @@
                         </div>
                     </div>
                 </div>
-                @endif
 
-                {{-- 5. Mi actividad — Usuario, Usuario-Supervisor, Supervisor-Usuario --}}
-                @if($mostrarMiActividad)
-                <div>
+                {{-- 5. Mi actividad — Guardia, 2do jefe, Jefe turno --}}
+                <div class="inicio-section" data-perfiles="USUARIO USUARIO_SUPERVISOR SUPERVISOR_USUARIO">
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
                             <h2 class="text-xl font-bold text-white flex items-center">
@@ -335,9 +358,28 @@
                         </div>
                     </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var select = document.getElementById('perfil-preview');
+    if (!select) return;
+    function filtrarPorPerfil() {
+        var perfil = select.value;
+        document.querySelectorAll('#inicio-secciones .inicio-section').forEach(function(section) {
+            var perfiles = (section.getAttribute('data-perfiles') || '').split(/\s+/);
+            var mostrar = perfiles.indexOf(perfil) !== -1;
+            section.style.display = mostrar ? '' : 'none';
+            section.querySelectorAll('.inicio-subitem').forEach(function(sub) {
+                var p = (sub.getAttribute('data-perfiles') || '').split(/\s+/);
+                sub.style.display = p.indexOf(perfil) !== -1 ? '' : 'none';
+            });
+        });
+    }
+    select.addEventListener('change', filtrarPorPerfil);
+    filtrarPorPerfil();
+});
+</script>
 @endsection

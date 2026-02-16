@@ -9,9 +9,8 @@
     <div class="flex-grow-1 overflow-auto py-2 px-2 side-menu-body">
         <ul class="nav flex-column side-menu-nav">
             @php
-                $homeRoute = auth()->user()->esAdministrador()
-                    ? 'administrador.index'
-                    : (auth()->user()->esSupervisor() ? 'supervisor.index' : 'usuario.index');
+                $user = auth()->user();
+                $homeRoute = $user->esAdministrador() ? 'administrador.index' : ($user->esSupervisor() ? 'supervisor.index' : 'usuario.index');
                 $isHomeActive = request()->routeIs($homeRoute);
             @endphp
             <li class="nav-item">
@@ -19,17 +18,19 @@
                     <i class="fas fa-home me-2" style="width: 1.25rem;"></i><span>Inicio</span>
                 </a>
             </li>
+            @if($user->puedeVerControlAcceso())
             <li class="nav-item">
                 <a href="{{ route('ingresos.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'active' : '' }}" style="{{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
                     <i class="fas fa-qrcode me-2" style="width: 1.25rem;"></i><span>Control de acceso</span>
                 </a>
             </li>
-            @if(auth()->user()->esUsuario() || auth()->user()->esSupervisorUsuario() || auth()->user()->esUsuarioSupervisor())
+            @endif
             <li class="nav-item">
                 <a href="{{ route('usuario.perfil.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.perfil.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.perfil.*') ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
                     <i class="fas fa-user me-2" style="width: 1.25rem;"></i><span>Mi perfil</span>
                 </a>
             </li>
+            @if($user->puedeVerMisReportes())
             <li class="nav-item">
                 <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-mis-reportes">
                     <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
@@ -60,7 +61,7 @@
                 </a>
             </li>
             @endif
-            @if(auth()->user()->esSupervisor() || auth()->user()->esAdministrador())
+            @if($user->puedeVerReporteSucursal() || $user->puedeVerReportesEstadisticasCompletos())
             <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
             <li class="nav-item">
                 <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-reportes-admin">
@@ -69,36 +70,41 @@
                 </a>
                 <div class="collapse {{ request()->routeIs(['admin.reportes-especiales.*', 'admin.rondas.reporte', 'admin.reportes-diarios', 'admin.reporte-sucursal']) ? 'show' : '' }}" id="mobile-reportes-admin">
                     <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
+                        @if($user->puedeVerReportesEstadisticasCompletos())
                         <li class="nav-item"><a href="{{ route('admin.reportes-especiales.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reportes-especiales.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-especiales.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Todos los reportes</a></li>
                         <li class="nav-item"><a href="{{ route('admin.rondas.reporte') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.rondas.reporte') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.reporte') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reporte escaneos QR</a></li>
-                        @if(auth()->user()->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.reportes-diarios') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reportes-diarios') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-diarios') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reportes diarios</a></li>
+                        @endif
+                        @if($user->puedeVerReporteSucursal())
                         <li class="nav-item"><a href="{{ route('admin.reporte-sucursal') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reporte-sucursal') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reporte-sucursal') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reporte por sucursal</a></li>
                         @endif
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-usuarios-docs">
-                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
-                    <i class="fas fa-users me-2" style="width: 1.25rem;"></i><span>Usuarios y supervisión</span>
-                </a>
-                <div class="collapse {{ request()->routeIs(['admin.usuarios.*', 'admin.documentos.*', 'admin.novedades.*', 'supervisor.documentos.*']) ? 'show' : '' }}" id="mobile-usuarios-docs">
-                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
-                        @if(auth()->user()->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Usuarios</a></li>
-                        @endif
-                        @if(config('app.show_documentos_guardias'))
-                        <li class="nav-item"><a href="{{ auth()->user()->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Aprobar documentos</a></li>
-                        @endif
-                        @if(auth()->user()->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Novedades</a></li>
+                        @if($user->puedeVerReportesDiarios())
+                        <li class="nav-item"><a href="{{ route('admin.reportes-diarios') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reportes-diarios') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-diarios') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reportes diarios</a></li>
                         @endif
                     </ul>
                 </div>
             </li>
             @endif
-            @if(auth()->user()->esAdministrador())
+            @if($user->puedeVerSupervision())
+            <li class="nav-item">
+                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-usuarios-docs">
+                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
+                    <i class="fas fa-users me-2" style="width: 1.25rem;"></i><span>Supervisión</span>
+                </a>
+                <div class="collapse {{ request()->routeIs(['admin.usuarios.*', 'admin.documentos.*', 'admin.novedades.*', 'supervisor.documentos.*', 'reportes-especiales.*']) ? 'show' : '' }}" id="mobile-usuarios-docs">
+                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
+                        @if($user->esAdministrador())
+                        <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Usuarios</a></li>
+                        @endif
+                        @if(config('app.show_documentos_guardias'))
+                        <li class="nav-item"><a href="{{ $user->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Aprobar documentos</a></li>
+                        @endif
+                        <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Novedades</a></li>
+                        <li class="nav-item"><a href="{{ $user->esAdministrador() ? route('admin.reportes-especiales.index') : route('reportes-especiales.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs(['admin.reportes-especiales.*', 'reportes-especiales.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.reportes-especiales.*', 'reportes-especiales.*']) ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Todos los reportes</a></li>
+                    </ul>
+                </div>
+            </li>
+            @endif
+            @if($user->puedeVerGestion())
             <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
             <li class="nav-item">
                 <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-gestion">

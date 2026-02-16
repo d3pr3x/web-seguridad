@@ -2,41 +2,71 @@
 
 ## Descripción General
 
-El sistema ahora cuenta con 4 perfiles de usuario diferentes, cada uno con características y permisos específicos:
+El sistema cuenta con **5 niveles de perfil** (de mayor a menor alcance). Todos tienen acceso a **Mi perfil**; el resto de accesos se delimita por nivel.
 
-## Perfiles Disponibles
+## Los 5 niveles (ordenados)
 
-### 1. Usuario (rol: `usuario`)
-- **Descripción**: Perfil básico para trabajadores de campo
+| Nivel | Rol (slug)           | Nombre en sistema        | Descripción breve        |
+|-------|---------------------|--------------------------|---------------------------|
+| 1     | `ADMIN`             | Administrador            | Acceso a todo, ordenado y no invasivo |
+| 2     | `SUPERVISOR`        | Supervisor               | Jefe de contrato — solo Supervisión   |
+| 3     | `SUPERVISOR_USUARIO`| Supervisor-Usuario       | Jefe del turno — operativo + Supervisión |
+| 4     | `USUARIO_SUPERVISOR`| Usuario-Supervisor      | 2º jefe del turno — operativo + reportes sucursal |
+| 5     | `USUARIO`           | Usuario (Guardia)        | Operativo: Control de acceso, Rondas QR, Reportes |
+
+## Matriz de acceso (menú / vistas)
+
+| Recurso                    | Guardia | Usuario-Supervisor | Supervisor-Usuario | Supervisor | Admin |
+|----------------------------|---------|--------------------|--------------------|------------|-------|
+| Inicio                     | ✓       | ✓                  | ✓                  | ✓          | ✓     |
+| Mi perfil                  | ✓       | ✓                  | ✓                  | ✓          | ✓     |
+| Control de acceso          | ✓       | ✓                  | ✓                  | —          | —     |
+| Mis reportes               | ✓       | ✓                  | ✓                  | —          | —     |
+| Mis documentos             | ✓       | ✓                  | —                  | —          | —     |
+| Rondas QR                  | ✓       | ✓                  | ✓                  | —          | —     |
+| Reporte por sucursal       | —       | ✓                  | ✓                  | ✓          | ✓     |
+| Reportes y estadísticas (todos, escaneos QR) | — | —       | ✓                  | ✓          | ✓     |
+| Reportes diarios           | —       | —                  | —                  | —          | ✓     |
+| Supervisión (aprobar docs, novedades, todos reportes) | — | — | ✓                  | ✓          | ✓     |
+| Gestión (usuarios, dispositivos, ubicaciones, sectores, puntos ronda) | — | — | —                  | —          | ✓     |
+
+La lógica de “quién ve qué” está centralizada en el modelo `User` mediante los métodos `puedeVer*()` (por ejemplo `puedeVerControlAcceso()`, `puedeVerSupervision()`), usados en el sidebar, menú móvil y vista de inicio unificada.
+
+## Perfiles Disponibles (detalle)
+
+### 1. Usuario (rol: `USUARIO`) — Guardia
+- **Descripción**: Perfil operativo de base (guardia).
 - **Características**:
   - Identificado por su RUT (7 u 8 números + dígito verificador)
   - **DEBE** estar asignado a una sucursal para acceder al sistema
   - Sin sucursal asignada, solo puede acceder a su perfil
-  - Acceso limitado a funcionalidades operativas
+  - Acceso: Control de acceso, Rondas QR, Reportes (crear/ver mis reportes), Mi perfil (y Mis documentos si aplica)
 
-### 2. Supervisor-Usuario (rol: `supervisor-usuario`)
-- **Descripción**: Perfil híbrido que combina funciones de supervisión y operativas
+### 2. Usuario-Supervisor (rol: `USUARIO_SUPERVISOR`) — 2º jefe del turno
+- **Descripción**: Lo mismo que el guardia más reportes de la sucursal.
 - **Características**:
-  - Identificado por su RUT
   - **DEBE** estar asignado a una sucursal
-  - Puede realizar funciones de usuario y supervisar
-  - Acceso a reportes y funciones de supervisión
+  - Todo lo del guardia + Reporte por sucursal (reportes de la sucursal)
 
-### 3. Supervisor (rol: `supervisor`)
-- **Descripción**: Perfil enfocado en supervisión y control
+### 3. Supervisor-Usuario (rol: `SUPERVISOR_USUARIO`) — Jefe del turno
+- **Descripción**: Lo mismo que Usuario-Supervisor más vista de Supervisión.
 - **Características**:
-  - Identificado por su RUT
   - **DEBE** estar asignado a una sucursal
-  - Enfocado en funciones de supervisión
-  - Acceso a reportes y gestión de equipos
+  - Todo lo del Usuario-Supervisor + Supervisión (aprobar documentos, novedades, todos los reportes) y Reportes y estadísticas (todos los reportes, reporte escaneos QR, reporte por sucursal)
 
-### 4. Administrador (rol: `administrador`)
-- **Descripción**: Perfil con acceso completo al sistema
+### 4. Supervisor (rol: `SUPERVISOR`) — Jefe de contrato
+- **Descripción**: Solo Supervisión (sin operativa de guardia).
+- **Características**:
+  - **DEBE** estar asignado a una sucursal
+  - Acceso: Inicio, Mi perfil, Reportes y estadísticas (todos, escaneos QR, reporte sucursal), Supervisión (aprobar documentos, novedades, todos los reportes). No ve Control de acceso, Rondas QR ni Mis reportes.
+
+### 5. Administrador (rol: `ADMIN`)
+- **Descripción**: Acceso a todo lo de supervisión y gestión, de forma ordenada y no invasiva. No usa la operativa de guardia.
 - **Características**:
   - Identificado por su RUT
   - **NO requiere** estar asignado a una sucursal
-  - Acceso completo a todas las funcionalidades
-  - Puede gestionar usuarios, sucursales y configuraciones
+  - **No** ve Control de acceso, Rondas QR ni Mis reportes (ni Mis documentos operativos).
+  - Acceso: Inicio, Mi perfil, Reportes y estadísticas (todos, escaneos QR, reporte sucursal, reportes diarios), Supervisión, Gestión (usuarios, dispositivos, ubicaciones, sectores, puntos de ronda).
 
 ## Identificación por RUT
 
