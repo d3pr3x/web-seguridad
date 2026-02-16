@@ -70,7 +70,7 @@
             border-radius: 10px;
         }
 
-        /* Tarjetas internas: tono crema y borde coherente (sin blanco) */
+        /* Tarjetas: misma lógica de fondo para todas (crema, borde, sombra) */
         .portal-layout div.flex-1 .bg-white.rounded-lg,
         .portal-layout div.flex-1 .bg-white.rounded-xl,
         .portal-layout div.flex-1 .rounded-xl.border {
@@ -79,6 +79,26 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         .portal-layout div.flex-1 .shadow-md { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+        /* Tablas dentro de cards: mismo fondo que las cards (evitar blanco/gris duro) */
+        .portal-layout div.flex-1 table thead.bg-gray-50 {
+            background: var(--app-border) !important;
+        }
+        .portal-layout div.flex-1 table tbody.bg-white {
+            background: var(--app-card) !important;
+        }
+        .portal-layout div.flex-1 table tbody tr.hover\:bg-gray-50:hover,
+        .portal-layout div.flex-1 table tbody tr:hover {
+            background: rgba(0,0,0,0.03) !important;
+        }
+        .portal-layout div.flex-1 .divide-y.divide-gray-200 > * {
+            border-color: var(--app-border) !important;
+        }
+
+        /* Bloques tipo “vacío” o informativo con bg-gray-50: tono coherente */
+        .portal-layout div.flex-1 .bg-gray-50 {
+            background: var(--app-card) !important;
+        }
 
         /* Títulos de sección con recuadro: usar teal del sistema */
         .portal-layout div.flex-1 [style*="rgba(15, 118, 110")] {
