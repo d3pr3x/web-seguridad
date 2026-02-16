@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('ingresos')->name('ingresos.')->group(function () {
         Route::get('/', [IngresosController::class, 'index'])->name('index');
         Route::get('/escaner', [IngresosController::class, 'escaner'])->name('escaner');
+        Route::get('/entrada-manual', [IngresosController::class, 'entradaManual'])->name('entrada-manual');
         Route::get('/buscar-persona', [IngresosController::class, 'buscarPersona'])->name('buscar-persona');
         Route::get('/{id}/qr-salida', [IngresosController::class, 'qrSalida'])->name('qr-salida');
         Route::get('/{id}', [IngresosController::class, 'show'])->name('show');

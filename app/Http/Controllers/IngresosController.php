@@ -40,11 +40,22 @@ class IngresosController extends Controller
     }
 
     /**
-     * Vista del escáner (peatonal/vehicular).
+     * Vista del escáner (peatonal/vehicular). Si config('app.ingresos_entrada_manual_solo') es true, redirige a entrada manual.
      */
     public function escaner()
     {
+        if (config('app.ingresos_entrada_manual_solo', true)) {
+            return redirect()->route('ingresos.entrada-manual');
+        }
         return view('ingresos.escaner');
+    }
+
+    /**
+     * Vista de entrada manual (sin escáner QR ni lector de patente). Registrar ingreso con RUT/nombre o patente.
+     */
+    public function entradaManual()
+    {
+        return view('ingresos.entrada-manual');
     }
 
     /**

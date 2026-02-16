@@ -133,4 +133,7 @@ return [
     /* Cálculo de sueldos / días trabajados: en false no se muestra en menús ni enlaces. Poner true cuando la función esté habilitada. */
     'show_calculo_sueldos' => false,
 
+    /* Control de acceso: si es true solo se muestra entrada manual (sin escáner QR ni lector de patente). Poner false para volver a habilitar escáner/lector. */
+    'ingresos_entrada_manual_solo' => true,
+
 ];
