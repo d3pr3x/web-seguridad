@@ -22,6 +22,7 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\Admin\SectorController as AdminSectorController;
 use App\Http\Controllers\Admin\NovedadController as AdminNovedadController;
 use App\Http\Controllers\Admin\ReporteEspecialController as AdminReporteEspecialController;
+use App\Http\Controllers\Admin\GruposIncidentesController as AdminGruposIncidentesController;
 use App\Http\Controllers\UsuarioAccionController;
 use App\Http\Controllers\UsuarioReporteController;
 use App\Http\Controllers\UsuarioRondaController;
@@ -241,11 +242,16 @@ Route::middleware(['auth'])->group(function () {
             // Gestión de novedades (admin)
             Route::get('novedades', [AdminNovedadController::class, 'index'])->name('novedades.index');
             Route::get('novedades/{accion}', [AdminNovedadController::class, 'show'])->name('novedades.show');
+            Route::post('novedades/{accion}/elevar-reporte', [AdminNovedadController::class, 'elevarAReporte'])->name('novedades.elevar-reporte');
+
+            // Punto 2: Grupos de delitos/incidentes y tipos
+            Route::get('grupos-incidentes', [AdminGruposIncidentesController::class, 'index'])->name('grupos-incidentes.index');
             
             // Gestión de reportes especiales (admin)
             Route::get('reportes-especiales', [AdminReporteEspecialController::class, 'index'])->name('reportes-especiales.index');
             Route::get('reportes-especiales/{reporteEspecial}', [AdminReporteEspecialController::class, 'show'])->name('reportes-especiales.show');
             Route::patch('reportes-especiales/{reporteEspecial}/estado', [AdminReporteEspecialController::class, 'updateEstado'])->name('reportes-especiales.update-estado');
+            Route::post('reportes-especiales/{reporteEspecial}/marcar-leido', [AdminReporteEspecialController::class, 'marcarLeido'])->name('reportes-especiales.marcar-leido');
 
             // Puntos de ronda (QR) y reporte de escaneos
             Route::get('rondas', [PuntoRondaController::class, 'index'])->name('rondas.index');

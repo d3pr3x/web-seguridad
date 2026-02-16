@@ -151,6 +151,7 @@ class ReporteEspecialController extends Controller
     {
         $user = Auth::user();
 
+        // Punto 3: ADMIN siempre puede modificar; supervisores también
         if (!$user->esAdministrador() && !$user->esSupervisor()) {
             abort(403, 'No tienes permiso para actualizar el estado.');
         }

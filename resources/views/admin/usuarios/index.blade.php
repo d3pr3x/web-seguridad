@@ -75,7 +75,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">Nombre</th>
-                                <th class="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">RUT / Email</th>
+                                <th class="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">RUT / Teléfono / Email</th>
                                 <th class="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">Perfil</th>
                                 <th class="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">Sucursal</th>
                                 <th class="px-2 sm:px-4 py-2 sm:py-3 text-right text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">Acciones</th>
@@ -89,7 +89,8 @@
                                     </td>
                                     <td class="px-2 sm:px-4 py-2 sm:py-3 text-sm text-gray-600">
                                         <div>{{ $u->run }}</div>
-                                        <div class="text-gray-500 truncate max-w-[140px] sm:max-w-none">{{ $u->email }}</div>
+                                        @if($u->telefono)<div class="text-gray-700">{{ $u->telefono }}</div>@endif
+                                        @if($u->email)<div class="text-gray-500 truncate max-w-[140px] sm:max-w-none">{{ $u->email }}</div>@endif
                                     </td>
                                     <td class="px-2 sm:px-4 py-2 sm:py-3">
                                         @if($u->rol)
@@ -106,7 +107,11 @@
                                     </td>
                                     <td class="px-2 sm:px-4 py-2 sm:py-3 text-sm text-gray-600">{{ $u->nombre_sucursal }}</td>
                                     <td class="px-2 sm:px-4 py-2 sm:py-3 text-right whitespace-nowrap">
+                                        @if(auth()->user()->esAdministrador())
                                         <a href="{{ route('admin.usuarios.edit', $u) }}" class="text-red-600 hover:text-red-800 font-medium">Editar</a>
+                                        @else
+                                        <span class="text-gray-400 text-sm">—</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

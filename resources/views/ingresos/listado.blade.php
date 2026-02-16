@@ -67,6 +67,10 @@
                 </div>
                 <div class="p-5">
                     <form method="get" action="{{ route('ingresos.index') }}" class="flex flex-wrap gap-4 items-end">
+                        <div class="w-full sm:w-auto sm:min-w-[160px]">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">RUT / Pasaporte</label>
+                            <input type="text" name="rut" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ request('rut') }}" placeholder="Buscar por RUT o pasaporte">
+                        </div>
                         <div class="w-full sm:w-auto sm:min-w-[140px]">
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Desde</label>
                             <input type="date" name="fecha_desde" class="w-full px-3 py-2.5 rounded-lg border text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition" style="border-color: var(--app-border);" value="{{ request('fecha_desde') }}">

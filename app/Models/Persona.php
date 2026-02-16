@@ -17,6 +17,7 @@ class Persona extends Model
 
     protected $fillable = [
         'rut',
+        'pasaporte',
         'nombre',
         'telefono',
         'email',

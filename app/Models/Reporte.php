@@ -31,6 +31,8 @@ class Reporte extends Model
         'precision',
         'estado',
         'comentarios_admin',
+        'leido_por_id',
+        'fecha_lectura',
     ];
 
     protected function casts(): array
@@ -38,6 +40,7 @@ class Reporte extends Model
         return [
             'datos' => 'array',
             'imagenes' => 'array',
+            'fecha_lectura' => 'datetime',
         ];
     }
 
@@ -63,5 +66,16 @@ class Reporte extends Model
     public function scopePorEstado($query, $estado)
     {
         return $query->where('estado', $estado);
+    }
+
+    /** Quién marcó como leído (Punto 5). */
+    public function leidoPor()
+    {
+        return $this->belongsTo(User::class, 'leido_por_id', 'id_usuario');
+    }
+
+    public function fueLeido(): bool
+    {
+        return $this->fecha_lectura !== null;
     }
 }

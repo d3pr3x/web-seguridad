@@ -31,13 +31,13 @@
                 </a>
             </div>
 
-            <!-- Filtros -->
+            <!-- Filtros (Punto 1: tipo hecho; Punto 15: importancia; Punto 8: Instalación) -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <form method="GET" action="{{ route('admin.novedades.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <form method="GET" action="{{ route('admin.novedades.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                     <div>
-                        <label for="sucursal_id" class="block text-sm font-medium text-gray-700 mb-2">Sucursal</label>
+                        <label for="sucursal_id" class="block text-sm font-medium text-gray-700 mb-2">Instalación</label>
                         <select name="sucursal_id" id="sucursal_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                            <option value="">Todas las sucursales</option>
+                            <option value="">Todas las instalaciones</option>
                             @foreach($sucursales as $sucursal)
                                 <option value="{{ $sucursal->id }}" @if(request('sucursal_id') == $sucursal->id) selected @endif>
                                     {{ $sucursal->nombre }}
@@ -54,6 +54,26 @@
                                 <option value="{{ $key }}" @if(request('tipo') == $key) selected @endif>
                                     {{ $nombre }}
                                 </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="tipo_hecho" class="block text-sm font-medium text-gray-700 mb-2">Tipo de hecho</label>
+                        <select name="tipo_hecho" id="tipo_hecho" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">Todos</option>
+                            @foreach($hechos ?? [] as $key => $nombre)
+                                <option value="{{ $key }}" @if(request('tipo_hecho') == $key) selected @endif>{{ $nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="importancia" class="block text-sm font-medium text-gray-700 mb-2">Importancia</label>
+                        <select name="importancia" id="importancia" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">Todas</option>
+                            @foreach($nivelesImportancia ?? [] as $key => $nombre)
+                                <option value="{{ $key }}" @if(request('importancia') == $key) selected @endif>{{ $nombre }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -147,7 +167,7 @@
                                             <p class="font-semibold text-gray-800">{{ $accion->user->nombre_completo }}</p>
                                         </div>
                                         <div>
-                                            <p class="text-gray-600 text-sm">Sucursal</p>
+                                            <p class="text-gray-600 text-sm">Instalación</p>
                                             <p class="font-semibold text-gray-800">{{ $accion->sucursal->nombre }}</p>
                                         </div>
                                         <div>
@@ -155,8 +175,8 @@
                                             <p class="font-semibold text-gray-800">{{ $accion->sector?->nombre ?? 'N/A' }}</p>
                                         </div>
                                         <div class="flex items-end justify-end">
-                                            <a href="{{ route('acciones.show', $accion) }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition text-sm">
-                                                Ver Detalle
+                                            <a href="{{ route('admin.novedades.show', $accion) }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition text-sm">
+                                                Ver detalle
                                             </a>
                                         </div>
                                     </div>

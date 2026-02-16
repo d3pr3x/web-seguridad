@@ -13,6 +13,8 @@ class Accion extends Model
         'sucursal_id',
         'sector_id',
         'tipo',
+        'tipo_hecho',
+        'importancia',
         'dia',
         'hora',
         'novedad',
@@ -23,6 +25,28 @@ class Accion extends Model
         'longitud',
         'precision',
     ];
+
+    /** Hechos/categorías para filtrar novedades (Punto 1). */
+    public static function hechos(): array
+    {
+        return [
+            'incidente' => 'Incidente',
+            'observacion' => 'Observación',
+            'informacion' => 'Información',
+            'delito' => 'Delito',
+            'accidente' => 'Accidente',
+        ];
+    }
+
+    /** Niveles de importancia (Punto 15). */
+    public static function nivelesImportancia(): array
+    {
+        return [
+            'cotidiana' => 'Cotidiana',
+            'importante' => 'Importante',
+            'critica' => 'Crítica',
+        ];
+    }
 
     protected function casts(): array
     {
@@ -104,6 +128,44 @@ class Accion extends Model
     public function scopePorSucursal($query, $sucursalId)
     {
         return $query->where('sucursal_id', $sucursalId);
+    }
+
+    /**
+     * Scope por tipo de hecho (Punto 1)
+     */
+    public function scopePorTipoHecho($query, $tipoHecho)
+    {
+        if (blank($tipoHecho)) {
+            return $query;
+        }
+        return $query->where('tipo_hecho', $tipoHecho);
+    }
+
+    /**
+     * Scope por importancia (Punto 15): importante / cotidiana
+     */
+    public function scopePorImportancia($query, $importancia)
+    {
+        if (blank($importancia)) {
+            return $query;
+        }
+        return $query->where('importancia', $importancia);
+    }
+
+    public function getNombreHechoAttribute(): ?string
+    {
+        return $this->tipo_hecho ? (self::hechos()[$this->tipo_hecho] ?? $this->tipo_hecho) : null;
+    }
+
+    public function getNombreImportanciaAttribute(): ?string
+    {
+        return $this->importancia ? (self::nivelesImportancia()[$this->importancia] ?? $this->importancia) : null;
+    }
+
+    /** Reporte especial generado desde esta acción (elevación, Punto 6). */
+    public function reporteEspecial()
+    {
+        return $this->hasOne(\App\Models\ReporteEspecial::class, 'accion_id');
     }
 }
 

@@ -10,9 +10,11 @@ class ReporteEspecial extends Model
     
     protected $fillable = [
         'id_usuario',
+        'accion_id',
         'sucursal_id',
         'sector_id',
         'tipo',
+        'tipo_incidente_id',
         'dia',
         'hora',
         'novedad',
@@ -24,6 +26,8 @@ class ReporteEspecial extends Model
         'precision',
         'estado',
         'comentarios_admin',
+        'leido_por_id',
+        'fecha_lectura',
     ];
 
     protected function casts(): array
@@ -34,6 +38,7 @@ class ReporteEspecial extends Model
             'latitud' => 'decimal:8',
             'longitud' => 'decimal:8',
             'precision' => 'decimal:2',
+            'fecha_lectura' => 'datetime',
         ];
     }
 
@@ -112,6 +117,29 @@ class ReporteEspecial extends Model
     public function scopePorSucursal($query, $sucursalId)
     {
         return $query->where('sucursal_id', $sucursalId);
+    }
+
+    /** Novedad/acción desde la que se elevó este reporte (Punto 6). */
+    public function accionOrigen()
+    {
+        return $this->belongsTo(Accion::class, 'accion_id');
+    }
+
+    /** Tipo de incidente dentro del grupo (Punto 2). */
+    public function tipoIncidente()
+    {
+        return $this->belongsTo(TipoIncidente::class, 'tipo_incidente_id');
+    }
+
+    /** Usuario que marcó como leído (Punto 5). */
+    public function leidoPor()
+    {
+        return $this->belongsTo(User::class, 'leido_por_id', 'id_usuario');
+    }
+
+    public function fueLeido(): bool
+    {
+        return $this->fecha_lectura !== null;
     }
 }
 

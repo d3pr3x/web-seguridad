@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PuntoRonda;
 use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class RondaQrController extends Controller
 {
     /**
-     * Mostrar QR en pantalla (para imprimir o descargar)
+     * Mostrar QR en pantalla (para imprimir o descargar).
+     * Usa SVG para no depender de la extensión GD (funciona en Docker sin php-gd).
      */
     public function show(PuntoRonda $punto)
     {
@@ -23,17 +24,17 @@ class RondaQrController extends Controller
 
         $qrCode = new QrCode($url, size: 280, margin: 10);
 
-        $writer = new PngWriter();
+        $writer = new SvgWriter();
         $result = $writer->write($qrCode);
 
         return response($result->getString(), Response::HTTP_OK, [
             'Content-Type' => $result->getMimeType(),
-            'Content-Disposition' => 'inline; filename="qr-punto-' . $punto->id . '.png"',
+            'Content-Disposition' => 'inline; filename="qr-punto-' . $punto->id . '.svg"',
         ]);
     }
 
     /**
-     * Descargar PNG del QR
+     * Descargar SVG del QR (sin depender de GD).
      */
     public function download(PuntoRonda $punto)
     {
@@ -44,10 +45,10 @@ class RondaQrController extends Controller
 
         $qrCode = new QrCode($url, size: 400, margin: 15);
 
-        $writer = new PngWriter();
+        $writer = new SvgWriter();
         $result = $writer->write($qrCode);
 
-        $filename = 'qr-' . \Illuminate\Support\Str::slug($punto->nombre) . '-' . $punto->codigo . '.png';
+        $filename = 'qr-' . \Illuminate\Support\Str::slug($punto->nombre) . '-' . $punto->codigo . '.svg';
 
         return response($result->getString(), Response::HTTP_OK, [
             'Content-Type' => $result->getMimeType(),

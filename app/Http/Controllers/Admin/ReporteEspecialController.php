@@ -11,11 +11,16 @@ use Illuminate\Http\Request;
 class ReporteEspecialController extends Controller
 {
     /**
-     * Mostrar listado completo de reportes especiales (Admin)
+     * Mostrar listado completo de reportes especiales (Admin). Punto 9: jefe de turno solo su instalación.
      */
     public function index(Request $request)
     {
         $query = ReporteEspecial::with(['user', 'sucursal', 'sector']);
+
+        $user = auth()->user();
+        if ($user->esSupervisorUsuario() && $user->sucursal_id) {
+            $query->where('sucursal_id', $user->sucursal_id);
+        }
 
         // Filtros
         if ($request->filled('sucursal_id')) {
@@ -87,7 +92,7 @@ class ReporteEspecialController extends Controller
      */
     public function show(ReporteEspecial $reporteEspecial)
     {
-        $reporteEspecial->load(['user', 'sucursal', 'sector']);
+        $reporteEspecial->load(['user', 'sucursal', 'sector', 'leidoPor', 'accionOrigen']);
         return view('admin.reportes-especiales.show', compact('reporteEspecial'));
     }
 
@@ -105,6 +110,19 @@ class ReporteEspecialController extends Controller
 
         return redirect()->route('admin.reportes-especiales.show', $reporteEspecial)
                         ->with('success', 'Estado actualizado exitosamente.');
+    }
+
+    /**
+     * Punto 5: Marcar reporte como leído por el jefe.
+     */
+    public function marcarLeido(ReporteEspecial $reporteEspecial)
+    {
+        $reporteEspecial->update([
+            'leido_por_id' => auth()->id(),
+            'fecha_lectura' => now(),
+        ]);
+        return redirect()->route('admin.reportes-especiales.show', $reporteEspecial)
+            ->with('success', 'Reporte marcado como leído.');
     }
 }
 

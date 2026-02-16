@@ -224,7 +224,7 @@
         </div>
         <div class="stat-box">
             <div class="stat-number">{{ $reportesPorSucursal->count() }}</div>
-            <div class="stat-label">Sucursales</div>
+            <div class="stat-label">Instalaciones</div>
         </div>
     </div>
 

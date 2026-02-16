@@ -106,6 +106,9 @@
                         <li class="nav-item"><a href="{{ $user->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Aprobar documentos</a></li>
                         @endif
                         <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Novedades</a></li>
+                        @if($user->esAdministrador())
+                        <li class="nav-item"><a href="{{ route('admin.grupos-incidentes.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs('admin.grupos-incidentes.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.grupos-incidentes.*') ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Grupos de incidentes</a></li>
+                        @endif
                         <li class="nav-item"><a href="{{ $user->esAdministrador() ? route('admin.reportes-especiales.index') : route('reportes-especiales.index') }}" class="nav-link py-1 small rounded {{ request()->routeIs(['admin.reportes-especiales.*', 'reportes-especiales.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.reportes-especiales.*', 'reportes-especiales.*']) ? 'color: var(--app-sidebar-active-text);' : 'color: #94a3b8;' }}">Todos los reportes</a></li>
                     </ul>
                 </div>

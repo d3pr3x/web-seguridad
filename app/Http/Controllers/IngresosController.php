@@ -8,6 +8,7 @@ use App\Models\Persona;
 use App\Rules\ChileRut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class IngresosController extends Controller
 {
@@ -32,6 +33,16 @@ class IngresosController extends Controller
         }
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
+        }
+        // Punto 12: filtro por RUT
+        if ($request->filled('rut')) {
+            $rut = trim($request->rut);
+            $query->where(function ($q) use ($rut) {
+                $q->where('rut', 'like', '%' . $rut . '%');
+                if (Schema::hasColumn('ingresos', 'pasaporte')) {
+                    $q->orWhere('pasaporte', 'like', '%' . $rut . '%');
+                }
+            });
         }
 
         $ingresos = $query->paginate(50)->withQueryString();

@@ -61,7 +61,8 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'nombre_completo' => 'required|string|max:255',
-            'email' => 'required|email|unique:usuarios,email',
+            'email' => 'nullable|email|unique:usuarios,email',
+            'telefono' => 'nullable|string|max:30',
             'run' => 'required|string|max:20|unique:usuarios,run',
             'password' => 'required|string|min:8|confirmed',
             'rol_id' => 'required|exists:roles_usuario,id',
@@ -74,6 +75,7 @@ class UserController extends Controller
         $validated['clave'] = Hash::make($validated['password']);
         unset($validated['password']);
         $validated['sucursal_id'] = $validated['sucursal_id'] ?: null;
+        $validated['email'] = !empty($validated['email']) ? $validated['email'] : null;
 
         User::create($validated);
 
@@ -86,23 +88,30 @@ class UserController extends Controller
     }
 
     /**
-     * Formulario para editar usuario
+     * Formulario para editar usuario. Punto 13: solo ADMIN puede editar; supervisor solo crea.
      */
     public function edit(User $usuario)
     {
+        if (!auth()->user()->esAdministrador()) {
+            abort(403, 'Solo el administrador puede editar usuarios.');
+        }
         $sucursales = Sucursal::activas()->orderBy('nombre')->get();
         $roles = RolUsuario::orderBy('nombre')->get();
         return view('admin.usuarios.edit', compact('usuario', 'sucursales', 'roles'));
     }
 
     /**
-     * Actualizar usuario
+     * Actualizar usuario. Punto 13: solo ADMIN.
      */
     public function update(Request $request, User $usuario)
     {
+        if (!auth()->user()->esAdministrador()) {
+            abort(403, 'Solo el administrador puede editar usuarios.');
+        }
         $validated = $request->validate([
             'nombre_completo' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('usuarios', 'email')->ignore($usuario->id_usuario, 'id_usuario')],
+            'email' => ['nullable', 'email', Rule::unique('usuarios', 'email')->ignore($usuario->id_usuario, 'id_usuario')],
+            'telefono' => 'nullable|string|max:30',
             'run' => ['required', 'string', 'max:20', Rule::unique('usuarios', 'run')->ignore($usuario->id_usuario, 'id_usuario')],
             'password' => 'nullable|string|min:8|confirmed',
             'rol_id' => 'required|exists:roles_usuario,id',
@@ -113,6 +122,7 @@ class UserController extends Controller
         ]);
 
         $validated['sucursal_id'] = $validated['sucursal_id'] ?: null;
+        $validated['email'] = !empty($validated['email']) ? $validated['email'] : null;
 
         if (!empty($validated['password'] ?? null)) {
             $validated['clave'] = Hash::make($validated['password']);

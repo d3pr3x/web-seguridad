@@ -15,6 +15,7 @@ class Ingreso extends Model
     protected $fillable = [
         'tipo',
         'rut',
+        'pasaporte',
         'nombre',
         'patente',
         'id_guardia',
