@@ -29,6 +29,10 @@
                     Ingresos
                 </h1>
                 <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('qr-automatico') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm hover:shadow" style="background: var(--app-primary);">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                        QR carnet
+                    </a>
                     @if(config('app.ingresos_entrada_manual_solo', true))
                     <a href="{{ route('ingresos.entrada-manual') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white transition shadow-sm hover:shadow" style="background: var(--app-primary);">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>

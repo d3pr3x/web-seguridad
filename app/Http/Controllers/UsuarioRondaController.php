@@ -10,4 +10,12 @@ class UsuarioRondaController extends Controller
     {
         return view('usuario.ronda.index');
     }
+
+    /**
+     * Vista aparte solo para escanear QR de puntos de ronda (sin listado ni sidebar).
+     */
+    public function escaner()
+    {
+        return view('usuario.ronda.escaner');
+    }
 }

@@ -51,6 +51,14 @@ class IngresosController extends Controller
     }
 
     /**
+     * Vista solo para leer QR del carnet (cédula). URL: /qr-automatico
+     */
+    public function qrAutomatico()
+    {
+        return view('ingresos.qr-automatico');
+    }
+
+    /**
      * Vista del escáner (peatonal/vehicular). Si config('app.ingresos_entrada_manual_solo') es true, redirige a entrada manual.
      */
     public function escaner()

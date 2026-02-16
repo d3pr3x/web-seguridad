@@ -28,10 +28,16 @@
 
             {{-- 1. Abrir cámara (acción principal) --}}
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <button type="button" id="btn-abrir-camara" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition text-base">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"></path></svg>
-                    Abrir cámara para escanear QR
-                </button>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <button type="button" id="btn-abrir-camara" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition text-base">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"></path></svg>
+                        Abrir cámara aquí
+                    </button>
+                    <a href="{{ route('usuario.ronda.escaner') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-lg shadow transition text-base" target="_blank">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        Vista solo para escanear QR
+                    </a>
+                </div>
                 <div id="contenedor-escanner" class="hidden mt-4">
                     <div id="reader" class="rounded-lg overflow-hidden border-2 border-gray-300 bg-black max-w-sm mx-auto"></div>
                     <p class="text-center text-sm text-gray-500 mt-2">Apunte la cámara al código QR del punto de ronda.</p>

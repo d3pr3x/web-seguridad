@@ -73,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Control de acceso (QR cédula + OCR patente) – todos los perfiles, sin exigir sucursal
+    Route::get('/qr-automatico', [IngresosController::class, 'qrAutomatico'])->name('qr-automatico');
     Route::prefix('ingresos')->name('ingresos.')->group(function () {
         Route::get('/', [IngresosController::class, 'index'])->name('index');
         Route::get('/escaner', [IngresosController::class, 'escaner'])->name('escaner');
@@ -138,6 +139,8 @@ Route::middleware(['auth'])->group(function () {
 
             // Rondas QR (guardia: instrucciones y listado de escaneos del día)
             Route::get('/ronda', [UsuarioRondaController::class, 'index'])->name('ronda.index');
+            // Vista aparte solo para escanear QR (pantalla dedicada)
+            Route::get('/ronda/escaner', [UsuarioRondaController::class, 'escaner'])->name('ronda.escaner');
         });
 
         // Escaneo de QR de ronda (el guardia abre esta URL al escanear; debe estar autenticado)
