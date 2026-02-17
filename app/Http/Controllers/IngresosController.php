@@ -71,6 +71,17 @@ class IngresosController extends Controller
     }
 
     /**
+     * Vista del escáner para cédula de identidad de nuevo formato (QR centrado, MRZ y nombre en QR).
+     */
+    public function escanerNuevo()
+    {
+        if (config('app.ingresos_entrada_manual_solo', true)) {
+            return redirect()->route('ingresos.entrada-manual');
+        }
+        return view('ingresos.escaner-nuevo');
+    }
+
+    /**
      * Vista de entrada manual (sin escáner QR ni lector de patente). Registrar ingreso con RUT/nombre o patente.
      */
     public function entradaManual()
