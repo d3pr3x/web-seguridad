@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'QR Carnet - Control de acceso')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
     <style>
         body { margin: 0; font-family: system-ui, sans-serif; background: #0f172a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
         .barra { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: #0f172a; border-bottom: 1px solid #334155; }
@@ -21,6 +22,8 @@
         .btn-volver:hover { background: #475569; color: #fff; }
         #qr-salida-box { margin-top: 1rem; padding: 1rem; background: #1e293b; border-radius: 12px; text-align: center; }
         #qr-salida-box img { max-width: 200px; border-radius: 8px; }
+        #lector-cedula { width: 100%; position: relative; }
+        #lector-cedula video { width: 100% !important; max-height: 50vh; min-height: 220px; object-fit: cover; display: block; }
     </style>
 </head>
 <body>
@@ -31,5 +34,6 @@
     <main class="contenido">
         @yield('content')
     </main>
+    @stack('scripts')
 </body>
 </html>
