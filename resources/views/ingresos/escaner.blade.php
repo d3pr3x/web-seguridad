@@ -43,10 +43,11 @@
                         {{-- 1. Cámara (arriba en DOM = se ve arriba tras scroll) --}}
                         <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden order-first relative">
                             <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block"></video>
+                            <p class="text-white/80 text-center text-xs py-1">Leyendo QR en todo momento. Encuadre el carnet.</p>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
                             <div class="flex flex-col gap-2 p-3">
                                 <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50" disabled>
-                                    Capturar y leer
+                                    Capturar y leer (si no se detecta solo)
                                 </button>
                                 <button type="button" id="btn-capturar-cedula-reintentar" class="w-full py-2.5 border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium rounded-lg transition hidden">
                                     Capturar de nuevo
@@ -238,9 +239,57 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }).then(function() {
             btnCapturarCedula.disabled = false;
+            iniciarEscaneoContinuo();
         }).catch(function(err) {
             lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
         });
+    }
+
+    var canvasContinuo = document.createElement('canvas');
+    var intervaloContinuo = null;
+    var scanEnCurso = false;
+    var ultimoQRLeido = '';
+    var ultimoQRTiempo = 0;
+    var PAUSA_DESPUES_QR_MS = 4000;
+
+    function intentarLeerFrameContinuo() {
+        if (!videoCedula.srcObject || videoCedula.readyState < 2 || scanEnCurso) return;
+        var w = videoCedula.videoWidth, h = videoCedula.videoHeight;
+        if (!w || !h) return;
+        scanEnCurso = true;
+        canvasContinuo.width = w;
+        canvasContinuo.height = h;
+        var ctx = canvasContinuo.getContext('2d');
+        ctx.drawImage(videoCedula, 0, 0, w, h);
+        canvasContinuo.toBlob(function(blob) {
+            if (!blob) { scanEnCurso = false; return; }
+            var file = new File([blob], 'frame.png', { type: 'image/png' });
+            new Html5Qrcode('dummy-cedula').scanFile(file, false).then(function(decodedText) {
+                scanEnCurso = false;
+                if (decodedText === ultimoQRLeido && (Date.now() - ultimoQRTiempo) < PAUSA_DESPUES_QR_MS) return;
+                ultimoQRLeido = decodedText;
+                ultimoQRTiempo = Date.now();
+                detenerEscaneoContinuo();
+                onScanCedula(decodedText);
+                setTimeout(function() {
+                    ultimoQRLeido = '';
+                    iniciarEscaneoContinuo();
+                }, PAUSA_DESPUES_QR_MS);
+            }).catch(function() { scanEnCurso = false; });
+        }, 'image/png', 0.8);
+    }
+
+    function iniciarEscaneoContinuo() {
+        if (intervaloContinuo) return;
+        if (!videoCedula.srcObject) return;
+        intervaloContinuo = setInterval(intentarLeerFrameContinuo, 700);
+    }
+
+    function detenerEscaneoContinuo() {
+        if (intervaloContinuo) {
+            clearInterval(intervaloContinuo);
+            intervaloContinuo = null;
+        }
     }
 
     var mensajeCapturaCedula = document.getElementById('mensaje-captura-cedula');
@@ -251,6 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Espere a que la cámara esté lista.');
             return;
         }
+        detenerEscaneoContinuo();
         var w = videoCedula.videoWidth;
         var h = videoCedula.videoHeight;
         if (!w || !h) {
@@ -280,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mensajeCapturaCedula.textContent = '';
             btnCapturarCedula.disabled = false;
             if (btnReintentar) btnReintentar.classList.add('hidden');
+            setTimeout(iniciarEscaneoContinuo, 500);
         }
         window._terminarCapturaCedula = terminar;
         function exitoQR(decodedText) {
@@ -1073,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', function() {
     nombreManual.addEventListener('input', function() { nombreInput.value = this.value; });
 
     function detenerCedula() {
+        detenerEscaneoContinuo();
         if (streamCedula) {
             streamCedula.getTracks().forEach(function(t) { t.stop(); });
             streamCedula = null;
