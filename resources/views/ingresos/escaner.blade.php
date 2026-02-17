@@ -1,4 +1,4 @@
-@extends(isset($modo_qr_automatico) && $modo_qr_automatico ? 'layouts.qr-automatico' : 'layouts.usuario')
+@extends('layouts.usuario')
 
 @push('styles')
 <style>
@@ -13,45 +13,6 @@
 @endpush
 
 @section('content')
-@if(isset($modo_qr_automatico) && $modo_qr_automatico)
-{{-- Vista /qr-automatico: mismo escáner de carnet (Capturar y leer), registro automático --}}
-<div class="w-full max-w-md mx-auto">
-    <p class="text-center text-slate-400 text-sm mb-4">Encuadre el código QR del carnet (cédula) y pulse «Capturar y leer». Se registrará el ingreso peatonal automáticamente.</p>
-    <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden border-2 border-teal-500 relative">
-        <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block"></video>
-        <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
-        <div class="flex flex-col gap-2 p-3">
-            <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition disabled:opacity-50" disabled>
-                Capturar y leer
-            </button>
-            <button type="button" id="btn-capturar-cedula-reintentar" class="w-full py-2.5 border border-amber-400 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-medium rounded-lg transition hidden">
-                Capturar de nuevo
-            </button>
-        </div>
-    </div>
-    <canvas id="canvas-cedula" style="display:none"></canvas>
-    <canvas id="canvas-cedula-espejo" style="display:none"></canvas>
-    <div id="dummy-cedula" style="width:1px;height:1px;overflow:hidden;position:absolute;opacity:0;pointer-events:none;"></div>
-    <div id="ingreso-manual-peatonal" class="hidden"></div>
-    <input type="text" id="rut" class="hidden" aria-hidden="true">
-    <input type="text" id="nombre" class="hidden" aria-hidden="true">
-    <input type="text" id="rut-manual" class="hidden" aria-hidden="true">
-    <input type="text" id="nombre-manual" class="hidden" aria-hidden="true">
-    <div id="bloque-registrar" class="hidden"></div>
-    <input type="hidden" id="tipo-actual" value="peatonal">
-    <div id="alerta-resultado" class="mt-4 hidden p-4 rounded"></div>
-    <div id="qr-salida-container" class="mt-4 text-center hidden">
-        <p class="text-sm text-emerald-400 mb-2">Ingreso registrado. QR para registrar salida:</p>
-        <div id="qr-salida-img"></div>
-        <p class="text-sm text-slate-500 mt-2">Escanear al salir para registrar la salida.</p>
-        <button type="button" id="btn-escaner-otro" class="mt-3 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition text-sm">Escanear otro ingreso</button>
-    </div>
-    <div class="text-center mt-4">
-        <a href="{{ route('ingresos.index') }}" class="btn-volver">Volver a Ingresos</a>
-    </div>
-</div>
-@else
-{{-- Vista ingresos/escaner completa (tabs peatonal + vehicular) --}}
 <div class="min-h-screen bg-gray-100 flex">
     <x-usuario.sidebar />
     <div class="flex-1 lg:mr-64">
@@ -161,7 +122,6 @@
         </div>
     </div>
 </div>
-@endif
 
 @push('scripts')
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -173,7 +133,6 @@
 <script src="{{ asset('js/rut-formatter.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var MODO_QR_AUTOMATICO = {{ (isset($modo_qr_automatico) && $modo_qr_automatico) ? 'true' : 'false' }};
     const tipoActual = document.getElementById('tipo-actual');
     const btnRegistrar = document.getElementById('btn-registrar');
     const bloqueRegistrar = document.getElementById('bloque-registrar');
@@ -1018,11 +977,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         function falloQR() {
-            if (!MODO_QR_AUTOMATICO) {
-                var manualSection = document.getElementById('ingreso-manual-peatonal');
-                if (manualSection) manualSection.classList.remove('hidden');
-            }
-            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y pulse «Capturar de nuevo»' + (MODO_QR_AUTOMATICO ? '.' : ' o ingrese RUT y nombre manualmente.'));
+            var manualSection = document.getElementById('ingreso-manual-peatonal');
+            if (manualSection) manualSection.classList.remove('hidden');
+            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y pulse «Capturar de nuevo» o ingrese RUT y nombre manualmente.');
             terminar();
         }
         function continuarConCanvas() {
@@ -1066,72 +1023,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function formatearRut(val) {
-        var r = (val || '').replace(/[^0-9kK]/g, '').toUpperCase();
-        if (r.length < 2) return r;
-        return r.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + r.slice(-1);
-    }
-
-    function parsearCedulaDesdeQR(decodedText) {
-        if (!decodedText || typeof decodedText !== 'string') return null;
-        var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
-        var rut = '';
-        var nombre = '';
-        if (runMatch) {
-            rut = formatearRut(runMatch[1].trim());
-            nombre = extraerParametroUrl(decodedText, 'NOMBRE') || extraerParametroUrl(decodedText, 'NOMBRES') || extraerParametroUrl(decodedText, 'NAME') || '';
-        }
-        var parts = decodedText.split(/[\|@\n\r\t;]/).map(function(p) { return p.trim(); }).filter(Boolean);
-        if (parts.length >= 2) {
-            if (!rut) rut = formatearRut(parts[0]);
-            if (!nombre) nombre = parts.slice(1).join(' ').trim();
-        } else if (parts.length === 1 && !runMatch && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
-            if (!rut) rut = formatearRut(parts[0]);
-        }
-        if (!rut) {
-            var rutEnTexto = decodedText.match(/\b(\d{7,8}[-]?[0-9kK])\b/i);
-            if (rutEnTexto) rut = formatearRut(rutEnTexto[1]);
-        }
-        if (!rut || rut.length < 8) return null;
-        return { rut: rut.replace(/\s/g, ''), nombre: nombre || '' };
-    }
-
-    function registrarIngresoAuto(rut, nombre) {
-        if (!alertaResultado || !qrSalidaContainer || !qrSalidaImg) return;
-        alertaResultado.classList.add('hidden');
-        qrSalidaContainer.classList.add('hidden');
-        var payload = { tipo: 'peatonal', rut: rut, nombre: nombre || '', _token: document.querySelector('meta[name="csrf-token"]').content };
-        axios.post('{{ route("ingresos.store") }}', payload)
-            .then(function(res) {
-                if (res.data.success) {
-                    alertaResultado.className = 'mt-4 p-4 rounded bg-green-100 text-green-800';
-                    if (document.body.classList.contains('bg-gray-100')) alertaResultado.className = 'mt-4 p-4 rounded bg-green-100 text-green-800';
-                    else alertaResultado.className = 'mt-4 p-4 rounded bg-emerald-500/20 text-emerald-200';
-                    alertaResultado.textContent = res.data.message || 'Ingreso registrado.';
-                    alertaResultado.classList.remove('hidden');
-                    if (res.data.qr_salida_url) {
-                        qrSalidaImg.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(res.data.qr_salida_url) + '" alt="QR Salida" class="mx-auto rounded-lg max-w-[200px]">';
-                        qrSalidaContainer.classList.remove('hidden');
-                    }
-                    var btnOtro = document.getElementById('btn-escaner-otro');
-                    if (btnOtro) btnOtro.classList.remove('hidden');
-                } else {
-                    alertaResultado.className = 'mt-4 p-4 rounded bg-red-100 text-red-800';
-                    if (!document.body.classList.contains('bg-gray-100')) alertaResultado.className = 'mt-4 p-4 rounded bg-red-500/20 text-red-200';
-                    alertaResultado.textContent = res.data.motivo || res.data.message || 'Error al registrar.';
-                    alertaResultado.classList.remove('hidden');
-                }
-            })
-            .catch(function(err) {
-                var data = err.response && err.response.data;
-                var msg = data && data.motivo ? data.motivo : (data && data.message ? data.message : 'Error de conexión.');
-                alertaResultado.className = 'mt-4 p-4 rounded bg-red-100 text-red-800';
-                if (!document.body.classList.contains('bg-gray-100')) alertaResultado.className = 'mt-4 p-4 rounded bg-red-500/20 text-red-200';
-                alertaResultado.textContent = msg;
-                alertaResultado.classList.remove('hidden');
-            });
-    }
-
     function buscarPersonaPorRut() {
         var rut = (rutInput.value || rutManual.value || '').replace(/\s/g, '');
         if (rut.length < 8) return;
@@ -1145,32 +1036,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function onScanCedula(decodedText) {
-        if (MODO_QR_AUTOMATICO) {
-            var p = parsearCedulaDesdeQR(decodedText);
-            if (p && p.rut) registrarIngresoAuto(p.rut, p.nombre);
-            if (typeof window._terminarCapturaCedula === 'function') window._terminarCapturaCedula();
-            return;
-        }
         var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
         if (runMatch) {
-            if (rutInput) rutInput.value = formatearRut(runMatch[1].trim());
+            rutInput.value = formatearRut(runMatch[1].trim());
             var nombreUrl = extraerParametroUrl(decodedText, 'NOMBRE') || extraerParametroUrl(decodedText, 'NOMBRES') || extraerParametroUrl(decodedText, 'NAME');
-            if (nombreUrl && nombreInput) nombreInput.value = nombreUrl;
+            if (nombreUrl) nombreInput.value = nombreUrl;
         }
         var parts = decodedText.split(/[\|@\n\r\t;]/).map(function(p) { return p.trim(); }).filter(Boolean);
         if (parts.length >= 2) {
-            if (!runMatch && rutInput) rutInput.value = formatearRut(parts[0]);
+            if (!runMatch) rutInput.value = formatearRut(parts[0]);
             var nombrePartes = parts.slice(1).join(' ').trim();
-            if (nombrePartes && nombreInput) nombreInput.value = nombrePartes;
+            if (nombrePartes) nombreInput.value = nombrePartes;
         } else if (parts.length === 1 && !runMatch && /^[0-9kK\-\.]+$/i.test(parts[0].replace(/\./g, ''))) {
-            if (rutInput) rutInput.value = formatearRut(parts[0]);
+            rutInput.value = formatearRut(parts[0]);
         }
-        if (rutInput && !rutInput.value) {
+        if (!rutInput.value) {
             var rutEnTexto = decodedText.match(/\b(\d{7,8}[-]?[0-9kK])\b/i);
             if (rutEnTexto) rutInput.value = formatearRut(rutEnTexto[1]);
         }
-        if (rutInput && rutInput.value && nombreInput && !nombreInput.value) setTimeout(buscarPersonaPorRut, 150);
-        if (typeof actualizarVisibilidadRegistrar === 'function') actualizarVisibilidadRegistrar();
+        if (rutInput.value && !nombreInput.value) setTimeout(buscarPersonaPorRut, 150);
+        actualizarVisibilidadRegistrar();
     }
 
     function formatearRut(val) {
@@ -1328,24 +1213,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var tabPeatonal = document.getElementById('panel-peatonal');
     function iniciarCuandoVisible() {
-        if (MODO_QR_AUTOMATICO) {
-            iniciarLectorCedula();
-            return;
-        }
         if (tabPeatonal && !tabPeatonal.classList.contains('hidden')) {
             iniciarLectorCedula();
             setTimeout(scrollAlFinalEscaner, 600);
         } else {
             setTimeout(iniciarCuandoVisible, 200);
         }
-    }
-    var btnEscanerOtro = document.getElementById('btn-escaner-otro');
-    if (btnEscanerOtro) {
-        btnEscanerOtro.addEventListener('click', function() {
-            if (qrSalidaContainer) qrSalidaContainer.classList.add('hidden');
-            if (alertaResultado) { alertaResultado.classList.add('hidden'); alertaResultado.textContent = ''; }
-            btnEscanerOtro.classList.add('hidden');
-        });
     }
     setTimeout(iniciarCuandoVisible, 300);
 });
