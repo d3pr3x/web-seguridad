@@ -72,12 +72,10 @@ class IngresosController extends Controller
 
     /**
      * Vista del escáner para cédula de identidad de nuevo formato (QR centrado, MRZ y nombre en QR).
+     * Siempre accesible (no redirige a entrada manual) para poder usar esta vista cuando se necesite.
      */
     public function escanerNuevo()
     {
-        if (config('app.ingresos_entrada_manual_solo', true)) {
-            return redirect()->route('ingresos.entrada-manual');
-        }
         return view('ingresos.escaner-nuevo');
     }
 
