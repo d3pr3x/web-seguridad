@@ -51,12 +51,12 @@ class IngresosController extends Controller
     }
 
     /**
-     * Vista solo para leer QR del carnet (cédula). Usa el mismo escáner que ingresos/escaner (Capturar y leer) con registro automático.
+     * Vista solo para leer QR del carnet (cédula). Escaneo en vivo con Html5Qrcode.
      * URL: /qr-automatico
      */
     public function qrAutomatico()
     {
-        return view('ingresos.escaner', ['modo_qr_automatico' => true]);
+        return view('ingresos.qr-automatico');
     }
 
     /**
