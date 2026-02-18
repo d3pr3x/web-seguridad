@@ -66,19 +66,24 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
                             <input type="text" id="rut" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-gray-50 rut-input text-gray-800" placeholder="Se obtiene al escanear" maxlength="12" readonly>
                         </div>
-                        {{-- 3. Nombre --}}
-                        <div class="order-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                            <input type="text" id="nombre" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-800" placeholder="Se completa al escanear o manual" maxlength="100" readonly>
+                        {{-- 3. Nombre (solo visible cuando RUT no está en tabla Personas) --}}
+                        <div id="nombre-container" class="order-3 hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre (persona no está en la base)</label>
+                            <input type="text" id="nombre" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-800" placeholder="Ingrese nombre para guardar en la base" maxlength="100">
+                        </div>
+
+                        {{-- Contenido del QR (para verificar si trae nombre y RUT - cédula antigua) --}}
+                        <div id="contenido-qr-container" class="order-3b hidden mt-2">
+                            <details class="text-sm">
+                                <summary class="cursor-pointer text-gray-600 hover:text-gray-800 font-medium">Contenido del QR (ver qué datos trae)</summary>
+                                <pre id="contenido-qr-crudo" class="mt-2 p-3 bg-gray-100 rounded-lg text-xs text-gray-700 overflow-x-auto whitespace-pre-wrap break-all border border-gray-200"></pre>
+                            </details>
                         </div>
 
                         {{-- 4. Ingreso manual (solo si falla la captura) --}}
                         <div id="ingreso-manual-peatonal" class="order-4 hidden border-t border-gray-200 pt-4 mt-2">
-                            <p class="text-sm text-amber-700 mb-3">No se detectó el código. Ingrese manualmente:</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <input type="text" id="rut-manual" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg rut-input" placeholder="RUT">
-                                <input type="text" id="nombre-manual" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg" placeholder="Nombre">
-                            </div>
+                            <p class="text-sm text-amber-700 mb-3">No se detectó el código. Ingrese RUT. Si la persona no está en la base, se solicitará el nombre.</p>
+                            <input type="text" id="rut-manual" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg rut-input" placeholder="RUT">
                         </div>
                     </div>
                 </div>
@@ -158,7 +163,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var mostrar = false;
         if (tipo === 'peatonal') {
             var rut = (document.getElementById('rut').value || document.getElementById('rut-manual').value || '').trim();
-            mostrar = rut.length >= 8;
+            var nombre = (document.getElementById('nombre').value || '').trim();
+            mostrar = rut.length >= 8 && nombre.length > 0;
         } else {
             var patente = (document.getElementById('patente-result').value || '').trim();
             mostrar = patente.length >= 5;
@@ -209,7 +215,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const rutInput = document.getElementById('rut');
     const nombreInput = document.getElementById('nombre');
     const rutManual = document.getElementById('rut-manual');
-    const nombreManual = document.getElementById('nombre-manual');
 
     function iniciarLectorCedula() {
         if (videoCedula.srcObject) return;
@@ -1079,22 +1084,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function buscarPersonaPorRut() {
         var rut = (rutInput.value || rutManual.value || '').replace(/\s/g, '');
-        if (rut.length < 8) return;
+        var nombreContainer = document.getElementById('nombre-container');
+        if (rut.length < 8) {
+            if (nombreContainer) nombreContainer.classList.add('hidden');
+            actualizarVisibilidadRegistrar();
+            return;
+        }
         var url = '{{ route("ingresos.buscar-persona") }}?rut=' + encodeURIComponent(rut);
         fetch(url, { method: 'GET', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r) { return r.json(); })
             .then(function(data) {
-                if (data.found && data.nombre && !nombreInput.value) nombreInput.value = data.nombre;
+                if (data.found && data.nombre) {
+                    nombreInput.value = data.nombre;
+                    if (nombreContainer) nombreContainer.classList.add('hidden');
+                } else {
+                    if (!nombreInput.value) {
+                        nombreInput.value = '';
+                        if (nombreContainer) nombreContainer.classList.remove('hidden');
+                    }
+                }
+                actualizarVisibilidadRegistrar();
             })
-            .catch(function() {});
+            .catch(function() {
+                if (!nombreInput.value) nombreInput.value = '';
+                if (nombreContainer) nombreContainer.classList.remove('hidden');
+                actualizarVisibilidadRegistrar();
+            });
     }
 
     function onScanCedula(decodedText) {
+        var contenedorQR = document.getElementById('contenido-qr-container');
+        var crudoQR = document.getElementById('contenido-qr-crudo');
+        if (contenedorQR && crudoQR) {
+            crudoQR.textContent = decodedText;
+            contenedorQR.classList.remove('hidden');
+        }
         var runMatch = decodedText.match(/[?&]RUN=([^&\s]+)/i) || decodedText.match(/RUN=([^&\s]+)/i);
+        var nombreFromUrl = extraerParametroUrl(decodedText, 'NOMBRE') || extraerParametroUrl(decodedText, 'NOMBRES') || extraerParametroUrl(decodedText, 'NAME');
+        if (nombreFromUrl) nombreInput.value = nombreFromUrl;
+        try {
+            var json = JSON.parse(decodedText);
+            if (json && typeof json === 'object') {
+                var runJson = (json.Run || json.RUN || json.run || json.rut || '').toString().trim();
+                var nomJson = (json.Nombre || json.NOMBRE || json.nombre || json.Nombres || json.nombres || '').toString().trim();
+                if (runJson) rutInput.value = formatearRut(runJson);
+                if (nomJson) nombreInput.value = nomJson;
+                if (rutInput.value || nombreInput.value) { actualizarVisibilidadRegistrar(); return; }
+            }
+        } catch (e) {}
         if (runMatch) {
             rutInput.value = formatearRut(runMatch[1].trim());
-            var nombreUrl = extraerParametroUrl(decodedText, 'NOMBRE') || extraerParametroUrl(decodedText, 'NOMBRES') || extraerParametroUrl(decodedText, 'NAME');
-            if (nombreUrl) nombreInput.value = nombreUrl;
         }
         var parts = decodedText.split(/[\|@\n\r\t;]/).map(function(p) { return p.trim(); }).filter(Boolean);
         if (parts.length >= 2) {
@@ -1124,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(window._timeoutBuscarPersona);
         window._timeoutBuscarPersona = setTimeout(buscarPersonaPorRut, 400);
     });
-    nombreManual.addEventListener('input', function() { nombreInput.value = this.value; });
+    if (nombreInput) nombreInput.addEventListener('input', actualizarVisibilidadRegistrar);
 
     function detenerCedula() {
         detenerEscaneoContinuo();
@@ -1230,8 +1269,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var rut = '', nombre = '', patente = '';
         if (tipo === 'peatonal') {
             rut = (rutInput.value || rutManual.value || '').replace(/\s/g, '');
-            nombre = (nombreInput.value || nombreManual.value || '').trim();
+            nombre = (nombreInput.value || '').trim();
             if (!rut) { alert('Ingrese o escanee el RUT.'); return; }
+            if (!nombre) { alert('Ingrese el nombre o espere a que se complete desde la base de personas.'); return; }
         } else {
             patente = (patenteResult.value || '').replace(/\s/g, '').toUpperCase();
             rut = (document.getElementById('conductor-rut').value || '').replace(/\s/g, '');
@@ -1251,7 +1291,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         qrSalidaImg.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(res.data.qr_salida_url) + '" alt="QR Salida" class="mx-auto rounded-lg">';
                         qrSalidaContainer.classList.remove('hidden');
                     }
-                    if (tipo === 'peatonal') { rutInput.value = ''; nombreInput.value = ''; rutManual.value = ''; nombreManual.value = ''; }
+                    if (tipo === 'peatonal') {
+                        rutInput.value = ''; nombreInput.value = ''; rutManual.value = '';
+                        var nc = document.getElementById('nombre-container'); if (nc) nc.classList.add('hidden');
+                    }
                     else { patenteResult.value = ''; document.getElementById('conductor-rut').value = ''; }
                     actualizarVisibilidadRegistrar();
                 }

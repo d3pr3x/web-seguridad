@@ -1,0 +1,19 @@
+{
+  "name": "Sistema de Seguridad — Control de Acceso",
+  "short_name": "QR Guardias",
+  "description": "Control de acceso peatonal y vehicular con escáner de cédula y patente",
+  "start_url": "/ingresos/escaner-nuevo",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f0ebe3",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
