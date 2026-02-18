@@ -200,26 +200,103 @@
     @yield('content')
 
     @if (!request()->routeIs('login'))
+    <!-- Modal: instrucciones para añadir a la pantalla de inicio (iOS, Android, escritorio) -->
+    <div class="modal fade" id="modalInstalarApp" tabindex="-1" aria-labelledby="modalInstalarAppTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title fw-bold" id="modalInstalarAppTitle">Añadir a la pantalla de inicio</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p id="instalar-app-intro" class="small mb-3 text-white-50">Así la app quedará en tu pantalla.</p>
+                    <ol id="instalar-app-pasos" class="small mb-3 ps-3 pe-1 text-start" style="line-height: 1.6; color: #e2e8f0;"></ol>
+                    <p id="instalar-app-camara" class="small mb-0 text-white-50" style="font-size: 0.8rem;">La cámara te pedirá permiso <strong>solo la primera vez</strong> que la uses (escáner QR, etc.). Ese permiso vale para toda la web en este navegador.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+    #modalInstalarApp .modal-content { background: #0f172a; color: #e2e8f0; border-color: rgba(226,232,240,0.2); }
+    #modalInstalarApp .modal-header { border-color: rgba(226,232,240,0.2); }
+    #modalInstalarApp .modal-body { color: #e2e8f0; }
+    </style>
+
     <script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function() {});
-    }
-    window._pwaInstallPrompt = null;
-    window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); window._pwaInstallPrompt = e; });
-    window.triggerPwaInstall = function() {
-        if (window._pwaInstallPrompt) {
-            window._pwaInstallPrompt.prompt();
-            window._pwaInstallPrompt.userChoice.then(function() { window._pwaInstallPrompt = null; });
-        } else {
-            alert('Para instalar la app: abra el menú del navegador (⋮) y elija "Añadir a la pantalla de inicio" o "Instalar aplicación". Así la cámara recordará el permiso.');
+    (function() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function() {});
         }
-    };
-    document.addEventListener('DOMContentLoaded', function() {
-        var el = document.getElementById('menu-item-instalar-app');
-        if (el && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone)) {
-            el.style.display = 'none';
+        window._pwaInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); window._pwaInstallPrompt = e; });
+
+        function getInstalarAppSteps() {
+            var ua = navigator.userAgent || '';
+            var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            var isAndroid = /Android/i.test(ua);
+            if (isIOS) {
+                return {
+                    intro: 'En iPhone o iPad solo <strong>Safari</strong> puede añadir la app a la pantalla de inicio. Chrome, Brave y otros navegadores en iOS no tienen esa opción.',
+                    pasos: [
+                        'Abre esta misma página <strong>en Safari</strong> (si ahora estás en Chrome o Brave, copia la dirección y ábrela en Safari).',
+                        'En Safari, toca el botón <strong>Compartir</strong> (□ con flecha hacia arriba), abajo en el centro.',
+                        'En el menú, toca <strong>«Añadir a la pantalla de inicio»</strong>.',
+                        'Toca <strong>«Añadir»</strong> arriba a la derecha.'
+                    ]
+                };
+            }
+            if (isAndroid) {
+                return {
+                    intro: 'En Android:',
+                    pasos: [
+                        'Toca el <strong>menú del navegador</strong> (tres puntos ⋮).',
+                        'Elige <strong>«Instalar aplicación»</strong> o <strong>«Añadir a la pantalla de inicio»</strong>.'
+                    ]
+                };
+            }
+            return {
+                intro: 'En el ordenador:',
+                pasos: [
+                    'En la <strong>barra de direcciones</strong> busca el icono de instalar (⊕ o similar), o',
+                    'Abre el <strong>menú del navegador</strong> (⋮) y busca <strong>«Instalar…»</strong> o <strong>«Añadir a la pantalla de inicio»</strong>.'
+                ]
+            };
         }
-    });
+
+        function showInstalarAppModal() {
+            var modal = document.getElementById('modalInstalarApp');
+            if (!modal) return;
+            var intro = document.getElementById('instalar-app-intro');
+            var list = document.getElementById('instalar-app-pasos');
+            var data = getInstalarAppSteps();
+            if (intro) intro.innerHTML = data.intro;
+            if (list) {
+                list.innerHTML = data.pasos.map(function(p) { return '<li class="mb-2">' + p + '</li>'; }).join('');
+            }
+            var camaraNote = document.getElementById('instalar-app-camara');
+            if (camaraNote) camaraNote.style.display = 'block';
+            var bsModal = typeof bootstrap !== 'undefined' && bootstrap.Modal ? new bootstrap.Modal(modal) : null;
+            if (bsModal) bsModal.show(); else modal.classList.add('show'); modal.style.display = 'block';
+        }
+
+        window.triggerPwaInstall = function() {
+            if (window._pwaInstallPrompt) {
+                window._pwaInstallPrompt.prompt();
+                window._pwaInstallPrompt.userChoice.then(function() { window._pwaInstallPrompt = null; });
+                return;
+            }
+            showInstalarAppModal();
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var standalone = window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+            if (standalone) {
+                var menuItem = document.getElementById('menu-item-instalar-app');
+                if (menuItem) menuItem.style.display = 'none';
+                document.querySelectorAll('.btn-header-instalar-app').forEach(function(btn) { btn.style.display = 'none'; });
+            }
+        });
+    })();
     </script>
     @endif
 
