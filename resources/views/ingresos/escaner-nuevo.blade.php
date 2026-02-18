@@ -46,14 +46,15 @@
                         {{-- 1. Cámara (arriba en DOM = se ve arriba tras scroll) --}}
                         <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden order-first relative">
                             <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block"></video>
+                            <img id="preview-captura-cedula" alt="" class="hidden w-full max-h-[50vh] min-h-[240px] object-cover bg-gray-900">
                             <p class="text-white/80 text-center text-xs py-1">Cédula nuevo formato: QR centrado. Encuadre el carnet con el código QR visible (zona central).</p>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
                             <div class="flex flex-col gap-2 p-3">
                                 <button type="button" id="btn-capturar-cedula" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition disabled:opacity-50" disabled>
-                                    Capturar y leer (si no se detecta solo)
+                                    Capturar y leer
                                 </button>
                                 <button type="button" id="btn-capturar-cedula-reintentar" class="w-full py-2.5 border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium rounded-lg transition hidden">
-                                    Capturar de nuevo
+                                    Volver a capturar
                                 </button>
                             </div>
                         </div>
@@ -347,6 +348,9 @@ document.addEventListener('DOMContentLoaded', function() {
         function terminar() {
             clearTimeout(captureTimeoutId);
             if (typeof window._terminarCapturaCedula === 'function') window._terminarCapturaCedula = null;
+            var preview = document.getElementById('preview-captura-cedula');
+            if (preview) { preview.classList.add('hidden'); preview.src = ''; }
+            videoCedula.classList.remove('hidden');
             mensajeCapturaCedula.classList.add('hidden');
             mensajeCapturaCedula.textContent = '';
             btnCapturarCedula.disabled = false;
@@ -1142,29 +1146,25 @@ document.addEventListener('DOMContentLoaded', function() {
         function mostrarFalloQR() {
             var manualSection = document.getElementById('ingreso-manual-peatonal');
             if (manualSection) manualSection.classList.remove('hidden');
-            alert('No se detectó un QR. Encuadre bien el código, asegure buena luz y pulse «Capturar de nuevo» o ingrese RUT manualmente.');
-            terminar();
+            mensajeCapturaCedula.textContent = 'No se obtuvo la información. Pulse «Volver a capturar» para ver la cámara en vivo e intentar de nuevo.';
+            mensajeCapturaCedula.classList.remove('hidden');
         }
         function falloQR() {
             mostrarFalloQR();
         }
         function continuarConCanvas() {
-            requestAnimationFrame(function() {
-                dibujarCanvas();
-                setTimeout(intentarDecodificar, 80);
-            });
+            dibujarCanvas();
+            setTimeout(intentarDecodificar, 80);
         }
-        escribirLogQR('2. Probando lectura directa del video (móvil)…');
-        if (typeof QrScanner !== 'undefined') {
-            if (!QrScanner.WORKER_PATH) QrScanner.WORKER_PATH = 'https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner-worker.min.js';
-            QrScanner.scanImage(videoCedula).then(function(r) {
-                var decoded = typeof r === 'string' ? r : (r && r.data) || null;
-                if (decoded) { exitoQR(decoded); return; }
-                continuarConCanvas();
-            }).catch(function() { continuarConCanvas(); });
-        } else {
-            continuarConCanvas();
+        // Tomar la foto al instante: congelar frame en canvas y mostrar preview (no seguir en vivo)
+        dibujarCanvas();
+        var preview = document.getElementById('preview-captura-cedula');
+        if (preview) {
+            preview.src = canvasCedula.toDataURL('image/png');
+            preview.classList.remove('hidden');
         }
+        videoCedula.classList.add('hidden');
+        setTimeout(intentarDecodificar, 80);
         });
     }
     if (btnCapturarCedula) btnCapturarCedula.addEventListener('click', capturarYLeerQR);
