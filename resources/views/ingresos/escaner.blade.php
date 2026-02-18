@@ -43,16 +43,9 @@
                 {{-- Orden para móvil: de arriba a abajo = cámara, RUT, Nombre. Al cargar se hace scroll al final para ver de abajo hacia arriba: Nombre, RUT, cámara. --}}
                 <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
                     <div class="p-4 pb-6 flex flex-col gap-4">
-                        {{-- 1. Cámara (arriba en DOM = se ve arriba tras scroll). En iOS/Safari el permiso se pide al pulsar "Activar cámara" para cumplir con el gesto de usuario y mejorar persistencia. --}}
+                        {{-- 1. Cámara (arriba en DOM = se ve arriba tras scroll) --}}
                         <div id="lector-cedula" class="bg-gray-900 rounded-xl overflow-hidden order-first relative">
-                            <div id="lector-cedula-activar" class="flex flex-col items-center justify-center min-h-[240px] p-6 text-center bg-gray-800">
-                                <p class="text-white/90 mb-4">Para escanear el QR de la cédula se necesita acceso a la cámara.</p>
-                                <button type="button" id="btn-activar-camara-cedula" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">
-                                    Activar cámara
-                                </button>
-                                <p id="aviso-ios-camara" class="text-white/60 text-xs mt-4 max-w-sm hidden">En iPhone/iPad, Safari puede pedir permiso cada vez que abras esta página. Es una limitación del navegador.</p>
-                            </div>
-                            <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block hidden"></video>
+                            <video id="video-cedula" autoplay playsinline muted class="w-full max-h-[50vh] min-h-[240px] object-cover block"></video>
                             <img id="preview-captura-cedula" alt="" class="hidden w-full max-h-[50vh] min-h-[240px] object-cover bg-gray-900">
                             <p class="text-white/80 text-center text-xs py-1">Leyendo QR en todo momento. Encuadre el carnet.</p>
                             <p id="mensaje-captura-cedula" class="text-white text-center text-sm py-2 hidden"></p>
@@ -205,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
             iniciarCamaraPatente();
         } else {
             detenerCamaraPatente();
-            // No auto-iniciar cámara al volver a Peatonal: el usuario debe pulsar "Activar cámara" (mejor persistencia en iOS Safari).
+            iniciarLectorCedula();
         }
     }
 
@@ -224,9 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const nombreInput = document.getElementById('nombre');
     const rutManual = document.getElementById('rut-manual');
 
-    var overlayActivarCamara = document.getElementById('lector-cedula-activar');
-    var btnActivarCamaraCedula = document.getElementById('btn-activar-camara-cedula');
-
     function iniciarLectorCedula() {
         if (videoCedula.srcObject) return;
         var constraints = {
@@ -240,8 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
             streamCedula = stream;
             videoCedula.srcObject = stream;
-            if (overlayActivarCamara) overlayActivarCamara.classList.add('hidden');
-            videoCedula.classList.remove('hidden');
             return videoCedula.play();
         }).catch(function() {
             return navigator.mediaDevices.getUserMedia({
@@ -250,16 +238,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }).then(function(stream) {
                 streamCedula = stream;
                 videoCedula.srcObject = stream;
-                if (overlayActivarCamara) overlayActivarCamara.classList.add('hidden');
-                videoCedula.classList.remove('hidden');
                 return videoCedula.play();
             });
         }).catch(function() {
             return navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
                 streamCedula = stream;
                 videoCedula.srcObject = stream;
-                if (overlayActivarCamara) overlayActivarCamara.classList.add('hidden');
-                videoCedula.classList.remove('hidden');
                 return videoCedula.play();
             });
         }).then(function() {
@@ -268,18 +252,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(function(err) {
             lectorCedula.innerHTML = '<p class="text-white p-3">No se pudo acceder a la cámara. Use entrada manual.</p>';
         });
-    }
-
-    if (btnActivarCamaraCedula) {
-        btnActivarCamaraCedula.addEventListener('click', function() {
-            iniciarLectorCedula();
-        });
-    }
-    var avisoIosCamara = document.getElementById('aviso-ios-camara');
-    var esIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    var esStandalone = (typeof navigator.standalone !== 'undefined' && navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches;
-    if (avisoIosCamara && esIos && !esStandalone) {
-        avisoIosCamara.classList.remove('hidden');
     }
 
     var canvasContinuo = document.createElement('canvas');
@@ -1200,8 +1172,6 @@ document.addEventListener('DOMContentLoaded', function() {
             streamCedula = null;
         }
         videoCedula.srcObject = null;
-        videoCedula.classList.add('hidden');
-        if (overlayActivarCamara) overlayActivarCamara.classList.remove('hidden');
     }
 
     var streamPatente = null;
@@ -1342,6 +1312,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var tabPeatonal = document.getElementById('panel-peatonal');
     function iniciarCuandoVisible() {
         if (tabPeatonal && !tabPeatonal.classList.contains('hidden')) {
+            iniciarLectorCedula();
             setTimeout(scrollAlFinalEscaner, 600);
         } else {
             setTimeout(iniciarCuandoVisible, 200);
