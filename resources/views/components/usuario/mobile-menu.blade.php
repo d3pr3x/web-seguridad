@@ -30,6 +30,11 @@
                     <i class="fas fa-user me-2" style="width: 1.25rem;"></i><span>Mi perfil</span>
                 </a>
             </li>
+            <li class="nav-item" id="menu-item-instalar-app">
+                <button type="button" class="nav-link side-menu-link d-flex align-items-center py-2 rounded w-100 text-start border-0 bg-transparent" style="color: #e2e8f0;" id="btn-instalar-app" onclick="toggleMenu(); if (typeof triggerPwaInstall === 'function') triggerPwaInstall();">
+                    <i class="fas fa-download me-2" style="width: 1.25rem;"></i><span>Instalar aplicación</span>
+                </button>
+            </li>
             @if($user->puedeVerMisReportes())
             <li class="nav-item">
                 <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-mis-reportes">

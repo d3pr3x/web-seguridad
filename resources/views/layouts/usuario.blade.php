@@ -204,6 +204,22 @@
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function() {});
     }
+    window._pwaInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); window._pwaInstallPrompt = e; });
+    window.triggerPwaInstall = function() {
+        if (window._pwaInstallPrompt) {
+            window._pwaInstallPrompt.prompt();
+            window._pwaInstallPrompt.userChoice.then(function() { window._pwaInstallPrompt = null; });
+        } else {
+            alert('Para instalar la app: abra el menú del navegador (⋮) y elija "Añadir a la pantalla de inicio" o "Instalar aplicación". Así la cámara recordará el permiso.');
+        }
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('menu-item-instalar-app');
+        if (el && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone)) {
+            el.style.display = 'none';
+        }
+    });
     </script>
     @endif
 
