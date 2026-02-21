@@ -1,6 +1,6 @@
 @php
     $isAuth = auth()->check();
-    $primaryUrl = route('go');
+    $primaryUrl = url('/go');
     $primaryLabel = $isAuth ? 'Ir a inicio' : 'Ir al login';
 @endphp
 <!DOCTYPE html>
