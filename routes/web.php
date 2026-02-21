@@ -54,6 +54,21 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Ruta de escape para vistas de error (403/404/419): evita quedar encerrado en PWA
+Route::get('/go', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        if ($user->esAdministrador()) {
+            return redirect()->route('administrador.index');
+        }
+        if ($user->esSupervisor()) {
+            return redirect()->route('supervisor.index');
+        }
+        return redirect()->route('usuario.index');
+    }
+    return redirect()->route('login');
+})->name('go');
+
 // Rutas de autenticación (rate limit login)
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
