@@ -1,0 +1,180 @@
+﻿
+  GET|HEAD        / .................................................................................................. 
+  GET|HEAD        acciones ................................................... acciones.index ÔÇ║ AccionController@index
+  POST            acciones ................................................... acciones.store ÔÇ║ AccionController@store
+  GET|HEAD        acciones/crear ........................................... acciones.create ÔÇ║ AccionController@create
+  GET|HEAD        acciones/{accion} ............................................ acciones.show ÔÇ║ AccionController@show
+  GET|HEAD        admin/auditorias ......................... admin.auditorias.index ÔÇ║ Admin\AuditoriasController@index
+  GET|HEAD        admin/auditorias/{auditoria} ............... admin.auditorias.show ÔÇ║ Admin\AuditoriasController@show
+  GET|HEAD        admin/calculo-sueldos .................. admin.calculo-sueldos ÔÇ║ Admin\CalculoSueldoController@index
+  GET|HEAD        admin/calculo-sueldos/exportar admin.calculo-sueldos.exportar ÔÇ║ Admin\CalculoSueldoController@exporÔÇª
+  GET|HEAD        admin/clientes ................................ admin.clientes.index ÔÇ║ Admin\ClienteController@index
+  POST            admin/clientes ................................ admin.clientes.store ÔÇ║ Admin\ClienteController@store
+  GET|HEAD        admin/clientes/crear ........................ admin.clientes.create ÔÇ║ Admin\ClienteController@create
+  PUT             admin/clientes/{cliente} .................... admin.clientes.update ÔÇ║ Admin\ClienteController@update
+  DELETE          admin/clientes/{cliente} .................. admin.clientes.destroy ÔÇ║ Admin\ClienteController@destroy
+  GET|HEAD        admin/clientes/{cliente}/editar ................. admin.clientes.edit ÔÇ║ Admin\ClienteController@edit
+  GET|HEAD        admin/clientes/{cliente}/instalaciones admin.clientes.instalaciones ÔÇ║ Admin\ClienteController@instaÔÇª
+  POST            admin/clientes/{cliente}/instalaciones admin.clientes.instalaciones.store ÔÇ║ Admin\ClienteControllerÔÇª
+  GET|HEAD        admin/clientes/{cliente}/instalaciones/crear admin.clientes.instalaciones.create ÔÇ║ Admin\ClienteConÔÇª
+  PUT             admin/clientes/{cliente}/instalaciones/{sucursal} admin.clientes.instalaciones.update ÔÇ║ Admin\ClienÔÇª
+  DELETE          admin/clientes/{cliente}/instalaciones/{sucursal} admin.clientes.instalaciones.destroy ÔÇ║ Admin\ClieÔÇª
+  GET|HEAD        admin/clientes/{cliente}/instalaciones/{sucursal}/editar admin.clientes.instalaciones.edit ÔÇ║ Admin\ÔÇª
+  GET|HEAD        admin/dispositivos ........... admin.dispositivos.index ÔÇ║ Admin\DispositivoPermitidoController@index
+  POST            admin/dispositivos ........... admin.dispositivos.store ÔÇ║ Admin\DispositivoPermitidoController@store
+  GET|HEAD        admin/dispositivos/create .. admin.dispositivos.create ÔÇ║ Admin\DispositivoPermitidoController@create
+  GET|HEAD        admin/dispositivos/{dispositivo} admin.dispositivos.show ÔÇ║ Admin\DispositivoPermitidoController@show
+  PUT|PATCH       admin/dispositivos/{dispositivo} admin.dispositivos.update ÔÇ║ Admin\DispositivoPermitidoController@uÔÇª
+  DELETE          admin/dispositivos/{dispositivo} admin.dispositivos.destroy ÔÇ║ Admin\DispositivoPermitidoController@ÔÇª
+  GET|HEAD        admin/dispositivos/{dispositivo}/edit admin.dispositivos.edit ÔÇ║ Admin\DispositivoPermitidoControlleÔÇª
+  PATCH           admin/dispositivos/{dispositivo}/toggle admin.dispositivos.toggle ÔÇ║ Admin\DispositivoPermitidoContrÔÇª
+  PATCH           admin/dispositivos/{dispositivo}/toggle-ubicacion admin.dispositivos.toggle-ubicacion ÔÇ║ Admin\DispoÔÇª
+  GET|HEAD        admin/documentos .................. admin.documentos.index ÔÇ║ Admin\DocumentoPersonalController@index
+  GET|HEAD        admin/documentos/usuario/{user} admin.documentos.usuario ÔÇ║ Admin\DocumentoPersonalController@usuariÔÇª
+  GET|HEAD        admin/documentos/usuarios ... admin.documentos.usuarios ÔÇ║ Admin\DocumentoPersonalController@usuarios
+  GET|HEAD        admin/documentos/{documento} ........ admin.documentos.show ÔÇ║ Admin\DocumentoPersonalController@show
+  PUT             admin/documentos/{documento}/aprobar admin.documentos.aprobar ÔÇ║ Admin\DocumentoPersonalController@aÔÇª
+  PUT             admin/documentos/{documento}/rechazar admin.documentos.rechazar ÔÇ║ Admin\DocumentoPersonalControllerÔÇª
+  GET|HEAD        admin/grupos-incidentes ..... admin.grupos-incidentes.index ÔÇ║ Admin\GruposIncidentesController@index
+  GET|HEAD        admin/novedades .............................. admin.novedades.index ÔÇ║ Admin\NovedadController@index
+  POST            admin/novedades .............................. admin.novedades.store ÔÇ║ Admin\NovedadController@store
+  GET|HEAD        admin/novedades/crear ...................... admin.novedades.create ÔÇ║ Admin\NovedadController@create
+  GET|HEAD        admin/novedades/{accion} ....................... admin.novedades.show ÔÇ║ Admin\NovedadController@show
+  POST            admin/novedades/{accion}/elevar-reporte admin.novedades.elevar-reporte ÔÇ║ Admin\NovedadController@elÔÇª
+  GET|HEAD        admin/reporte-sucursal .................... admin.reporte-sucursal ÔÇ║ ReporteSucursalController@index
+  GET|HEAD        admin/reporte-sucursal/exportar admin.reporte-sucursal.exportar ÔÇ║ ReporteSucursalController@exportar
+  GET|HEAD        admin/reportes-diarios ................ admin.reportes-diarios ÔÇ║ Admin\ReporteDiarioController@index
+  GET|HEAD        admin/reportes-diarios/exportar admin.reportes-diarios.exportar ÔÇ║ Admin\ReporteDiarioController@expÔÇª
+  GET|HEAD        admin/reportes-especiales .. admin.reportes-especiales.index ÔÇ║ Admin\ReporteEspecialController@index
+  GET|HEAD        admin/reportes-especiales/{reporteEspecial} admin.reportes-especiales.show ÔÇ║ Admin\ReporteEspecialCÔÇª
+  PATCH           admin/reportes-especiales/{reporteEspecial}/estado admin.reportes-especiales.update-estado ÔÇ║ Admin\ÔÇª
+  POST            admin/reportes-especiales/{reporteEspecial}/marcar-leido admin.reportes-especiales.marcar-leido ÔÇ║ AÔÇª
+  GET|HEAD        admin/rondas ................................. admin.rondas.index ÔÇ║ Admin\PuntoRondaController@index
+  POST            admin/rondas ................................. admin.rondas.store ÔÇ║ Admin\PuntoRondaController@store
+  GET|HEAD        admin/rondas-reporte ..................... admin.rondas.reporte ÔÇ║ Admin\RondaReporteController@index
+  GET|HEAD        admin/rondas/crear ......................... admin.rondas.create ÔÇ║ Admin\PuntoRondaController@create
+  GET|HEAD        admin/rondas/sucursal/{sucursal} ............... admin.rondas.show ÔÇ║ Admin\PuntoRondaController@show
+  PUT             admin/rondas/{punto} ....................... admin.rondas.update ÔÇ║ Admin\PuntoRondaController@update
+  DELETE          admin/rondas/{punto} ..................... admin.rondas.destroy ÔÇ║ Admin\PuntoRondaController@destroy
+  GET|HEAD        admin/rondas/{punto}/editar .................... admin.rondas.edit ÔÇ║ Admin\PuntoRondaController@edit
+  GET|HEAD        admin/rondas/{punto}/qr ........................ admin.rondas.qr.show ÔÇ║ Admin\RondaQrController@show
+  GET|HEAD        admin/rondas/{punto}/qr/descargar ...... admin.rondas.qr.download ÔÇ║ Admin\RondaQrController@download
+  GET|HEAD        admin/sectores ................................. admin.sectores.index ÔÇ║ Admin\SectorController@index
+  POST            admin/sectores ................................. admin.sectores.store ÔÇ║ Admin\SectorController@store
+  GET|HEAD        admin/sectores/crear ......................... admin.sectores.create ÔÇ║ Admin\SectorController@create
+  GET|HEAD        admin/sectores/empresa/{empresa} .... admin.sectores.por-empresa ÔÇ║ Admin\SectorController@porEmpresa
+  GET|HEAD        admin/sectores/sucursal/{sucursal} ............... admin.sectores.show ÔÇ║ Admin\SectorController@show
+  PUT             admin/sectores/{sector} ...................... admin.sectores.update ÔÇ║ Admin\SectorController@update
+  DELETE          admin/sectores/{sector} .................... admin.sectores.destroy ÔÇ║ Admin\SectorController@destroy
+  GET|HEAD        admin/sectores/{sector}/editar ................... admin.sectores.edit ÔÇ║ Admin\SectorController@edit
+  PATCH           admin/sectores/{sector}/toggle ............... admin.sectores.toggle ÔÇ║ Admin\SectorController@toggle
+  GET|HEAD        admin/ubicaciones ............... admin.ubicaciones.index ÔÇ║ Admin\UbicacionPermitidaController@index
+  POST            admin/ubicaciones ............... admin.ubicaciones.store ÔÇ║ Admin\UbicacionPermitidaController@store
+  GET|HEAD        admin/ubicaciones/create ...... admin.ubicaciones.create ÔÇ║ Admin\UbicacionPermitidaController@create
+  GET|HEAD        admin/ubicaciones/{ubicacione} .... admin.ubicaciones.show ÔÇ║ Admin\UbicacionPermitidaController@show
+  PUT|PATCH       admin/ubicaciones/{ubicacione} admin.ubicaciones.update ÔÇ║ Admin\UbicacionPermitidaController@update
+  DELETE          admin/ubicaciones/{ubicacione} admin.ubicaciones.destroy ÔÇ║ Admin\UbicacionPermitidaController@destrÔÇª
+  GET|HEAD        admin/ubicaciones/{ubicacione}/edit admin.ubicaciones.edit ÔÇ║ Admin\UbicacionPermitidaController@edit
+  PATCH           admin/ubicaciones/{ubicacion}/toggle admin.ubicaciones.toggle ÔÇ║ Admin\UbicacionPermitidaController@ÔÇª
+  GET|HEAD        admin/usuarios ................................... admin.usuarios.index ÔÇ║ Admin\UserController@index
+  POST            admin/usuarios ................................... admin.usuarios.store ÔÇ║ Admin\UserController@store
+  GET|HEAD        admin/usuarios/crear ........................... admin.usuarios.create ÔÇ║ Admin\UserController@create
+  PUT             admin/usuarios/{usuario} ....................... admin.usuarios.update ÔÇ║ Admin\UserController@update
+  GET|HEAD        admin/usuarios/{usuario}/editar .................... admin.usuarios.edit ÔÇ║ Admin\UserController@edit
+  GET|HEAD        administrador .................................. administrador.index ÔÇ║ AdministradorController@index
+  POST            api/verificar-dispositivo .... api.verificar-dispositivo ÔÇ║ Auth\LoginController@verificarDispositivo
+  GET|HEAD        archivos-privados/acciones/{accion}/imagen/{index} archivos-privados.accion ÔÇ║ ArchivoPrivadoControlÔÇª
+  GET|HEAD        archivos-privados/documentos/{documento}/{lado} archivos-privados.documento ÔÇ║ ArchivoPrivadoControlÔÇª
+  GET|HEAD        archivos-privados/informes/{informe}/fotografia/{index} archivos-privados.informe ÔÇ║ ArchivoPrivadoCÔÇª
+  GET|HEAD        archivos-privados/reportes-especiales/{reporte_especial}/imagen/{index} archivos-privados.reporte-eÔÇª
+  GET|HEAD        archivos-privados/reportes/{reporte}/imagen/{index} archivos-privados.reporte ÔÇ║ ArchivoPrivadoContrÔÇª
+  GET|HEAD        blacklist .............................................. blacklist.index ÔÇ║ BlacklistController@index
+  POST            blacklist .............................................. blacklist.store ÔÇ║ BlacklistController@store
+  DELETE          blacklist/{id} ..................................... blacklist.destroy ÔÇ║ BlacklistController@destroy
+  PATCH           blacklist/{id}/toggle ................................ blacklist.toggle ÔÇ║ BlacklistController@toggle
+  GET|HEAD        dias-trabajados ............................... dias-trabajados.index ÔÇ║ DiaTrabajadoController@index
+  POST            dias-trabajados ............................... dias-trabajados.store ÔÇ║ DiaTrabajadoController@store
+  GET|HEAD        dias-trabajados/create ...................... dias-trabajados.create ÔÇ║ DiaTrabajadoController@create
+  PUT             dias-trabajados/{id} ........................ dias-trabajados.update ÔÇ║ DiaTrabajadoController@update
+  DELETE          dias-trabajados/{id} ...................... dias-trabajados.destroy ÔÇ║ DiaTrabajadoController@destroy
+  GET|HEAD        dias-trabajados/{id}/edit ....................... dias-trabajados.edit ÔÇ║ DiaTrabajadoController@edit
+  GET|HEAD        informes .................................................. informes.index ÔÇ║ InformeController@index
+  POST            informes .................................................. informes.store ÔÇ║ InformeController@store
+  GET|HEAD        informes-preview-pdf ........................... informes.preview-pdf ÔÇ║ InformeController@previewPdf
+  GET|HEAD        informes/create/{reporteId} ............................. informes.create ÔÇ║ InformeController@create
+  GET|HEAD        informes/{id} ............................................... informes.show ÔÇ║ InformeController@show
+  POST            informes/{id}/aprobar ................................. informes.aprobar ÔÇ║ InformeController@aprobar
+  GET|HEAD        informes/{id}/pdf ............................................. informes.pdf ÔÇ║ InformeController@pdf
+  POST            informes/{id}/rechazar .............................. informes.rechazar ÔÇ║ InformeController@rechazar
+  POST            informes/{id}/reenviar .............................. informes.reenviar ÔÇ║ InformeController@reenviar
+  GET|HEAD        informes/{id}/ver-pdf .................................. informes.ver-pdf ÔÇ║ InformeController@verPdf
+  GET|HEAD        ingresos ................................................. ingresos.index ÔÇ║ IngresosController@index
+  POST            ingresos ................................................. ingresos.store ÔÇ║ IngresosController@store
+  GET|HEAD        ingresos/buscar-persona ................. ingresos.buscar-persona ÔÇ║ IngresosController@buscarPersona
+  GET|HEAD        ingresos/entrada-manual ................. ingresos.entrada-manual ÔÇ║ IngresosController@entradaManual
+  GET|HEAD        ingresos/escaner ..................................... ingresos.escaner ÔÇ║ IngresosController@escaner
+  GET|HEAD        ingresos/escaner-nuevo .................... ingresos.escaner-nuevo ÔÇ║ IngresosController@escanerNuevo
+  POST            ingresos/exportar-csv ....................... ingresos.exportar-csv ÔÇ║ IngresosController@exportarCsv
+  GET|HEAD        ingresos/{id} .............................................. ingresos.show ÔÇ║ IngresosController@show
+  GET|HEAD        ingresos/{id}/qr-salida ........................... ingresos.qr-salida ÔÇ║ IngresosController@qrSalida
+  POST            ingresos/{id}/salida ................................... ingresos.salida ÔÇ║ IngresosController@salida
+  GET|HEAD        inicio-unificado .......................... inicio-unificado.index ÔÇ║ InicioUnificadoController@index
+  GET|HEAD        livewire/livewire.js ................... Livewire\Mechanisms ÔÇ║ FrontendAssets@returnJavaScriptAsFile
+  GET|HEAD        livewire/livewire.min.js.map ............................. Livewire\Mechanisms ÔÇ║ FrontendAssets@maps
+  GET|HEAD        livewire/preview-file/{filename} livewire.preview-file ÔÇ║ Livewire\Features ÔÇ║ FilePreviewController@ÔÇª
+  POST            livewire/update ........ default.livewire.update ÔÇ║ Livewire\Mechanisms ÔÇ║ HandleRequests@handleUpdate
+  POST            livewire/upload-file ........ livewire.upload-file ÔÇ║ Livewire\Features ÔÇ║ FileUploadController@handle
+  GET|HEAD        login ................................................... login ÔÇ║ Auth\LoginController@showLoginForm
+  POST            login ................................................................... Auth\LoginController@login
+  POST            logout ........................................................ logout ÔÇ║ Auth\LoginController@logout
+  GET|HEAD        personas ................................................. personas.index ÔÇ║ PersonasController@index
+  POST            personas ................................................. personas.store ÔÇ║ PersonasController@store
+  GET|HEAD        personas/crear ......................................... personas.create ÔÇ║ PersonasController@create
+  PUT             personas/{id} .......................................... personas.update ÔÇ║ PersonasController@update
+  DELETE          personas/{id} ........................................ personas.destroy ÔÇ║ PersonasController@destroy
+  GET|HEAD        personas/{id}/editar ....................................... personas.edit ÔÇ║ PersonasController@edit
+  GET|HEAD        profile .................................................... profile.index ÔÇ║ ProfileController@index
+  PUT             profile .................................................. profile.update ÔÇ║ ProfileController@update
+  GET|HEAD        profile/password ..................................... profile.password ÔÇ║ ProfileController@password
+  PUT             profile/password ........................ profile.password.update ÔÇ║ ProfileController@updatePassword
+  GET|HEAD        qr-automatico ...................................... qr-automatico ÔÇ║ IngresosController@qrAutomatico
+  POST            reportes .................................................. reportes.store ÔÇ║ ReporteController@store
+  GET|HEAD        reportes .................................................. reportes.index ÔÇ║ ReporteController@index
+  GET|HEAD        reportes-especiales .................... reportes-especiales.index ÔÇ║ ReporteEspecialController@index
+  POST            reportes-especiales .................... reportes-especiales.store ÔÇ║ ReporteEspecialController@store
+  GET|HEAD        reportes-especiales/crear ............ reportes-especiales.create ÔÇ║ ReporteEspecialController@create
+  GET|HEAD        reportes-especiales/{reporteEspecial} .... reportes-especiales.show ÔÇ║ ReporteEspecialController@show
+  PATCH           reportes-especiales/{reporteEspecial}/estado reportes-especiales.update-estado ÔÇ║ ReporteEspecialConÔÇª
+  GET|HEAD        reportes/{id} ............................................... reportes.show ÔÇ║ ReporteController@show
+  GET|HEAD        ronda/escanear/{codigo} ........................... ronda.escanear ÔÇ║ RondaEscaneoController@escanear
+  GET|HEAD        sectores/sucursal/{sucursalId} ........ sectores.por-sucursal ÔÇ║ AccionController@sectoresPorSucursal
+  GET|HEAD        supervisor ........................................... supervisor.index ÔÇ║ SupervisorController@index
+  GET|HEAD        supervisor/documentos ... supervisor.documentos.index ÔÇ║ Supervisor\DocumentoPersonalController@index
+  GET|HEAD        supervisor/documentos/usuario/{user} supervisor.documentos.usuario ÔÇ║ Supervisor\DocumentoPersonalCoÔÇª
+  GET|HEAD        supervisor/documentos/usuarios supervisor.documentos.usuarios ÔÇ║ Supervisor\DocumentoPersonalControlÔÇª
+  GET|HEAD        supervisor/documentos/{documento} supervisor.documentos.show ÔÇ║ Supervisor\DocumentoPersonalControllÔÇª
+  PUT             supervisor/documentos/{documento}/aprobar supervisor.documentos.aprobar ÔÇ║ Supervisor\DocumentoPersoÔÇª
+  PUT             supervisor/documentos/{documento}/rechazar supervisor.documentos.rechazar ÔÇ║ Supervisor\DocumentoPerÔÇª
+  GET|HEAD        tareas/{id} ..................................................... tareas.show ÔÇ║ TareaController@show
+  GET|HEAD        up ................................................................................................. 
+  GET|HEAD        usuario .................................................... usuario.index ÔÇ║ UsuarioController@index
+  GET|HEAD        usuario/acciones ............................ usuario.acciones.index ÔÇ║ UsuarioAccionController@index
+  POST            usuario/acciones ............................ usuario.acciones.store ÔÇ║ UsuarioAccionController@store
+  GET|HEAD        usuario/acciones/crear .................... usuario.acciones.create ÔÇ║ UsuarioAccionController@create
+  GET|HEAD        usuario/acciones/{accion} ..................... usuario.acciones.show ÔÇ║ UsuarioAccionController@show
+  GET|HEAD        usuario/documentos ..................... usuario.documentos.index ÔÇ║ UsuarioDocumentoController@index
+  POST            usuario/documentos ..................... usuario.documentos.store ÔÇ║ UsuarioDocumentoController@store
+  GET|HEAD        usuario/documentos/crear ............. usuario.documentos.create ÔÇ║ UsuarioDocumentoController@create
+  GET|HEAD        usuario/documentos/{documento} ........... usuario.documentos.show ÔÇ║ UsuarioDocumentoController@show
+  GET|HEAD        usuario/historial ....................... usuario.historial.index ÔÇ║ UsuarioHistorialController@index
+  GET|HEAD        usuario/perfil ................................ usuario.perfil.index ÔÇ║ UsuarioPerfilController@index
+  PUT             usuario/perfil/password .... usuario.perfil.password.update ÔÇ║ UsuarioPerfilController@updatePassword
+  GET|HEAD        usuario/reportes ........................... usuario.reportes.index ÔÇ║ UsuarioReporteController@index
+  POST            usuario/reportes ........................... usuario.reportes.store ÔÇ║ UsuarioReporteController@store
+  GET|HEAD        usuario/reportes/crear ................... usuario.reportes.create ÔÇ║ UsuarioReporteController@create
+  GET|HEAD        usuario/reportes/{reporteEspecial} ........... usuario.reportes.show ÔÇ║ UsuarioReporteController@show
+  GET|HEAD        usuario/ronda ................................... usuario.ronda.index ÔÇ║ UsuarioRondaController@index
+  GET|HEAD        usuario/ronda/escaner ....................... usuario.ronda.escaner ÔÇ║ UsuarioRondaController@escaner
+
+                                                                                                  Showing [176] routes
+
