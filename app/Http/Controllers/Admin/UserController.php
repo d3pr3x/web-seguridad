@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminStoreUserRequest;
+use App\Http\Requests\AdminUpdateUserRequest;
 use App\Models\Persona;
 use App\Models\RolUsuario;
 use App\Models\User;
 use App\Models\Sucursal;
+use App\Services\AuditoriaService;
+use App\Services\SessionRevocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -55,29 +58,18 @@ class UserController extends Controller
     }
 
     /**
-     * Guardar nuevo usuario
+     * Guardar nuevo usuario (política de contraseña: min 12, confirmación, no comprometida).
      */
-    public function store(Request $request)
+    public function store(AdminStoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'nombre_completo' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:usuarios,email',
-            'telefono' => 'nullable|string|max:30',
-            'run' => 'required|string|max:20|unique:usuarios,run',
-            'password' => 'required|string|min:8|confirmed',
-            'rol_id' => 'required|exists:roles_usuario,id',
-            'sucursal_id' => 'nullable|exists:sucursales,id',
-            'fecha_nacimiento' => 'nullable|date',
-            'domicilio' => 'nullable|string|max:500',
-            'rango' => 'nullable|string|max:80',
-        ]);
-
+        $validated = $request->validated();
         $validated['clave'] = Hash::make($validated['password']);
         unset($validated['password']);
         $validated['sucursal_id'] = $validated['sucursal_id'] ?: null;
         $validated['email'] = !empty($validated['email']) ? $validated['email'] : null;
 
-        User::create($validated);
+        $user = User::create($validated);
+        AuditoriaService::registrar('password_changed', 'usuarios', (string) $user->id_usuario, null, null, ['contexto' => 'admin_crear_usuario']);
 
         Persona::registrarOActualizar($validated['run'], $validated['nombre_completo'], [
             'sucursal_id' => $validated['sucursal_id'],
@@ -101,38 +93,31 @@ class UserController extends Controller
     }
 
     /**
-     * Actualizar usuario. Punto 13: solo ADMIN.
+     * Actualizar usuario (solo ADMIN). Si se envía password, política: min 12, confirmación, no comprometida.
      */
-    public function update(Request $request, User $usuario)
+    public function update(AdminUpdateUserRequest $request, User $usuario)
     {
-        if (!auth()->user()->esAdministrador()) {
-            abort(403, 'Solo el administrador puede editar usuarios.');
-        }
-        $validated = $request->validate([
-            'nombre_completo' => 'required|string|max:255',
-            'email' => ['nullable', 'email', Rule::unique('usuarios', 'email')->ignore($usuario->id_usuario, 'id_usuario')],
-            'telefono' => 'nullable|string|max:30',
-            'run' => ['required', 'string', 'max:20', Rule::unique('usuarios', 'run')->ignore($usuario->id_usuario, 'id_usuario')],
-            'password' => 'nullable|string|min:8|confirmed',
-            'rol_id' => 'required|exists:roles_usuario,id',
-            'sucursal_id' => 'nullable|exists:sucursales,id',
-            'fecha_nacimiento' => 'nullable|date',
-            'domicilio' => 'nullable|string|max:500',
-            'rango' => 'nullable|string|max:80',
-        ]);
-
+        $validated = $request->validated();
         $validated['sucursal_id'] = $validated['sucursal_id'] ?: null;
         $validated['email'] = !empty($validated['email']) ? $validated['email'] : null;
 
-        if (!empty($validated['password'] ?? null)) {
+        $oldRolId = $usuario->rol_id;
+        $oldSucursalId = $usuario->sucursal_id;
+        $passwordChanged = !empty($validated['password'] ?? null);
+        if ($passwordChanged) {
             $validated['clave'] = Hash::make($validated['password']);
+            AuditoriaService::registrar('password_changed', 'usuarios', (string) $usuario->id_usuario, null, null, ['contexto' => 'admin_editar_usuario']);
         }
-        unset($validated['password']);
-        if (isset($validated['password_confirmation'])) {
-            unset($validated['password_confirmation']);
-        }
+        unset($validated['password'], $validated['password_confirmation']);
 
         $usuario->update($validated);
+
+        if ($passwordChanged) {
+            SessionRevocationService::revokeOtherSessionsForUser($usuario->id_usuario, 'password_changed_by_admin');
+        }
+        if ((int) $oldRolId !== (int) ($usuario->rol_id ?? 0) || (int) $oldSucursalId !== (int) ($usuario->sucursal_id ?? 0)) {
+            SessionRevocationService::revokeOtherSessionsForUser($usuario->id_usuario, 'rol_or_sucursal_changed');
+        }
 
         Persona::registrarOActualizar($validated['run'], $validated['nombre_completo'], [
             'sucursal_id' => $validated['sucursal_id'],

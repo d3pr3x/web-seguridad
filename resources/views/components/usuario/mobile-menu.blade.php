@@ -1,3 +1,16 @@
+@php
+    use App\Services\MenuBuilder;
+    $menuBuilder = app(MenuBuilder::class);
+    $user = $menuBuilder->user();
+    $homeRoute = $menuBuilder->getHomeRoute();
+    $isHomeActive = request()->routeIs($homeRoute);
+    $sections = $menuBuilder->buildMenu();
+    $acordeon = $menuBuilder->getItemsAcordeon();
+    $acordeonLabel = $menuBuilder->tierSecundario() === 'supervisor' ? 'Supervisión' : ($menuBuilder->tierSecundario() === 'usuario' ? 'Usuario' : '');
+    $activeColor = 'color: #5eead4;';
+    $inactiveColor = 'color: #e2e8f0;';
+    $sublinkColor = 'color: #cbd5e1;';
+@endphp
 <!-- Menú Móvil (solo visible en móvil) - Abre por la derecha -->
 <div id="sideMenu" class="d-lg-none position-fixed top-0 end-0 h-100 z-50 overflow-hidden transition-all duration-300 shadow side-menu-mobile" style="width: 280px; max-width: 85vw; transform: translateX(100%);">
     <div class="p-3 border-bottom d-flex align-items-center justify-content-between side-menu-header" style="border-color: rgba(226,232,240,0.25) !important;">
@@ -8,124 +21,82 @@
     </div>
     <div class="flex-grow-1 overflow-auto py-2 px-2 side-menu-body">
         <ul class="nav flex-column side-menu-nav">
-            @php
-                $user = auth()->user();
-                $homeRoute = $user->esAdministrador() ? 'administrador.index' : ($user->esSupervisor() ? 'supervisor.index' : 'usuario.index');
-                $isHomeActive = request()->routeIs($homeRoute);
-            @endphp
-            <li class="nav-item">
-                <a href="{{ route($homeRoute) }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ $isHomeActive ? 'active' : '' }}" style="{{ $isHomeActive ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
-                    <i class="fas fa-home me-2" style="width: 1.25rem;"></i><span>Inicio</span>
-                </a>
-            </li>
-            @if($user->puedeVerControlAcceso())
-            <li class="nav-item">
-                <a href="{{ route('ingresos.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'active' : '' }}" style="{{ request()->routeIs('ingresos.*') || request()->routeIs('blacklist.*') ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
-                    <i class="fas fa-qrcode me-2" style="width: 1.25rem;"></i><span>Control de acceso</span>
-                </a>
-            </li>
+            @foreach($sections as $section)
+                @if($section['label'] !== '')
+                    <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
+                @endif
+                @foreach($section['items'] as $item)
+                    @if($item['type'] === 'link' && ($item['route'] ?? null))
+                        @php $linkActive = collect($item['routes_active'] ?? [])->contains(fn ($r) => request()->routeIs($r)); @endphp
+                        <li class="nav-item">
+                            <a href="{{ route($item['route']) }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ $linkActive ? 'active' : '' }}" style="{{ $linkActive ? $activeColor : $inactiveColor }}" onclick="toggleMenu()">
+                                <i class="fas {{ $item['icon'] }} me-2" style="width: 1.25rem;"></i><span>{{ $item['label'] }}</span>
+                            </a>
+                        </li>
+                    @elseif($item['type'] === 'collapse' && !empty($item['children'] ?? []))
+                        @php
+                            $collapseId = 'mobile-' . $item['key'];
+                            $isActive = collect($item['routes_active'] ?? [])->contains(fn ($r) => request()->routeIs($r));
+                            if (($item['key'] ?? '') === 'gestion') { $isActive = $isActive && !request()->routeIs('admin.rondas.reporte'); }
+                        @endphp
+                        <li class="nav-item">
+                            <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded {{ $isActive ? '' : 'collapsed' }}" style="{{ $inactiveColor }}" data-bs-toggle="collapse" data-bs-target="#{{ $collapseId }}" aria-expanded="{{ $isActive ? 'true' : 'false' }}">
+                                <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
+                                <i class="fas {{ $item['icon'] }} me-2" style="width: 1.25rem;"></i><span>{{ $item['label'] }}</span>
+                            </a>
+                            <div class="collapse {{ $isActive ? 'show' : '' }}" id="{{ $collapseId }}">
+                                <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
+                                    @foreach($item['children'] as $child)
+                                        @php $childActive = collect($child['routes_active'] ?? [])->contains(fn ($r) => request()->routeIs($r)); @endphp
+                                        <li class="nav-item">
+                                            <a href="{{ $child['route'] ? route($child['route']) : '#' }}" class="nav-link side-menu-sublink py-2 small rounded {{ $childActive ? 'active' : '' }}" style="{{ $childActive ? $activeColor : $sublinkColor }}" onclick="toggleMenu()">{{ $child['label'] }}</a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </li>
+                    @endif
+                @endforeach
+            @endforeach
+
+            @if(count($acordeon) > 0 && $acordeonLabel)
+                <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
+                <li class="nav-item">
+                    @php
+                        $acordeonId = 'mobile-acordeon-secundario';
+                        $acordeonActive = collect($acordeon)->contains(fn ($i) => collect($i['routes_active'] ?? [])->contains(fn ($r) => request()->routeIs($r)));
+                    @endphp
+                    <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded {{ $acordeonActive ? '' : 'collapsed' }}" style="{{ $inactiveColor }}" data-bs-toggle="collapse" data-bs-target="#{{ $acordeonId }}" aria-expanded="{{ $acordeonActive ? 'true' : 'false' }}">
+                        <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
+                        <i class="fas fa-layer-group me-2" style="width: 1.25rem;"></i><span>{{ $acordeonLabel }}</span>
+                    </a>
+                    <div class="collapse {{ $acordeonActive ? 'show' : '' }}" id="{{ $acordeonId }}">
+                        <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
+                            @foreach($acordeon as $item)
+                                @if($item['type'] === 'link' && ($item['route'] ?? null))
+                                    @php $aActive = collect($item['routes_active'] ?? [])->contains(fn ($r) => request()->routeIs($r)); @endphp
+                                    <li class="nav-item">
+                                        <a href="{{ route($item['route']) }}" class="nav-link side-menu-sublink py-2 small rounded {{ $aActive ? 'active' : '' }}" style="{{ $aActive ? $activeColor : $sublinkColor }}" onclick="toggleMenu()">{{ $item['label'] }}</a>
+                                    </li>
+                                @elseif($item['type'] === 'collapse' && !empty($item['children'] ?? []))
+                                    @foreach($item['children'] as $child)
+                                        @php $cActive = collect($child['routes_active'] ?? [])->contains(fn ($r) => request()->routeIs($r)); @endphp
+                                        <li class="nav-item">
+                                            <a href="{{ $child['route'] ? route($child['route']) : '#' }}" class="nav-link side-menu-sublink py-2 small rounded {{ $cActive ? 'active' : '' }}" style="{{ $cActive ? $activeColor : $sublinkColor }}" onclick="toggleMenu()">{{ $child['label'] }}</a>
+                                        </li>
+                                    @endforeach
+                                @endif
+                            @endforeach
+                        </ul>
+                    </div>
+                </li>
             @endif
-            <li class="nav-item">
-                <a href="{{ route('usuario.perfil.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.perfil.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.perfil.*') ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
-                    <i class="fas fa-user me-2" style="width: 1.25rem;"></i><span>Mi perfil</span>
-                </a>
-            </li>
+
             <li class="nav-item" id="menu-item-instalar-app">
-                <button type="button" class="nav-link side-menu-link d-flex align-items-center py-2 rounded w-100 text-start border-0 bg-transparent" style="color: #e2e8f0;" id="btn-instalar-app" onclick="toggleMenu(); if (typeof triggerPwaInstall === 'function') triggerPwaInstall();">
+                <button type="button" class="nav-link side-menu-link d-flex align-items-center py-2 rounded w-100 text-start border-0 bg-transparent" style="{{ $inactiveColor }}" id="btn-instalar-app" onclick="toggleMenu(); if (typeof triggerPwaInstall === 'function') triggerPwaInstall();">
                     <i class="fas fa-download me-2" style="width: 1.25rem;"></i><span>Instalar aplicación</span>
                 </button>
             </li>
-            @if($user->puedeVerMisReportes())
-            <li class="nav-item">
-                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-mis-reportes">
-                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
-                    <i class="fas fa-exclamation-triangle me-2" style="width: 1.25rem;"></i><span>Mis reportes</span>
-                </a>
-                <div class="collapse {{ request()->routeIs('usuario.reportes.*') ? 'show' : '' }}" id="mobile-mis-reportes">
-                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
-                        <li class="nav-item"><a href="{{ route('usuario.reportes.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('usuario.reportes.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.reportes.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Ver mis reportes</a></li>
-                    </ul>
-                </div>
-            </li>
-            @if(config('app.show_documentos_guardias'))
-            <li class="nav-item">
-                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-mis-documentos">
-                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
-                    <i class="fas fa-file-alt me-2" style="width: 1.25rem;"></i><span>Mis documentos</span>
-                </a>
-                <div class="collapse {{ request()->routeIs('usuario.documentos.*') ? 'show' : '' }}" id="mobile-mis-documentos">
-                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
-                        <li class="nav-item"><a href="{{ route('usuario.documentos.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('usuario.documentos.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.documentos.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Ver mis documentos</a></li>
-                    </ul>
-                </div>
-            </li>
-            @endif
-            <li class="nav-item">
-                <a href="{{ route('usuario.ronda.index') }}" class="nav-link side-menu-link d-flex align-items-center py-2 rounded {{ request()->routeIs('usuario.ronda.*') ? 'active' : '' }}" style="{{ request()->routeIs('usuario.ronda.*') ? 'color: #5eead4;' : 'color: #e2e8f0;' }}">
-                    <i class="fas fa-route me-2" style="width: 1.25rem;"></i><span>Rondas QR</span>
-                </a>
-            </li>
-            @endif
-            @if($user->puedeVerReporteSucursal() || $user->puedeVerReportesEstadisticasCompletos())
-            <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
-            <li class="nav-item">
-                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-reportes-admin">
-                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
-                    <i class="fas fa-chart-bar me-2" style="width: 1.25rem;"></i><span>Reportes y estadísticas</span>
-                </a>
-                <div class="collapse {{ request()->routeIs(['admin.reportes-especiales.*', 'admin.rondas.reporte', 'admin.reportes-diarios', 'admin.reporte-sucursal']) ? 'show' : '' }}" id="mobile-reportes-admin">
-                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
-                        @if($user->puedeVerReportesEstadisticasCompletos())
-                        <li class="nav-item"><a href="{{ route('admin.reportes-especiales.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reportes-especiales.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-especiales.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Todos los reportes</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.rondas.reporte') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.rondas.reporte') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.reporte') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reporte escaneos QR</a></li>
-                        @endif
-                        @if($user->puedeVerReporteSucursal())
-                        <li class="nav-item"><a href="{{ route('admin.reporte-sucursal') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reporte-sucursal') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reporte-sucursal') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reporte por sucursal</a></li>
-                        @endif
-                        @if($user->puedeVerReportesDiarios())
-                        <li class="nav-item"><a href="{{ route('admin.reportes-diarios') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.reportes-diarios') ? 'active' : '' }}" style="{{ request()->routeIs('admin.reportes-diarios') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Reportes diarios</a></li>
-                        @endif
-                    </ul>
-                </div>
-            </li>
-            @endif
-            @if($user->puedeVerSupervision())
-            <li class="nav-item">
-                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-usuarios-docs">
-                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
-                    <i class="fas fa-users me-2" style="width: 1.25rem;"></i><span>Supervisión</span>
-                </a>
-                <div class="collapse {{ request()->routeIs(['admin.usuarios.*', 'admin.documentos.*', 'admin.novedades.*', 'supervisor.documentos.*', 'reportes-especiales.*']) ? 'show' : '' }}" id="mobile-usuarios-docs">
-                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
-                        @if($user->esAdministrador())
-                        <li class="nav-item"><a href="{{ route('admin.usuarios.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.usuarios.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Usuarios</a></li>
-                        @endif
-                        @if(config('app.show_documentos_guardias'))
-                        <li class="nav-item"><a href="{{ $user->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.documentos.*', 'supervisor.documentos.*']) ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Aprobar documentos</a></li>
-                        @endif
-                        <li class="nav-item"><a href="{{ route('admin.novedades.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.novedades.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.novedades.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Novedades</a></li>
-                        <li class="nav-item"><a href="{{ $user->esAdministrador() ? route('admin.reportes-especiales.index') : route('reportes-especiales.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs(['admin.reportes-especiales.*', 'reportes-especiales.*']) ? 'active' : '' }}" style="{{ request()->routeIs(['admin.reportes-especiales.*', 'reportes-especiales.*']) ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Todos los reportes</a></li>
-                    </ul>
-                </div>
-            </li>
-            @endif
-            @if($user->puedeVerGestion())
-            <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
-            <li class="nav-item">
-                <a class="nav-link side-menu-link side-menu-toggle d-flex align-items-center py-2 rounded collapsed" style="color: #e2e8f0;" data-bs-toggle="collapse" data-bs-target="#mobile-gestion">
-                    <i class="fas fa-chevron-right me-2 mobile-chevron" style="width: 1.25rem; transition: transform 0.2s;"></i>
-                    <i class="fas fa-cog me-2" style="width: 1.25rem;"></i><span>Gestión</span>
-                </a>
-                <div class="collapse {{ request()->routeIs(['admin.dispositivos.*', 'admin.ubicaciones.*', 'admin.sectores.*', 'admin.rondas.*']) && !request()->routeIs('admin.rondas.reporte') ? 'show' : '' }}" id="mobile-gestion">
-                    <ul class="nav flex-column ms-4 ps-2 border-start" style="border-color: rgba(226,232,240,0.2) !important;">
-                        <li class="nav-item"><a href="{{ route('admin.dispositivos.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.dispositivos.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.dispositivos.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Dispositivos</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.ubicaciones.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.ubicaciones.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.ubicaciones.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Ubicaciones</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.sectores.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.sectores.*') ? 'active' : '' }}" style="{{ request()->routeIs('admin.sectores.*') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Sectores</a></li>
-                        <li class="nav-item"><a href="{{ route('admin.rondas.index') }}" class="nav-link side-menu-sublink py-2 small rounded {{ request()->routeIs('admin.rondas.index') || request()->routeIs('admin.rondas.show') || request()->routeIs('admin.rondas.create') || request()->routeIs('admin.rondas.edit') ? 'active' : '' }}" style="{{ request()->routeIs('admin.rondas.index') || request()->routeIs('admin.rondas.show') || request()->routeIs('admin.rondas.create') || request()->routeIs('admin.rondas.edit') ? 'color: #5eead4;' : 'color: #cbd5e1;' }}">Puntos de ronda (QR)</a></li>
-                    </ul>
-                </div>
-            </li>
-            @endif
             <li class="nav-item"><hr class="my-2" style="border-color: rgba(226,232,240,0.25);"></li>
             <li class="nav-item">
                 <form method="POST" action="{{ route('logout') }}">
@@ -140,14 +111,12 @@
 </div>
 <div id="menuOverlay" class="d-lg-none position-fixed top-0 start-0 w-100 h-100 z-40 bg-black bg-opacity-50" style="display: none; left: 0;" onclick="toggleMenu()"></div>
 <style>
-/* Menú móvil: fondo oscuro forzado (evitar que Bootstrap o temas pinten de claro) */
 #sideMenu.side-menu-mobile,
 #sideMenu.side-menu-mobile .side-menu-header,
 #sideMenu.side-menu-mobile .side-menu-body,
 #sideMenu.side-menu-mobile .side-menu-nav,
 #sideMenu.side-menu-mobile ul.nav { background: #0f172a !important; }
 #sideMenu.side-menu-mobile .nav-item { background: transparent !important; }
-/* Contraste alto: texto claro sobre fondo oscuro */
 .side-menu-mobile .nav-link { text-decoration: none !important; }
 .side-menu-mobile .side-menu-link,
 .side-menu-mobile .side-menu-link span,
@@ -172,7 +141,6 @@
 #sideMenu.show { transform: translateX(0) !important; }
 .side-menu-mobile .collapse.show { visibility: visible !important; }
 .side-menu-mobile .collapse .nav-link { opacity: 1 !important; visibility: visible !important; }
-/* Sin fondo al hacer clic, tap, hover ni focus; solo color en activo */
 .side-menu-mobile .nav-link:active,
 .side-menu-mobile .nav-link:focus,
 .side-menu-mobile .nav-link:hover { background: transparent !important; box-shadow: none !important; outline: none !important; }

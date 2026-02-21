@@ -126,8 +126,9 @@
                                 Frente
                             </h3>
                             @if($documento->imagen_frente)
-                                <a href="{{ Storage::url($documento->imagen_frente) }}" target="_blank" class="block">
-                                    <img src="{{ Storage::url($documento->imagen_frente) }}" 
+                                @php $urlFrente = route('archivos-privados.documento', [$documento, 'frente']); @endphp
+                                <a href="{{ $urlFrente }}" target="_blank" class="block">
+                                    <img src="{{ $urlFrente }}" 
                                          alt="Frente del documento" 
                                          class="w-full h-auto rounded-lg border-2 border-gray-300 hover:border-blue-500 transition cursor-pointer">
                                 </a>
@@ -151,8 +152,9 @@
                                 Reverso
                             </h3>
                             @if($documento->imagen_reverso)
-                                <a href="{{ Storage::url($documento->imagen_reverso) }}" target="_blank" class="block">
-                                    <img src="{{ Storage::url($documento->imagen_reverso) }}" 
+                                @php $urlReverso = route('archivos-privados.documento', [$documento, 'reverso']); @endphp
+                                <a href="{{ $urlReverso }}" target="_blank" class="block">
+                                    <img src="{{ $urlReverso }}" 
                                          alt="Reverso del documento" 
                                          class="w-full h-auto rounded-lg border-2 border-gray-300 hover:border-blue-500 transition cursor-pointer">
                                 </a>

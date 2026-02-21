@@ -18,7 +18,7 @@ class CalculoSueldoController extends Controller
      */
     public function index(Request $request)
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         $mes = $request->get('mes', Carbon::now()->format('Y-m'));

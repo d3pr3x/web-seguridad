@@ -187,7 +187,7 @@
                                 @foreach($reporte->imagenes as $index => $imagen)
                                     <div class="col-md-4 mb-3">
                                         <div class="card">
-                                            <img src="{{ asset('storage/' . $imagen) }}" 
+                                            <img src="{{ route('archivos-privados.reporte', [$reporte, $index]) }}" 
                                                  class="card-img-top" 
                                                  style="height: 150px; object-fit: cover;"
                                                  alt="Imagen del reporte">

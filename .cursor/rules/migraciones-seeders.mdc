@@ -1,0 +1,58 @@
+---
+description: Política obligatoria de migraciones y seeders del proyecto
+globs: database/migrations/**/*.php,database/seeders/**/*.php
+alwaysApply: false
+---
+
+# Política de migraciones y seeders
+
+## Antes de crear o modificar una migración
+
+**Pregunta obligatoria:** ¿La tabla ya existe en producción?
+
+- **No** → Modifica la migración **original** de la tabla (estructura final consolidada).
+- **Sí** → Crea **una sola** migración incremental nueva.
+
+## Reglas de migraciones
+
+### Una migración por tabla (estructura final)
+
+- No generar migraciones incrementales para agregar/modificar/eliminar columnas si la tabla **aún no está en producción**.
+- Si la tabla no ha sido desplegada, la migración original debe quedar con la **estructura final** (todas las columnas, FKs, índices).
+- Solo se permite **una migración adicional** por cambio cuando la tabla **ya está en producción**.
+
+### Evitar migraciones redundantes
+
+No generar migraciones tipo:
+
+- `add_xxx_to_table`
+- `modify_xxx_in_table`
+- `change_xxx_type`
+
+Consolidar todos los cambios en la **migración principal** de la tabla cuando la tabla no está en producción.
+
+### Estructura limpia y definitiva
+
+Cada migración debe:
+
+- Incluir **todas las columnas definitivas**.
+- Incluir **índices y foreign keys** finales.
+- Definir bien: `nullable`, `default`, `unique`, `cascadeOnDelete` / `nullOnDelete` según corresponda.
+- Incluir `timestamps()` solo si realmente se necesitan.
+
+### Orden lógico
+
+1. Primero tablas base (sin FKs a tablas propias del dominio).
+2. Luego tablas con relaciones.
+3. Luego tablas pivot.
+
+### Prohibido
+
+- Migraciones experimentales o para pruebas temporales.
+- Migraciones que luego serán reemplazadas.
+
+## Seeders
+
+- **Un seeder por entidad lógica**; evitar múltiples seeders fragmentados.
+- Evitar seeders duplicados.
+- Consolidar datos estáticos en **un solo seeder por módulo**.

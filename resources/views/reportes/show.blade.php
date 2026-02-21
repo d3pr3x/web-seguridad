@@ -82,16 +82,16 @@
                     <hr>
                     <h6>Imágenes adjuntas:</h6>
                     <div class="row">
-                        @foreach($reporte->imagenes as $imagen)
+@foreach($reporte->imagenes as $idx => $imagen)
                             <div class="col-md-4 mb-3">
                                 <div class="card">
-                                    <img src="{{ asset('storage/' . $imagen) }}" 
-                                         class="card-img-top" 
+                                    <img src="{{ route('archivos-privados.reporte', [$reporte, $idx]) }}"
+                                         class="card-img-top"
                                          style="height: 200px; object-fit: cover;"
                                          alt="Imagen del reporte">
                                     <div class="card-body p-2">
                                         <small class="text-muted">
-                                            <a href="{{ asset('storage/' . $imagen) }}" 
+                                            <a href="{{ route('archivos-privados.reporte', [$reporte, $idx]) }}"
                                                target="_blank" 
                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-external-link-alt me-1"></i>Ver completa

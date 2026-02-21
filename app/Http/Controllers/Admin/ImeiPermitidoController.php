@@ -98,7 +98,9 @@ class ImeiPermitidoController extends Controller
      */
     public function toggle(ImeiPermitido $imei)
     {
+        $antes = ['activo' => $imei->activo];
         $imei->update(['activo' => !$imei->activo]);
+        \App\Services\AuditoriaService::registrar('toggle_activo', 'imeis_permitidos', $imei->id, $antes, $imei->only('activo'), []);
 
         $status = $imei->activo ? 'activado' : 'desactivado';
         

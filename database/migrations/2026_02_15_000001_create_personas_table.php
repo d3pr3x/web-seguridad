@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('personas', function (Blueprint $table) {
             $table->id();
             $table->string('rut', 12)->unique()->comment('RUT normalizado 12.345.678-9');
+            $table->string('pasaporte', 30)->nullable();
             $table->string('nombre', 100);
             $table->string('telefono', 20)->nullable();
             $table->string('email', 100)->nullable();
@@ -21,11 +22,13 @@ return new class extends Migration
             $table->text('notas')->nullable();
             $table->unsignedBigInteger('sucursal_id')->nullable()->comment('Opcional: persona asociada a sucursal');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::table('personas', function (Blueprint $table) {
             $table->foreign('sucursal_id')->references('id')->on('sucursales')->nullOnDelete();
             $table->index('rut');
+            $table->index('pasaporte');
         });
     }
 

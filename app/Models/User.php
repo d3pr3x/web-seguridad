@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
  * Modelo Usuario (tabla usuarios). PK: id_usuario, identificador: run (ej. 987403M).
+ * Perfiles y autorización se basan solo en rol_id / roles_usuario (BD). No se usa Spatie.
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'usuarios';
 
@@ -100,9 +102,17 @@ class User extends Authenticatable
         return $this->hasMany(Ingreso::class, 'id_guardia');
     }
 
+    /**
+     * Slug del rol en mayúsculas para comparaciones case-insensitive (no depender del seed/BD).
+     */
+    protected function rolSlugUpper(): string
+    {
+        return strtoupper((string) optional($this->rol)->slug);
+    }
+
     public function esGuardiaControlAcceso()
     {
-        return $this->rol && $this->rol->slug === 'GUARDIA';
+        return $this->rolSlugUpper() === 'GUARDIA';
     }
 
     public function getNombreCompletoAttribute($value)
@@ -130,12 +140,12 @@ class User extends Authenticatable
 
     public function esAdministrador()
     {
-        return $this->rol && $this->rol->slug === 'ADMIN';
+        return $this->rolSlugUpper() === 'ADMIN';
     }
 
     public function esSupervisor()
     {
-        return $this->rol && in_array($this->rol->slug, ['SUPERVISOR', 'SUPERVISOR_USUARIO', 'USUARIO_SUPERVISOR']);
+        return in_array($this->rolSlugUpper(), ['SUPERVISOR', 'SUPERVISOR_USUARIO', 'USUARIO_SUPERVISOR'], true);
     }
 
     public function getNombrePerfilAttribute()
@@ -145,17 +155,17 @@ class User extends Authenticatable
 
     public function esSupervisorUsuario()
     {
-        return $this->rol && $this->rol->slug === 'SUPERVISOR_USUARIO';
+        return $this->rolSlugUpper() === 'SUPERVISOR_USUARIO';
     }
 
     public function esUsuarioSupervisor()
     {
-        return $this->rol && $this->rol->slug === 'USUARIO_SUPERVISOR';
+        return $this->rolSlugUpper() === 'USUARIO_SUPERVISOR';
     }
 
     public function esUsuario()
     {
-        return $this->rol && $this->rol->slug === 'USUARIO';
+        return $this->rolSlugUpper() === 'USUARIO';
     }
 
     // ─── Accesos por perfil (5 niveles: Admin, Supervisor, Supervisor-Usuario, Usuario-Supervisor, Usuario/Guardia) ───
@@ -204,6 +214,22 @@ class User extends Authenticatable
     public function puedeVerGestion(): bool
     {
         return $this->esAdministrador();
+    }
+
+    /**
+     * Comprueba si el usuario tiene un permiso por slug (tabla permisos vía rol_permiso).
+     * Si el rol no tiene permisos asignados en BD, se considera solo por rol (slug del rol).
+     */
+    public function tienePermiso(string $permisoSlug): bool
+    {
+        if (!$this->rol) {
+            return false;
+        }
+        $this->rol->load('permisos');
+        if ($this->rol->permisos->isNotEmpty()) {
+            return $this->rol->permisos->contains('slug', $permisoSlug);
+        }
+        return false;
     }
 
     public function getRouteKeyName(): string

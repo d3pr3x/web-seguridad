@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PuntoRonda extends Model
 {
+    use HasActivoScope, SoftDeletes;
+
     protected $table = 'puntos_ronda';
 
     protected $fillable = [
@@ -41,11 +45,6 @@ class PuntoRonda extends Model
     public function escaneos()
     {
         return $this->hasMany(RondaEscaneo::class);
-    }
-
-    public function scopeActivos($query)
-    {
-        return $query->where('activo', true);
     }
 
     public function scopePorSucursal($query, $sucursalId)

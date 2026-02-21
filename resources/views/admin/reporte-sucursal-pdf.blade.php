@@ -269,9 +269,9 @@
                                 @endif
                             </td>
                             <td class="foto-cell">
-                                @if($reporte->imagenes && count($reporte->imagenes) > 0)
-                                    @foreach($reporte->imagenes as $imagen)
-                                        <img src="{{ public_path('storage/' . $imagen) }}" 
+                                @if($reporte->imagenes_abs && count($reporte->imagenes_abs) > 0)
+                                    @foreach($reporte->imagenes_abs as $imagenPath)
+                                        <img src="{{ $imagenPath }}" 
                                              class="foto-thumb" 
                                              alt="Imagen del reporte">
                                     @endforeach

@@ -2,10 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tarea extends Model
 {
+    use HasActivoScope, SoftDeletes;
+
+    protected function activoColumn(): string
+    {
+        return 'activa';
+    }
     public const CREATED_AT = 'creado_en';
     public const UPDATED_AT = 'actualizado_en';
 

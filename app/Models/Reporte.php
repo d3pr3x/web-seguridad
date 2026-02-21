@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Schema;
 
 class Reporte extends Model
 {
+    use SoftDeletes;
     protected static function booted(): void
     {
         static::saving(function (Reporte $reporte) {
@@ -24,6 +26,7 @@ class Reporte extends Model
         'id_usuario',
         'user_id',
         'tarea_id',
+        'sector_id',
         'datos',
         'imagenes',
         'latitud',

@@ -93,9 +93,9 @@
                     <div>
                         <p class="text-sm text-gray-500 mb-2">Imágenes</p>
                         <div class="flex flex-wrap gap-2">
-                            @foreach($accion->imagenes as $imagen)
-                                <a href="{{ asset('storage/' . $imagen) }}" target="_blank" class="block">
-                                    <img src="{{ asset('storage/' . $imagen) }}" alt="Evidencia" class="w-24 h-24 object-cover rounded border">
+                            @foreach($accion->imagenes as $idx => $imagen)
+                                <a href="{{ route('archivos-privados.accion', [$accion, $idx]) }}" target="_blank" class="block">
+                                    <img src="{{ route('archivos-privados.accion', [$accion, $idx]) }}" alt="Evidencia" class="w-24 h-24 object-cover rounded border">
                                 </a>
                             @endforeach
                         </div>

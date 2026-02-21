@@ -65,7 +65,7 @@
                     @if($reporteEspecial->imagenes && count($reporteEspecial->imagenes) > 0)
                         <div><p class="text-sm text-gray-500 mb-2">Imágenes</p><div class="flex flex-wrap gap-2">
                             @foreach($reporteEspecial->imagenes as $imagen)
-                                <a href="{{ asset('storage/' . $imagen) }}" target="_blank"><img src="{{ asset('storage/' . $imagen) }}" alt="Evidencia" class="w-24 h-24 object-cover rounded border"></a>
+                                <a href="{{ route('archivos-privados.reporte-especial', [$reporteEspecial, $loop->index]) }}" target="_blank"><img src="{{ route('archivos-privados.reporte-especial', [$reporteEspecial, $loop->index]) }}" alt="Evidencia" class="w-24 h-24 object-cover rounded border"></a>
                             @endforeach
                         </div></div>
                     @endif

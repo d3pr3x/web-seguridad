@@ -49,7 +49,8 @@ class ReporteEspecialController extends Controller
 
         $reportes = $query->orderBy('dia', 'desc')
                           ->orderBy('hora', 'desc')
-                          ->paginate(20);
+                          ->paginate(15)
+                          ->withQueryString();
 
         // Datos para filtros
         $sucursales = Sucursal::activas()->orderBy('nombre')->get();

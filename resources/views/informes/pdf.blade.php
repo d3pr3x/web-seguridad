@@ -157,6 +157,7 @@
             ? $informe->fecha_aprobacion->locale('es')->translatedFormat('d \d\e F \d\e Y')
             : $fechaTexto;
         $primeraFoto = isset($informe->fotografias[0]) ? $informe->fotografias[0] : null;
+        $primeraFotoPath = $primeraFotoPath ?? null;
     @endphp
 
     <table class="header-doc">
@@ -212,13 +213,8 @@
     <div class="seccion">
         <h3 style="margin-top: 30px;">FIJACION FOTOGRÁFICA:</h3>
         <div class="foto">
-            @if($primeraFoto)
-                @php $fotoPath = public_path('storage/' . $primeraFoto); @endphp
-                @if(file_exists($fotoPath))
-                    <img src="{{ $fotoPath }}" alt="Foto 1">
-                @else
-                    <div class="foto-placeholder">[ESPACIO PARA FOTOGRAFÍA]</div>
-                @endif
+            @if($primeraFotoPath && file_exists($primeraFotoPath))
+                <img src="{{ $primeraFotoPath }}" alt="Foto 1">
             @else
                 <div class="foto-placeholder">[ESPACIO PARA FOTOGRAFÍA]</div>
             @endif

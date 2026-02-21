@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Controller;
 use App\Models\DocumentoPersonal;
 use App\Models\User;
+use App\Services\AuditoriaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -68,6 +69,7 @@ class DocumentoPersonalController extends Controller
             'aprobado_por' => $user->id_usuario,
             'aprobado_en' => now(),
         ]);
+        AuditoriaService::registrar('documento_approve', 'documentos', $documento->id, ['estado' => 'pendiente'], ['estado' => 'aprobado'], ['tipo_documento' => $documento->tipo_documento, 'id_usuario' => $documento->id_usuario, 'rol' => 'supervisor']);
         
         return redirect()->back()->with('success', 'Documento aprobado exitosamente.');
     }
@@ -92,6 +94,7 @@ class DocumentoPersonalController extends Controller
             'aprobado_por' => $user->id_usuario,
             'aprobado_en' => now(),
         ]);
+        AuditoriaService::registrar('documento_reject', 'documentos', $documento->id, ['estado' => 'pendiente'], ['estado' => 'rechazado'], ['tipo_documento' => $documento->tipo_documento, 'id_usuario' => $documento->id_usuario, 'motivo_rechazo' => $validated['motivo_rechazo'], 'rol' => 'supervisor']);
         
         return redirect()->back()->with('success', 'Documento rechazado.');
     }

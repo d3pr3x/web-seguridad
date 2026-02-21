@@ -122,7 +122,9 @@ class UbicacionPermitidaController extends Controller
      */
     public function toggle(UbicacionPermitida $ubicacion)
     {
+        $antes = ['activa' => $ubicacion->activa];
         $ubicacion->update(['activa' => !$ubicacion->activa]);
+        \App\Services\AuditoriaService::registrar('toggle_activo', 'ubicaciones_permitidas', $ubicacion->id, $antes, $ubicacion->only('activa'), ['nombre' => $ubicacion->nombre]);
 
         $status = $ubicacion->activa ? 'activada' : 'desactivada';
         

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ReporteEspecial;
 use App\Models\Sector;
+use App\Services\SecureUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -93,12 +94,11 @@ class ReporteEspecialController extends Controller
             'imagenes.*.mimes' => 'Solo se aceptan imágenes en formato JPG, PNG o HEIC.',
         ]);
 
-        // Manejo de imágenes
+        $upload = app(SecureUploadService::class);
         $imagenes = [];
         if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $imagen) {
-                $path = $imagen->store('reportes-especiales', 'public');
-                $imagenes[] = $path;
+                $imagenes[] = $upload->storeImage($imagen, 'reportes-especiales');
             }
         }
 

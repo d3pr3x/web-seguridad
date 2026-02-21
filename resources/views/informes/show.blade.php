@@ -426,7 +426,7 @@
                                     $esFotoReporte = $fotoIndex < count($fotosReporte);
                                 @endphp
                                 
-                                <img src="{{ asset('storage/' . $fotografiasHoja[$i]) }}" 
+                                <img src="{{ route('archivos-privados.informe', [$informe, $fotoIndex]) }}" 
                                      class="photo-image" 
                                      alt="Fotografía {{ $fotoNumber }}">
                                 <div class="photo-caption">

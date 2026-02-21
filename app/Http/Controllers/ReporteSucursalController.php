@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Reporte;
 use App\Models\Sucursal;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ReporteSucursalController extends Controller
 {
@@ -88,6 +89,21 @@ class ReporteSucursalController extends Controller
         if ($sucursalId) {
             $sucursal = Sucursal::find($sucursalId);
         }
+
+        $reportesPorSucursal = $reportesPorSucursal->map(function ($reportes) {
+            return $reportes->map(function ($reporte) {
+                $reporte->imagenes_abs = collect($reporte->imagenes ?? [])->map(function ($path) {
+                    if (Storage::disk('private')->exists($path)) {
+                        return Storage::disk('private')->path($path);
+                    }
+                    if (Storage::disk('public')->exists($path)) {
+                        return Storage::disk('public')->path($path);
+                    }
+                    return null;
+                })->filter()->values()->all();
+                return $reporte;
+            });
+        });
         
         return view('admin.reporte-sucursal-pdf', compact(
             'reportesPorSucursal',

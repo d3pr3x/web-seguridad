@@ -1,0 +1,102 @@
+@extends('layouts.usuario')
+
+@section('content')
+<div class="min-h-screen bg-gray-100 flex">
+    <x-usuario.sidebar />
+    <div class="flex-1 lg:mr-64">
+        <x-usuario.header />
+        <x-usuario.mobile-menu />
+        <div class="container mx-auto px-4 py-6 max-w-4xl">
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+                <a href="{{ route('admin.clientes.index') }}" class="hover:text-indigo-600">Clientes</a>
+                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <span>Editar {{ $cliente->nombre }}</span>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Editar empresa</h1>
+            @if($cliente->trashed())
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg mb-6">
+                    <p class="text-amber-800 font-medium">Registro histórico (borrado). Solo lectura. No se puede restaurar desde esta interfaz.</p>
+                </div>
+            @endif
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <form action="{{ route('admin.clientes.update', $cliente) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <fieldset @if($cliente->trashed()) disabled @endif>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="md:col-span-2">
+                            <label for="modalidad_id" class="block text-sm font-medium text-gray-700 mb-1">Modalidad de jerarquía *</label>
+                            <select id="modalidad_id" name="modalidad_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 @error('modalidad_id') border-red-500 @enderror" @if($cliente->trashed()) disabled @endif>
+                                <option value="">Seleccione modalidad</option>
+                                @foreach($modalidades ?? [] as $m)
+                                    <option value="{{ $m->id }}" {{ old('modalidad_id', $cliente->modalidad_id) == $m->id ? 'selected' : '' }}>{{ $m->nombre }}</option>
+                                @endforeach
+                            </select>
+                            @error('modalidad_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                            @if($cliente->trashed())<input type="hidden" name="modalidad_id" value="{{ $cliente->modalidad_id }}">@endif
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                            <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $cliente->nombre) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 @error('nombre') border-red-500 @enderror" required>
+                            @error('nombre')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label for="codigo" class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                            <input type="text" id="codigo" name="codigo" value="{{ old('codigo', $cliente->codigo) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 @error('codigo') border-red-500 @enderror">
+                            @error('codigo')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label for="rut" class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
+                            <input type="text" id="rut" name="rut" value="{{ old('rut', $cliente->rut) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="razon_social" class="block text-sm font-medium text-gray-700 mb-1">Razón social</label>
+                            <input type="text" id="razon_social" name="razon_social" value="{{ old('razon_social', $cliente->razon_social) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="direccion" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                            <input type="text" id="direccion" name="direccion" value="{{ old('direccion', $cliente->direccion) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="comuna" class="block text-sm font-medium text-gray-700 mb-1">Comuna</label>
+                            <input type="text" id="comuna" name="comuna" value="{{ old('comuna', $cliente->comuna) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                            <input type="text" id="ciudad" name="ciudad" value="{{ old('ciudad', $cliente->ciudad) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="region" class="block text-sm font-medium text-gray-700 mb-1">Región</label>
+                            <input type="text" id="region" name="region" value="{{ old('region', $cliente->region) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                            <input type="text" id="telefono" name="telefono" value="{{ old('telefono', $cliente->telefono) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" name="email" value="{{ old('email', $cliente->email) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 @error('email') border-red-500 @enderror">
+                            @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="activa" value="1" {{ old('activa', $cliente->activa) ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Empresa activa</span>
+                            </label>
+                        </div>
+                        </div>
+                    </fieldset>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                        <a href="{{ route('admin.clientes.index') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">Volver</a>
+                        @if(!$cliente->trashed())
+                            <a href="{{ route('admin.clientes.instalaciones', $cliente) }}" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200">Ver instalaciones</a>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">Guardar cambios</button>
+                        @endif
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

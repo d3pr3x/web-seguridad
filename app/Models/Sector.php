@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sector extends Model
 {
+    use HasActivoScope, SoftDeletes;
+
     protected $table = 'sectores';
     
     protected $fillable = [
         'sucursal_id',
+        'empresa_id',
         'nombre',
         'descripcion',
         'activo',
@@ -52,14 +57,6 @@ class Sector extends Model
     public function puntosRonda()
     {
         return $this->hasMany(PuntoRonda::class);
-    }
-
-    /**
-     * Scope para sectores activos
-     */
-    public function scopeActivos($query)
-    {
-        return $query->where('activo', true);
     }
 
     /**

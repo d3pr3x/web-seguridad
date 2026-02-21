@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePasswordRequest;
+use App\Services\AuditoriaService;
+use App\Services\SessionRevocationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
@@ -27,15 +30,9 @@ class ProfileController extends Controller
             'nombre_completo' => 'required|string|max:255',
             'fecha_nacimiento' => 'required|date|before:today',
             'domicilio' => 'required|string|max:500',
-            'sucursal_id' => 'nullable|exists:sucursales,id',
         ]);
 
-        $user->update([
-            'nombre_completo' => $request->nombre_completo,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'domicilio' => $request->domicilio,
-            'sucursal_id' => $request->sucursal_id,
-        ]);
+        $user->update($request->only(['nombre_completo', 'fecha_nacimiento', 'domicilio']));
 
         return redirect()->route('profile.index')
             ->with('success', 'Perfil actualizado exitosamente.');
@@ -50,23 +47,19 @@ class ProfileController extends Controller
     }
 
     /**
-     * Actualizar la contraseña del usuario
+     * Actualizar la contraseña del usuario (política: min 12, confirmación, no comprometida).
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request)
     {
         $user = auth()->user();
-        
-        $request->validate([
-            'current_password' => 'required|current_password',
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
-
         $user->update([
-            'clave' => Hash::make($request->password),
+            'clave' => Hash::make($request->validated('password')),
         ]);
-
+        Auth::logoutOtherDevices($request->validated('current_password'));
+        SessionRevocationService::revokeOtherSessionsForUser($user->id_usuario, 'password_changed');
+        AuditoriaService::registrar('password_changed', 'usuarios', (string) $user->id_usuario, null, null, ['contexto' => 'perfil']);
         return redirect()->route('profile.index')
-            ->with('success', 'Contraseña actualizada exitosamente.');
+            ->with('success', 'Contraseña actualizada exitosamente. El resto de sesiones han sido cerradas.');
     }
 }
 

@@ -101,7 +101,9 @@ class DispositivoPermitidoController extends Controller
      */
     public function toggle(DispositivoPermitido $dispositivo)
     {
+        $antes = ['activo' => $dispositivo->activo];
         $dispositivo->update(['activo' => !$dispositivo->activo]);
+        \App\Services\AuditoriaService::registrar('toggle_activo', 'dispositivos_permitidos', $dispositivo->id, $antes, $dispositivo->only('activo'), ['descripcion' => $dispositivo->descripcion]);
 
         $status = $dispositivo->activo ? 'activado' : 'desactivado';
         

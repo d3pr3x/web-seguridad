@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Accion;
 use App\Models\Sector;
+use App\Services\SecureUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -73,7 +74,7 @@ class UsuarioAccionController extends Controller
             'accion' => 'nullable|string',
             'resultado' => 'nullable|string',
             'imagenes' => 'nullable|array|max:4',
-            'imagenes.*' => 'image|mimes:jpeg,jpg,png,heic,heif|max:15360',
+            'imagenes.*' => 'image|mimes:jpeg,jpg,png,webp,heic,heif|max:' . (config('uploads.max_image_kb', 5120)),
             'latitud' => 'nullable|numeric',
             'longitud' => 'nullable|numeric',
             'precision' => 'nullable|numeric',
@@ -87,8 +88,7 @@ class UsuarioAccionController extends Controller
         $imagenes = [];
         if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $imagen) {
-                $path = $imagen->store('acciones', 'public');
-                $imagenes[] = $path;
+                $imagenes[] = app(SecureUploadService::class)->storeImage($imagen, 'acciones');
             }
         }
 

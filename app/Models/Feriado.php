@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
 class Feriado extends Model
 {
+    use HasActivoScope, SoftDeletes;
     protected $fillable = [
         'nombre',
         'fecha',
@@ -21,14 +24,6 @@ class Feriado extends Model
             'irrenunciable' => 'boolean',
             'activo' => 'boolean',
         ];
-    }
-
-    /**
-     * Scope para feriados activos
-     */
-    public function scopeActivos($query)
-    {
-        return $query->where('activo', true);
     }
 
     /**

@@ -1,0 +1,26 @@
+---
+description: Prohibido borrar tablas, base de datos o ejecutar reset/wipe sin autorización explícita
+alwaysApply: true
+---
+
+# Prohibido borrar base de datos o tablas
+
+**Regla obligatoria:** No ejecutar nunca comandos ni acciones que borren datos o estructura de la base de datos a menos que el usuario lo pida explícitamente.
+
+## Prohibido sin autorización explícita
+
+- **No** ejecutar `php artisan migrate:fresh`
+- **No** ejecutar `php artisan migrate:fresh --seed`
+- **No** ejecutar `php artisan db:wipe`
+- **No** borrar tablas (DROP TABLE)
+- **No** truncar tablas (TRUNCATE) salvo que lo pida el usuario
+- **No** sugerir ni ofrecer "resetear la base de datos" o "volver a cargar" como solución por iniciativa propia
+
+## Permitido
+
+- Ejecutar migraciones **incrementales**: `php artisan migrate` (solo nuevas migraciones)
+- Ejecutar seeders por separado: `php artisan db:seed` (si el usuario lo pide)
+- Crear o modificar migraciones/seeders como archivos de código
+- Cualquier operación destructiva **solo** cuando el usuario diga explícitamente que quiere borrar, resetear o volver a cargar la base de datos/tablas
+
+Si el usuario pide "resetear", "borrar la base de datos", "migrate:fresh" o similar, entonces sí se puede ejecutar.

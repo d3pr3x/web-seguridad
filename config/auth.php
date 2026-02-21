@@ -112,4 +112,13 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Login anti-enumeration (timing)
+    |--------------------------------------------------------------------------
+    | Hash bcrypt fijo para ejecutar Hash::check() cuando el RUN no existe,
+    | evitando timing attacks. Debe ser un hash bcrypt válido (ej. Hash::make('dummy')).
+    */
+    'login_dummy_bcrypt_hash' => env('LOGIN_DUMMY_BCRYPT_HASH', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
+
 ];

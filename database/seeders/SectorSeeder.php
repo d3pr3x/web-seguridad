@@ -6,54 +6,39 @@ use App\Models\Sector;
 use App\Models\Sucursal;
 use Illuminate\Database\Seeder;
 
+/**
+ * Sectores demo: 3–5 por instalación. Idempotente por (sucursal_id, nombre).
+ */
 class SectorSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $sucursales = Sucursal::all();
+        $plantilla = [
+            ['nombre' => 'Acceso principal', 'descripcion' => 'Área de acceso principal y recepción', 'activo' => true],
+            ['nombre' => 'Bodega', 'descripcion' => 'Bodega y almacén', 'activo' => true],
+            ['nombre' => 'Oficinas', 'descripcion' => 'Oficinas administrativas', 'activo' => true],
+            ['nombre' => 'Perímetro exterior', 'descripcion' => 'Perímetro exterior del edificio', 'activo' => true],
+            ['nombre' => 'Estacionamiento', 'descripcion' => 'Área de estacionamiento vehicular', 'activo' => true],
+        ];
 
-        foreach ($sucursales as $sucursal) {
-            // Crear sectores genéricos para cada sucursal
-            Sector::create([
-                'sucursal_id' => $sucursal->id,
-                'nombre' => 'Sector A - Acceso Principal',
-                'descripcion' => 'Área de acceso principal y recepción',
-                'activo' => true,
-            ]);
-
-            Sector::create([
-                'sucursal_id' => $sucursal->id,
-                'nombre' => 'Sector B - Estacionamiento',
-                'descripcion' => 'Área de estacionamiento vehicular',
-                'activo' => true,
-            ]);
-
-            Sector::create([
-                'sucursal_id' => $sucursal->id,
-                'nombre' => 'Sector C - Perímetro Exterior',
-                'descripcion' => 'Perímetro exterior del edificio',
-                'activo' => true,
-            ]);
-
-            Sector::create([
-                'sucursal_id' => $sucursal->id,
-                'nombre' => 'Sector D - Piso 1',
-                'descripcion' => 'Primer piso del edificio',
-                'activo' => true,
-            ]);
-
-            Sector::create([
-                'sucursal_id' => $sucursal->id,
-                'nombre' => 'Sector E - Piso 2',
-                'descripcion' => 'Segundo piso del edificio',
-                'activo' => false, // Un sector inactivo como ejemplo
-            ]);
+        foreach (Sucursal::all() as $sucursal) {
+            foreach ($plantilla as $p) {
+                Sector::updateOrCreate(
+                    [
+                        'sucursal_id' => $sucursal->id,
+                        'nombre' => $p['nombre'],
+                    ],
+                    [
+                        'empresa_id' => $sucursal->empresa_id,
+                        'descripcion' => $p['descripcion'],
+                        'activo' => $p['activo'],
+                    ]
+                );
+            }
         }
     }
 }
+
 
 
 

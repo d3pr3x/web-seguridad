@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Reporte;
 use App\Models\Tarea;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Services\SecureUploadService;
+use Illuminate\Http\Request;
 
 class ReporteController extends Controller
 {
@@ -20,7 +19,7 @@ class ReporteController extends Controller
                 'tarea_id' => 'required|exists:tareas,id',
                 'datos' => 'required|array',
                 'imagenes' => 'nullable|array|max:5',
-                'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:15360',
+                'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:' . (config('uploads.max_image_kb', 5120)),
                 'latitud' => 'nullable|numeric|between:-90,90',
                 'longitud' => 'nullable|numeric|between:-180,180',
                 'precision' => 'nullable|numeric|min:0',
@@ -28,20 +27,18 @@ class ReporteController extends Controller
                 'imagenes.max' => 'Solo puedes subir un máximo de 5 imágenes.',
                 'imagenes.*.image' => 'Todos los archivos deben ser imágenes.',
                 'imagenes.*.mimes' => 'Las imágenes deben ser de tipo: jpeg, png, jpg, gif o webp.',
-                'imagenes.*.max' => 'Cada imagen no debe superar los 15MB.',
+                'imagenes.*.max' => 'Cada imagen no debe superar ' . (config('uploads.max_image_kb', 5120) / 1024) . ' MB.',
             ]);
 
             $tarea = Tarea::findOrFail($request->tarea_id);
             $usuario = auth()->user();
             
-            // Procesar imágenes si existen
+            $upload = app(SecureUploadService::class);
             $imagenes = [];
             if ($request->hasFile('imagenes')) {
-                foreach ($request->file('imagenes') as $index => $imagen) {
+                foreach ($request->file('imagenes') as $imagen) {
                     if ($imagen->isValid()) {
-                        $nombreArchivo = Str::uuid() . '.' . $imagen->getClientOriginalExtension();
-                        $ruta = $imagen->storeAs('reportes', $nombreArchivo, 'public');
-                        $imagenes[] = $ruta;
+                        $imagenes[] = $upload->storeImage($imagen, 'reportes');
                     }
                 }
             }

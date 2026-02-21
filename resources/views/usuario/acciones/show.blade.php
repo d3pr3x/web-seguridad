@@ -123,10 +123,10 @@
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Imágenes</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach($accion->imagenes as $imagen)
+                                @foreach($accion->imagenes as $idx => $imagen)
                                     <div class="relative group">
-                                        <a href="{{ asset('storage/' . $imagen) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $imagen) }}" 
+                                        <a href="{{ route('archivos-privados.accion', [$accion, $idx]) }}" target="_blank">
+                                            <img src="{{ route('archivos-privados.accion', [$accion, $idx]) }}" 
                                                  alt="Imagen de la acción" 
                                                  class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition">
                                         </a>

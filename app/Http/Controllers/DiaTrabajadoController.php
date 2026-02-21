@@ -13,7 +13,7 @@ class DiaTrabajadoController extends Controller
      */
     public function index()
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         $usuario = auth()->user();
@@ -34,7 +34,7 @@ class DiaTrabajadoController extends Controller
      */
     public function create()
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         return view('dias-trabajados.create');
@@ -45,7 +45,7 @@ class DiaTrabajadoController extends Controller
      */
     public function store(Request $request)
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         $request->validate([
@@ -80,7 +80,7 @@ class DiaTrabajadoController extends Controller
      */
     public function edit($id)
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         $diaTrabajado = DiaTrabajado::where('id', $id)
@@ -95,7 +95,7 @@ class DiaTrabajadoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         $request->validate([
@@ -132,7 +132,7 @@ class DiaTrabajadoController extends Controller
      */
     public function destroy($id)
     {
-        if (!config('app.show_calculo_sueldos')) {
+        if (!module_enabled('calculo_sueldos')) {
             abort(403, 'Función no habilitada.');
         }
         $diaTrabajado = DiaTrabajado::where('id', $id)

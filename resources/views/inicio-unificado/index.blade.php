@@ -113,7 +113,7 @@
                             <p class="text-sm mt-1 {{ $user->esAdministrador() ? 'text-teal-100' : 'text-purple-100' }}">Aprobaciones y revisión</p>
                         </div>
                         <div class="p-4 space-y-3">
-                            @if(config('app.show_documentos_guardias'))
+                            @if(module_enabled('documentos_guardias'))
                             <a href="{{ $user->esAdministrador() ? route('admin.documentos.index') : route('supervisor.documentos.index') }}" class="block">
                                 <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
                                     <div class="flex items-center justify-between">
@@ -342,7 +342,7 @@
                                     </div>
                                 </div>
                             </a>
-                            @if(config('app.show_documentos_guardias'))
+                            @if(module_enabled('documentos_guardias'))
                             <a href="{{ route('usuario.documentos.index') }}" class="block">
                                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
                                     <div class="flex items-center justify-between">

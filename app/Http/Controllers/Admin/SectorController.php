@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\AuditoriaService;
+use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
@@ -10,15 +12,28 @@ use Illuminate\Http\Request;
 class SectorController extends Controller
 {
     /**
-     * Mostrar listado de sucursales para gestionar sectores
+     * Vista Sectores: listado de empresas para elegir y luego ver instalaciones
      */
     public function index()
     {
-        $sucursales = Sucursal::withCount('sectores')
+        $empresas = Empresa::withCount('sucursales')
             ->orderBy('nombre')
             ->paginate(15);
-            
-        return view('admin.sectores.index', compact('sucursales'));
+
+        return view('admin.sectores.index', compact('empresas'));
+    }
+
+    /**
+     * Instalaciones de una empresa: seleccionar instalación para administrar sectores
+     */
+    public function porEmpresa(Empresa $empresa)
+    {
+        $instalaciones = $empresa->sucursales()
+            ->withCount('sectores')
+            ->orderBy('nombre')
+            ->paginate(15);
+
+        return view('admin.sectores.por-empresa', compact('empresa', 'instalaciones'));
     }
 
     /**
@@ -42,7 +57,7 @@ class SectorController extends Controller
         
         if (!$sucursalId) {
             return redirect()->route('admin.sectores.index')
-                ->with('error', 'Debe seleccionar una sucursal primero.');
+                ->with('error', 'Debe seleccionar una instalación primero.');
         }
         
         $sucursal = Sucursal::findOrFail($sucursalId);
@@ -93,7 +108,7 @@ class SectorController extends Controller
 
         $sector->update($validated);
 
-        return redirect()->route('admin.sectores.show', $sector->sucursal_id)
+        return redirect()->route('admin.sectores.show', $sector->sucursal)
             ->with('success', 'Sector actualizado exitosamente.');
     }
 
@@ -102,10 +117,10 @@ class SectorController extends Controller
      */
     public function destroy(Sector $sector)
     {
-        $sucursalId = $sector->sucursal_id;
+        $sucursal = $sector->sucursal;
         $sector->delete();
 
-        return redirect()->route('admin.sectores.show', $sucursalId)
+        return redirect()->route('admin.sectores.show', $sucursal)
             ->with('success', 'Sector eliminado exitosamente.');
     }
 
@@ -114,11 +129,13 @@ class SectorController extends Controller
      */
     public function toggle(Sector $sector)
     {
+        $antes = ['activo' => $sector->activo];
         $sector->update(['activo' => !$sector->activo]);
+        AuditoriaService::registrar('toggle_activo', 'sectores', $sector->id, $antes, $sector->only('activo'), ['nombre' => $sector->nombre]);
 
         $status = $sector->activo ? 'activado' : 'desactivado';
         
-        return redirect()->route('admin.sectores.show', $sector->sucursal_id)
+        return redirect()->route('admin.sectores.show', $sector->sucursal)
             ->with('success', "Sector {$status} exitosamente.");
     }
 }

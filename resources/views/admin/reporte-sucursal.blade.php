@@ -190,10 +190,11 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($reporte->imagenes && count($reporte->imagenes) > 0)
                                                     <div class="flex flex-wrap gap-1">
-                                                        @foreach($reporte->imagenes as $imagen)
-                                                            <img src="{{ asset('storage/' . $imagen) }}" 
+@foreach($reporte->imagenes as $idx => $imagen)
+                                                            @php $imgUrl = route('archivos-privados.reporte', [$reporte, $idx]); @endphp
+                                                            <img src="{{ $imgUrl }}"
                                                                  class="w-12 h-12 object-cover rounded cursor-pointer hover:opacity-75 transition"
-                                                                 onclick="mostrarImagen('{{ asset('storage/' . $imagen) }}')"
+                                                                 onclick="mostrarImagen('{{ $imgUrl }}')"
                                                                  alt="Imagen del reporte">
                                                         @endforeach
                                                     </div>

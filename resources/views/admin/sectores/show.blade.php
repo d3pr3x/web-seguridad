@@ -17,16 +17,13 @@
         <div class="container mx-auto px-4 py-6 max-w-7xl">
             <!-- Título con información de la sucursal -->
             <div class="mb-6">
-                <div class="flex items-center text-sm text-gray-600 mb-2">
-                    <a href="{{ route('admin.sectores.index') }}" class="hover:text-cyan-600 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Sucursales
-                    </a>
-                    <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
+                <div class="flex items-center text-sm text-gray-600 mb-2 flex-wrap gap-x-1">
+                    <a href="{{ route('admin.sectores.index') }}" class="hover:text-cyan-600 flex items-center">Empresas</a>
+                    @if($sucursal->empresa)
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        <a href="{{ route('admin.sectores.por-empresa', $sucursal->empresa) }}" class="hover:text-cyan-600">{{ $sucursal->empresa->nombre }}</a>
+                    @endif
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     <span>{{ $sucursal->nombre }}</span>
                 </div>
                 
@@ -39,7 +36,9 @@
                             Sectores de {{ $sucursal->nombre }}
                         </h1>
                         @if($sucursal->empresa)
-                            <p class="text-gray-600 mt-1">{{ $sucursal->empresa }} @if($sucursal->codigo) - Código: {{ $sucursal->codigo }} @endif</p>
+                            <p class="text-gray-600 mt-1">{{ $sucursal->empresa->nombre }} @if($sucursal->codigo) - Código: {{ $sucursal->codigo }} @endif</p>
+                        @elseif($sucursal->codigo)
+                            <p class="text-gray-600 mt-1">Código: {{ $sucursal->codigo }}</p>
                         @endif
                     </div>
                     <div class="flex gap-2">

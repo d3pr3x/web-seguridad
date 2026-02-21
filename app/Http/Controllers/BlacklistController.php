@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Blacklist;
 use App\Rules\ChileRut;
+use App\Services\AuditoriaService;
 use Illuminate\Http\Request;
 
 class BlacklistController extends Controller
@@ -61,12 +62,14 @@ class BlacklistController extends Controller
     public function toggle(int $id)
     {
         $item = Blacklist::withTrashed()->findOrFail($id);
+        $antes = ['activo' => $item->activo, 'trashed' => $item->trashed()];
         if ($item->trashed()) {
             $item->restore();
             $item->update(['activo' => true]);
         } else {
             $item->update(['activo' => !$item->activo]);
         }
+        AuditoriaService::registrar('toggle_activo', 'blacklists', $item->id, $antes, ['activo' => $item->activo], ['rut' => $item->rut, 'patente' => $item->patente]);
 
         return redirect()->route('blacklist.index')->with('success', 'Estado actualizado.');
     }

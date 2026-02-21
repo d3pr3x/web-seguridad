@@ -95,13 +95,11 @@ class InformeController extends Controller
                 $fotografias = array_merge($fotografias, $reporte->imagenes);
             }
             
-            // Luego agregar las nuevas fotografías del informe
             if ($request->hasFile('fotografias')) {
-                foreach ($request->file('fotografias') as $index => $fotografia) {
+                $upload = app(\App\Services\SecureUploadService::class);
+                foreach ($request->file('fotografias') as $fotografia) {
                     if ($fotografia->isValid()) {
-                        $nombreArchivo = Str::uuid() . '.' . $fotografia->getClientOriginalExtension();
-                        $ruta = $fotografia->storeAs('informes/fotografias', $nombreArchivo, 'public');
-                        $fotografias[] = $ruta;
+                        $fotografias[] = $upload->storeImage($fotografia, 'informes');
                     }
                 }
             }
@@ -159,8 +157,10 @@ class InformeController extends Controller
             })
             ->firstOrFail();
 
-        $pdf = Pdf::loadView('informes.pdf', compact('informe'));
+        $primeraFotoPath = $this->resolveFotoPath($informe->fotografias[0] ?? null);
+        $pdf = Pdf::loadView('informes.pdf', compact('informe', 'primeraFotoPath'));
         $pdf->setPaper('letter', 'portrait');
+        \App\Services\AuditoriaService::registrar('download_file', 'informes', $informe->id, null, null, ['numero_informe' => $informe->numero_informe, 'tipo' => 'pdf_download']);
 
         return $pdf->download('informe_incidente_' . $informe->numero_informe . '.pdf');
     }
@@ -178,8 +178,10 @@ class InformeController extends Controller
             })
             ->firstOrFail();
 
-        $pdf = Pdf::loadView('informes.pdf', compact('informe'));
+        $primeraFotoPath = $this->resolveFotoPath($informe->fotografias[0] ?? null);
+        $pdf = Pdf::loadView('informes.pdf', compact('informe', 'primeraFotoPath'));
         $pdf->setPaper('letter', 'portrait');
+        \App\Services\AuditoriaService::registrar('download_file', 'informes', $informe->id, null, null, ['numero_informe' => $informe->numero_informe, 'tipo' => 'pdf_stream']);
 
         return $pdf->stream('informe_incidente_' . $informe->numero_informe . '.pdf', ['Attachment' => false]);
     }
@@ -193,9 +195,28 @@ class InformeController extends Controller
         if (!$informe) {
             $informe = $this->informeDemo();
         }
-        $pdf = Pdf::loadView('informes.pdf', compact('informe'));
+        $primeraFotoPath = $informe->fotografias && isset($informe->fotografias[0])
+            ? $this->resolveFotoPath($informe->fotografias[0]) : null;
+        $pdf = Pdf::loadView('informes.pdf', compact('informe', 'primeraFotoPath'));
         $pdf->setPaper('letter', 'portrait');
         return $pdf->stream('informe_incidente_' . $informe->numero_informe . '.pdf', ['Attachment' => false]);
+    }
+
+    /**
+     * Resuelve path de foto: primero private, luego public (legacy). Retorna ruta absoluta o null.
+     */
+    private function resolveFotoPath(?string $relativePath): ?string
+    {
+        if (!$relativePath) {
+            return null;
+        }
+        if (Storage::disk('private')->exists($relativePath)) {
+            return Storage::disk('private')->path($relativePath);
+        }
+        if (Storage::disk('public')->exists($relativePath)) {
+            return Storage::disk('public')->path($relativePath);
+        }
+        return null;
     }
 
     /**

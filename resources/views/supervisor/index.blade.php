@@ -32,66 +32,46 @@
             @endphp
 
             @if($esUsuarioSupervisor)
-            {{-- Usuario-Supervisor: más funciones de usuario → Reportes (1), Supervisión (2), Reportes y estadísticas (3) --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- 1. Reportes -->
+            {{-- Usuario-Supervisor: Incidentes (1), Supervisión (2), Reportes y estadísticas (3) — alineado al menú --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <!-- 1. Incidentes (Novedades + Reportes) -->
+                @if(auth()->user()->puedeVerMisReportes())
                 <div>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="bg-gradient-to-r from-red-600 to-red-700 p-4">
-                            <h2 class="text-xl font-bold text-white flex items-center">
+                            <h2 class="text-lg font-bold text-white flex items-center">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>
-                                Reportes
+                                Incidentes
                             </h2>
-                            <p class="text-red-50 text-sm mt-1">Situaciones críticas que requieren atención</p>
+                            <p class="text-red-50 text-sm mt-1">Novedades y reportes</p>
                         </div>
                         <div class="p-4 space-y-3">
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'incidentes']) }}" class="block">
+                            <a href="{{ route('usuario.acciones.index') }}" class="block">
                                 <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg hover:bg-red-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <h3 class="font-bold text-red-800">Incidentes</h3>
-                                            <p class="text-sm text-red-600">Eventos críticos</p>
+                                            <h3 class="font-bold text-red-800">Novedades</h3>
+                                            <p class="text-sm text-red-600">Registro de novedades</p>
                                         </div>
                                         <i class="fas fa-chevron-right text-red-500"></i>
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'denuncia']) }}" class="block">
-                                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
+                            <a href="{{ route('usuario.reportes.index') }}" class="block">
+                                <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg hover:bg-rose-100 transition">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <h3 class="font-bold text-purple-800">Denuncia</h3>
-                                            <p class="text-sm text-purple-600">Reportar delito</p>
+                                            <h3 class="font-bold text-rose-800">Reportes</h3>
+                                            <p class="text-sm text-rose-600">Crear y ver reportes</p>
                                         </div>
-                                        <i class="fas fa-chevron-right text-purple-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'detenido']) }}" class="block">
-                                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg hover:bg-orange-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-orange-800">Detenido</h3>
-                                            <p class="text-sm text-orange-600">Persona detenida</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-orange-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'accion_sospechosa']) }}" class="block">
-                                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg hover:bg-yellow-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-yellow-800">Acción Sospechosa</h3>
-                                            <p class="text-sm text-yellow-600">Comportamiento extraño</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-yellow-500"></i>
+                                        <i class="fas fa-chevron-right text-rose-500"></i>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <!-- 2. Supervisión -->
                 <div>
@@ -104,7 +84,7 @@
                             <p class="text-purple-100 text-sm mt-1">Aprobaciones y revisión</p>
                         </div>
                         <div class="p-4 space-y-3">
-                            @if(config('app.show_documentos_guardias'))
+                            @if(module_enabled('documentos_guardias'))
                             <a href="{{ route('supervisor.documentos.index') }}" class="block">
                                 <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
                                     <div class="flex items-center justify-between">
@@ -144,7 +124,8 @@
                 </div>
             </div>
 
-            <!-- 3. Reportes y estadísticas -->
+            <!-- 3. Reportes y estadísticas (Usuario-Supervisor) -->
+            @if(auth()->user()->puedeVerReporteSucursal() || auth()->user()->puedeVerReportesEstadisticasCompletos())
             <div class="mt-6">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden max-w-2xl">
                     <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
@@ -180,6 +161,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             @else
             {{-- Supervisor puro o Supervisor-Usuario: Supervisión (1), Reportes y estadísticas (2), Reportes (3 solo supervisor-usuario) --}}
@@ -195,7 +177,7 @@
                             <p class="text-purple-100 text-sm mt-1">Aprobaciones y revisión</p>
                         </div>
                         <div class="p-4 space-y-3">
-                            @if(config('app.show_documentos_guardias'))
+                            @if(module_enabled('documentos_guardias'))
                             <a href="{{ route('supervisor.documentos.index') }}" class="block">
                                 <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
                                     <div class="flex items-center justify-between">
@@ -272,59 +254,37 @@
                 </div>
             </div>
 
-            @if($esSupervisorUsuario)
-            <!-- 3. Supervisor-Usuario: sección Reportes (crear incidentes, etc.) -->
+            @if($esSupervisorUsuario && auth()->user()->puedeVerMisReportes())
+            <!-- 3. Supervisor-Usuario: sección Incidentes (Novedades + Reportes) — alineado al menú -->
             <div class="mt-6">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="bg-gradient-to-r from-red-600 to-red-700 p-4">
                         <h2 class="text-xl font-bold text-white flex items-center">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
-                            Reportes
+                            Incidentes
                         </h2>
-                        <p class="text-red-50 text-sm mt-1">Situaciones críticas que requieren atención</p>
+                        <p class="text-red-50 text-sm mt-1">Novedades y reportes</p>
                     </div>
-                    <div class="p-4 space-y-3">
-                        <a href="{{ route('usuario.reportes.create', ['tipo' => 'incidentes']) }}" class="block">
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <a href="{{ route('usuario.acciones.index') }}" class="block">
                             <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg hover:bg-red-100 transition">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <h3 class="font-bold text-red-800">Incidentes</h3>
-                                        <p class="text-sm text-red-600">Eventos críticos</p>
+                                        <h3 class="font-bold text-red-800">Novedades</h3>
+                                        <p class="text-sm text-red-600">Registro de novedades</p>
                                     </div>
                                     <i class="fas fa-chevron-right text-red-500"></i>
                                 </div>
                             </div>
                         </a>
-                        <a href="{{ route('usuario.reportes.create', ['tipo' => 'denuncia']) }}" class="block">
-                            <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
+                        <a href="{{ route('usuario.reportes.index') }}" class="block">
+                            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg hover:bg-rose-100 transition">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <h3 class="font-bold text-purple-800">Denuncia</h3>
-                                        <p class="text-sm text-purple-600">Reportar delito</p>
+                                        <h3 class="font-bold text-rose-800">Reportes</h3>
+                                        <p class="text-sm text-rose-600">Crear y ver reportes</p>
                                     </div>
-                                    <i class="fas fa-chevron-right text-purple-500"></i>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('usuario.reportes.create', ['tipo' => 'detenido']) }}" class="block">
-                            <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg hover:bg-orange-100 transition">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h3 class="font-bold text-orange-800">Detenido</h3>
-                                        <p class="text-sm text-orange-600">Persona detenida</p>
-                                    </div>
-                                    <i class="fas fa-chevron-right text-orange-500"></i>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('usuario.reportes.create', ['tipo' => 'accion_sospechosa']) }}" class="block">
-                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg hover:bg-yellow-100 transition">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h3 class="font-bold text-yellow-800">Acción Sospechosa</h3>
-                                        <p class="text-sm text-yellow-600">Comportamiento extraño</p>
-                                    </div>
-                                    <i class="fas fa-chevron-right text-yellow-500"></i>
+                                    <i class="fas fa-chevron-right text-rose-500"></i>
                                 </div>
                             </div>
                         </a>

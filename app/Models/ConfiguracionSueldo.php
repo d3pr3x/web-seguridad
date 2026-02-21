@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ConfiguracionSueldo extends Model
 {
+    use HasActivoScope, SoftDeletes;
+
     protected $table = 'configuraciones_sueldo';
     
     protected $fillable = [
@@ -24,19 +28,11 @@ class ConfiguracionSueldo extends Model
     }
 
     /**
-     * Scope para configuraciones activas
-     */
-    public function scopeActivas($query)
-    {
-        return $query->where('activo', true);
-    }
-
-    /**
      * Obtener multiplicador por tipo de día
      */
     public static function getMultiplicador($tipoDia)
     {
-        $config = self::activas()->where('tipo_dia', $tipoDia)->first();
+        $config = self::activos()->where('tipo_dia', $tipoDia)->first();
         return $config ? $config->multiplicador : 1.00;
     }
 }

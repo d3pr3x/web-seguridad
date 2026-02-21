@@ -7,6 +7,7 @@ use App\Models\Accion;
 use App\Models\Sector;
 use App\Models\Sucursal;
 use App\Models\User;
+use App\Services\SecureUploadService;
 use Illuminate\Http\Request;
 
 class NovedadController extends Controller
@@ -123,16 +124,17 @@ class NovedadController extends Controller
             'accion' => 'nullable|string',
             'resultado' => 'nullable|string',
             'imagenes' => 'nullable|array|max:4',
-            'imagenes.*' => 'image|mimes:jpeg,jpg,png,heic,heif|max:15360',
+            'imagenes.*' => 'image|mimes:jpeg,jpg,png,webp,heic,heif|max:' . (config('uploads.max_image_kb', 5120)),
         ], [
             'imagenes.max' => 'Máximo 4 fotografías.',
-            'imagenes.*.max' => 'Cada imagen máximo 15MB.',
+            'imagenes.*.max' => 'Cada imagen máximo ' . (config('uploads.max_image_kb', 5120) / 1024) . ' MB.',
         ]);
 
+        $upload = app(SecureUploadService::class);
         $imagenes = [];
         if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $imagen) {
-                $imagenes[] = $imagen->store('acciones', 'public');
+                $imagenes[] = $upload->storeImage($imagen, 'acciones');
             }
         }
 

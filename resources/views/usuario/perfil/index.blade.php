@@ -151,7 +151,7 @@
                         <!-- Fecha de Registro -->
                         <div class="bg-gray-50 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Miembro desde</label>
-                            <p class="text-gray-900 font-medium">{{ $user->created_at->format('d/m/Y') }}</p>
+                            <p class="text-gray-900 font-medium">{{ $user->created_at?->format('d/m/Y') ?? '—' }}</p>
                         </div>
                     </div>
                 </div>
@@ -210,7 +210,7 @@
                 </div>
             </div>
 
-            @if(config('app.show_documentos_guardias'))
+            @if(module_enabled('documentos_guardias'))
             <!-- Documentos Personales -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
                 <div class="p-6">

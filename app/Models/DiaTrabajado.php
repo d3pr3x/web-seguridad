@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DiaTrabajado extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'dias_trabajados';
 
     public const CREATED_AT = 'creado_en';

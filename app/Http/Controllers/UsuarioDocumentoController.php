@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\DocumentoPersonal;
+use App\Services\SecureUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class UsuarioDocumentoController extends Controller
 {
@@ -70,33 +70,34 @@ class UsuarioDocumentoController extends Controller
     
     public function store(Request $request)
     {
+        $maxKb = config('uploads.max_image_kb', 5120);
         $validated = $request->validate([
             'tipo_documento' => 'required|in:cedula_identidad,licencia_conductor,certificado_antecedentes,certificado_os10',
-            'imagen_frente' => 'required|image|mimes:jpeg,jpg,png,heic,heif|max:15360',
-            'imagen_reverso' => 'required|image|mimes:jpeg,jpg,png,heic,heif|max:15360',
+            'imagen_frente' => 'required|image|mimes:jpeg,jpg,png,webp|max:' . $maxKb,
+            'imagen_reverso' => 'required|image|mimes:jpeg,jpg,png,webp|max:' . $maxKb,
         ], [
             'imagen_frente.required' => 'La imagen del frente es obligatoria.',
-            'imagen_frente.max' => 'La imagen del frente no debe superar los 15MB.',
+            'imagen_frente.max' => 'La imagen del frente no debe superar ' . ($maxKb / 1024) . ' MB.',
             'imagen_reverso.required' => 'La imagen del reverso es obligatoria.',
-            'imagen_reverso.max' => 'La imagen del reverso no debe superar los 15MB.',
+            'imagen_reverso.max' => 'La imagen del reverso no debe superar ' . ($maxKb / 1024) . ' MB.',
         ]);
-        
+
         $user = Auth::user();
-        
-        // Verificar si ya tiene una solicitud pendiente
+
         $solicitudPendiente = $user->documentosPersonales()
             ->where('tipo_documento', $validated['tipo_documento'])
             ->where('estado', 'pendiente')
             ->first();
-        
+
         if ($solicitudPendiente) {
             return redirect()->route('usuario.documentos.index')
                 ->with('error', 'Ya tienes una solicitud pendiente para este documento.');
         }
-        
-        // Subir imágenes
-        $imagenFrente = $request->file('imagen_frente')->store('documentos/' . $user->id_usuario, 'public');
-        $imagenReverso = $request->file('imagen_reverso')->store('documentos/' . $user->id_usuario, 'public');
+
+        $upload = app(SecureUploadService::class);
+        $subdir = 'documentos/' . $user->id_usuario;
+        $imagenFrente = $upload->storeImage($request->file('imagen_frente'), $subdir);
+        $imagenReverso = $upload->storeImage($request->file('imagen_reverso'), $subdir);
         
         // Verificar si es un cambio de documento existente
         $documentoExistente = $user->documentosPersonales()

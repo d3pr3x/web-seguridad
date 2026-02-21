@@ -125,25 +125,13 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="sucursal_id" class="form-label">
+                        <label class="form-label">
                             <i class="fas fa-building me-1"></i>Sucursal
                         </label>
-                        <select class="form-control @error('sucursal_id') is-invalid @enderror" 
-                                id="sucursal_id" 
-                                name="sucursal_id">
-                            <option value="">Seleccione una sucursal</option>
-                            @foreach(\App\Models\Sucursal::activas()->get() as $sucursal)
-                                <option value="{{ $sucursal->id }}" 
-                                        @if(old('sucursal_id', auth()->user()->sucursal_id) == $sucursal->id) selected @endif>
-                                    {{ $sucursal->nombre }} - {{ $sucursal->ciudad }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('sucursal_id')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
+                        <p class="form-control-plaintext border rounded px-3 py-2 bg-light mb-0">
+                            {{ auth()->user()->sucursal?->nombre ?? '—' }}@if(auth()->user()->sucursal?->ciudad) — {{ auth()->user()->sucursal->ciudad }}@endif
+                        </p>
+                        <div class="form-text">La sucursal solo puede ser modificada por un administrador.</div>
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">

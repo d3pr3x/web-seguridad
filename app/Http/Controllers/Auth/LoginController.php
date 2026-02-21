@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Services\AuditoriaService;
+use App\Services\LoginAttemptService;
 use App\Models\User;
 use App\Models\DispositivoPermitido;
 use App\Models\UbicacionPermitida;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -67,17 +70,25 @@ class LoginController extends Controller
                 if ($verificacionUbicacion['ubicacion']) {
                     $mensaje .= ' La ubicación más cercana (' . $verificacionUbicacion['ubicacion']->nombre . ') está a ' . $verificacionUbicacion['distancia'] . ' metros.';
                 }
-                
+
                 return back()->withErrors([
                     'ubicacion' => $mensaje,
                 ])->onlyInput('rut');
             }
         }
-        
+
+        $loginAttempts = app(LoginAttemptService::class);
+        if ($loginAttempts->isLockedOut($rut)) {
+            AuditoriaService::registrar('login_failed', 'usuarios', null, null, null, ['run' => $rut, 'reason' => 'lockout']);
+            return back()->withErrors([
+                'rut' => 'Credenciales inválidas.',
+            ])->onlyInput('rut');
+        }
+
         $user = User::where('run', $rut)->first();
 
         if ($user && Hash::check($request->password, $user->clave)) {
-            // Actualizar el fingerprint del dispositivo si es diferente
+            $loginAttempts->clearAttemptsForRun($rut);
             if ($user->browser_fingerprint !== $request->browser_fingerprint) {
                 $user->update([
                     'browser_fingerprint' => $request->browser_fingerprint,
@@ -89,14 +100,13 @@ class LoginController extends Controller
 
             Auth::login($user);
             $request->session()->regenerate();
-            
-            // Verificar si el usuario tiene sucursal asignada (excepto administradores)
+            AuditoriaService::registrar('login_success', 'usuarios', $user->id_usuario, null, null, ['run' => $user->run]);
+
             if (!$user->esAdministrador() && !$user->tieneSucursal()) {
                 return redirect()->route('profile.index')
                     ->with('warning', 'Bienvenido al sistema. Debe estar asignado a una sucursal para acceder a todas las funcionalidades. Por favor, contacte al administrador.');
             }
-            
-            // Redirigir según el perfil (sin usar intended para evitar redirecciones a URLs previas)
+
             if ($user->esAdministrador()) {
                 return redirect()->route('administrador.index');
             } elseif ($user->esSupervisor()) {
@@ -106,8 +116,14 @@ class LoginController extends Controller
             }
         }
 
+        if (!$user) {
+            Hash::check($request->password, config('auth.login_dummy_bcrypt_hash'));
+        }
+        $loginAttempts->recordFailedAttempt($rut, $request);
+        AuditoriaService::registrar('login_failed', 'usuarios', null, null, null, ['run' => $rut, 'reason' => 'credenciales_invalidas']);
+        Log::channel('security')->warning('login_failed', ['run' => $rut, 'ip' => $request->ip(), 'user_agent' => $request->userAgent()]);
         return back()->withErrors([
-            'rut' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+            'rut' => 'Credenciales inválidas.',
         ])->onlyInput('rut');
     }
 

@@ -2,16 +2,26 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sucursal extends Model
 {
+    use HasActivoScope, SoftDeletes;
+
     protected $table = 'sucursales';
+
+    protected function activoColumn(): string
+    {
+        return 'activa';
+    }
 
     public const CREATED_AT = 'creado_en';
     public const UPDATED_AT = 'actualizado_en';
     
     protected $fillable = [
+        'empresa_id',
         'nombre',
         'empresa',
         'codigo',
@@ -29,6 +39,14 @@ class Sucursal extends Model
         return [
             'activa' => 'boolean',
         ];
+    }
+
+    /**
+     * Empresa (cliente) a la que pertenece esta instalación
+     */
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class);
     }
 
     /**
@@ -71,11 +89,8 @@ class Sucursal extends Model
         return $this->hasMany(PuntoRonda::class);
     }
 
-    /**
-     * Scope para sucursales activas
-     */
     public function scopeActivas($query)
     {
-        return $query->where('activa', true);
+        return $this->scopeActivos($query);
     }
 }

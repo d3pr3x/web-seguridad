@@ -127,13 +127,15 @@ return [
 
     'debug_download_token' => env('DEBUG_DOWNLOAD_TOKEN', ''),
 
-    /* Documentos de guardias: en false no se muestra en menús ni enlaces. Poner true para volver a habilitar. */
-    'show_documentos_guardias' => false,
+    /*
+    | Módulos extras/pagados: usar config/modules.php y helper module_enabled('clave').
+    | Los valores siguientes se mantienen por compatibilidad; tienen preferencia
+    | config/modules.php para control de módulos.
+    */
+    'show_documentos_guardias' => env('SHOW_DOCUMENTOS_GUARDIAS', false),
+    'show_calculo_sueldos' => env('SHOW_CALCULO_SUELDOS', false),
 
-    /* Cálculo de sueldos / días trabajados: en false no se muestra en menús ni enlaces. Poner true cuando la función esté habilitada. */
-    'show_calculo_sueldos' => false,
-
-    /* Control de acceso: si es true solo se muestra entrada manual (sin escáner QR ni lector de patente). Poner false para volver a habilitar escáner/lector. */
-    'ingresos_entrada_manual_solo' => true,
+    /* Control de acceso: si es true solo se muestra entrada manual (sin escáner QR ni lector de patente). */
+    'ingresos_entrada_manual_solo' => env('INGRESOS_ENTRADA_MANUAL_SOLO', true),
 
 ];

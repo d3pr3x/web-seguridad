@@ -32,8 +32,15 @@ return [
 
         'local' => [
             'driver' => 'local',
+            'root' => storage_path('app'),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        /** Disco para archivos sensibles: no URL pública, solo descarga por controlador con auth y auditoría. */
+        'private' => [
+            'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

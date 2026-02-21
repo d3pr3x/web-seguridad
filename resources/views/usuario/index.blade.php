@@ -26,128 +26,125 @@
                 <h1 class="text-xl font-bold text-gray-800 mt-0">Resumen</h1>
             </div>
 
-            <!-- Secciones: mismo diseño que administrador -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Reportes -->
-                <div>
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div class="bg-gradient-to-r from-red-600 to-red-700 p-4">
-                            <h2 class="text-xl font-bold text-white flex items-center">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>
-                                Reportes
+            <!-- Cards principales: alineadas al menú (Control de acceso, Rondas QR, Incidentes) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                @if(module_enabled('control_acceso') && auth()->user()->puedeVerControlAcceso())
+                <a href="{{ route('ingresos.index') }}" class="block">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden h-full hover:shadow-lg transition">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
+                            <h2 class="text-lg font-bold text-white flex items-center">
+                                <i class="fas fa-qrcode mr-2"></i>
+                                Control de acceso
                             </h2>
-                            <p class="text-red-50 text-sm mt-1">Situaciones críticas que requieren atención</p>
+                            <p class="text-blue-50 text-sm mt-1">Ingresos, salidas y blacklist</p>
                         </div>
-                        <div class="p-4 space-y-3">
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'incidentes']) }}" class="block">
-                                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg hover:bg-red-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-red-800">Incidentes</h3>
-                                            <p class="text-sm text-red-600">Eventos críticos</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-red-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'denuncia']) }}" class="block">
-                                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg hover:bg-purple-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-purple-800">Denuncia</h3>
-                                            <p class="text-sm text-purple-600">Reportar delito</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-purple-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'detenido']) }}" class="block">
-                                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg hover:bg-orange-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-orange-800">Detenido</h3>
-                                            <p class="text-sm text-orange-600">Persona detenida</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-orange-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.reportes.create', ['tipo' => 'accion_sospechosa']) }}" class="block">
-                                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg hover:bg-yellow-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-yellow-800">Acción Sospechosa</h3>
-                                            <p class="text-sm text-yellow-600">Comportamiento extraño</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-yellow-500"></i>
-                                    </div>
-                                </div>
-                            </a>
+                        <div class="p-4">
+                            <span class="text-blue-600 text-sm font-medium">Ir al módulo <i class="fas fa-chevron-right ml-1"></i></span>
                         </div>
                     </div>
-                </div>
+                </a>
+                @endif
 
-                <!-- Mi actividad -->
-                <div>
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
-                            <h2 class="text-xl font-bold text-white flex items-center">
-                                <i class="fas fa-user mr-2"></i>
-                                Mi actividad
+                @if(module_enabled('rondas_qr') && auth()->user()->puedeVerRondasQR())
+                <a href="{{ route('usuario.ronda.index') }}" class="block">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden h-full hover:shadow-lg transition">
+                        <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 p-4">
+                            <h2 class="text-lg font-bold text-white flex items-center">
+                                <i class="fas fa-route mr-2"></i>
+                                Rondas QR
                             </h2>
-                            <p class="text-slate-200 text-sm mt-1">Perfil, reportes y rondas</p>
+                            <p class="text-emerald-50 text-sm mt-1">Puntos de ronda y escaneos</p>
                         </div>
-                        <div class="p-4 space-y-3">
-                            <a href="{{ route('usuario.perfil.index') }}" class="block">
-                                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg hover:bg-blue-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-blue-800">Mi perfil</h3>
-                                            <p class="text-sm text-blue-600">Datos personales y contraseña</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-blue-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.reportes.index') }}" class="block">
-                                <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg hover:bg-teal-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-teal-800">Mis reportes</h3>
-                                            <p class="text-sm text-teal-600">Ver historial de reportes</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-teal-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('usuario.ronda.index') }}" class="block">
-                                <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg hover:bg-emerald-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-emerald-800">Rondas QR</h3>
-                                            <p class="text-sm text-emerald-600">Registro de puntos de ronda</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-emerald-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            @if(config('app.show_documentos_guardias'))
-                            <a href="{{ route('usuario.documentos.index') }}" class="block">
-                                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hover:bg-indigo-100 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="font-bold text-indigo-800">Mis documentos</h3>
-                                            <p class="text-sm text-indigo-600">Documentos personales</p>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-indigo-500"></i>
-                                    </div>
-                                </div>
-                            </a>
-                            @endif
+                        <div class="p-4">
+                            <span class="text-emerald-600 text-sm font-medium">Ir al módulo <i class="fas fa-chevron-right ml-1"></i></span>
                         </div>
+                    </div>
+                </a>
+                @endif
+
+                <!-- Incidentes: solo Novedades y Reportes -->
+                @if(auth()->user()->puedeVerMisReportes())
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-red-600 to-red-700 p-4">
+                        <h2 class="text-lg font-bold text-white flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Incidentes
+                        </h2>
+                        <p class="text-red-50 text-sm mt-1">Novedades y reportes</p>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <a href="{{ route('usuario.acciones.index') }}" class="block">
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg hover:bg-red-100 transition">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-red-800">Novedades</h3>
+                                        <p class="text-sm text-red-600">Registro de novedades</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-red-500"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="{{ route('usuario.reportes.index') }}" class="block">
+                            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg hover:bg-rose-100 transition">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-rose-800">Reportes</h3>
+                                        <p class="text-sm text-rose-600">Crear y ver reportes</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-rose-500"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            <!-- Mi actividad: solo historial (registro de puntos escaneados, historial de reportes) -->
+            @php
+                $mostrarMiActividad = (module_enabled('rondas_qr') && auth()->user()->puedeVerRondasQR()) || auth()->user()->puedeVerMisReportes();
+            @endphp
+            @if($mostrarMiActividad)
+            <div class="mt-6">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
+                        <h2 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-history mr-2"></i>
+                            Mi actividad
+                        </h2>
+                        <p class="text-slate-200 text-sm mt-1">Historial y registros recientes</p>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @if(auth()->user()->puedeVerMisReportes())
+                        <a href="{{ route('usuario.reportes.index') }}" class="block">
+                            <div class="bg-slate-50 border-l-4 border-slate-500 p-4 rounded-r-lg hover:bg-slate-100 transition">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-slate-800">Historial de reportes</h3>
+                                        <p class="text-sm text-slate-600">Ver mis reportes enviados</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-slate-500"></i>
+                                </div>
+                            </div>
+                        </a>
+                        @endif
+                        @if(module_enabled('rondas_qr') && auth()->user()->puedeVerRondasQR())
+                        <a href="{{ route('usuario.ronda.index') }}" class="block">
+                            <div class="bg-slate-50 border-l-4 border-slate-500 p-4 rounded-r-lg hover:bg-slate-100 transition">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-slate-800">Registro de puntos escaneados</h3>
+                                        <p class="text-sm text-slate-600">Historial de escaneos de ronda</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-slate-500"></i>
+                                </div>
+                            </div>
+                        </a>
+                        @endif
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Registro histórico de personas (RUT + nombre y datos opcionales).
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Persona extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'personas';
 
     protected $fillable = [

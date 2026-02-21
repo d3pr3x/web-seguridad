@@ -2,14 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivoScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UbicacionPermitida extends Model
 {
-    use HasFactory;
+    use HasFactory, HasActivoScope, SoftDeletes;
 
     protected $table = 'ubicaciones_permitidas';
+
+    protected function activoColumn(): string
+    {
+        return 'activa';
+    }
 
     protected $fillable = [
         'nombre',

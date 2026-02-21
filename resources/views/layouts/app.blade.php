@@ -276,7 +276,7 @@
                             <i class="fas fa-file-pdf me-1"></i>Mis Informes
                         </a>
                     </li>
-                    @if(config('app.show_calculo_sueldos'))
+                    @if(module_enabled('calculo_sueldos'))
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('dias-trabajados.index') }}">
                             <i class="fas fa-calendar me-1"></i>Días Trabajados
@@ -299,7 +299,7 @@
                             <li><a class="dropdown-item" href="{{ route('admin.reporte-sucursal') }}">
                                 <i class="fas fa-building me-1"></i>Reporte por Sucursal
                             </a></li>
-                            @if(config('app.show_calculo_sueldos'))
+                            @if(module_enabled('calculo_sueldos'))
                             <li><a class="dropdown-item" href="{{ route('admin.calculo-sueldos') }}">
                                 <i class="fas fa-calculator me-1"></i>Cálculo de Sueldos
                             </a></li>
@@ -308,7 +308,7 @@
                             <li><a class="dropdown-item" href="{{ route('admin.sectores.index') }}">
                                 <i class="fas fa-map-marked-alt me-1"></i>Gestión de Sectores
                             </a></li>
-                            @if(config('app.show_documentos_guardias'))
+                            @if(module_enabled('documentos_guardias'))
                             <li><a class="dropdown-item" href="{{ route('admin.documentos.index') }}">
                                 <i class="fas fa-file-alt me-1"></i>Documentos Personales
                             </a></li>

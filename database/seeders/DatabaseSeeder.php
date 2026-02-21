@@ -12,13 +12,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            SucursalSeeder::class,
             RolesUsuarioSeeder::class,
+            ModalidadesJerarquiaSeeder::class,
+            ModalidadRolesSeeder::class,
             PermisosSeeder::class,
-            UbicacionPermitidaSeeder::class,
-            UsuariosSeeder::class,
+            EmpresaSeeder::class,
+            SucursalSeeder::class,
             SectorSeeder::class,
             TareaSeeder::class,
+            GruposIncidentesSeeder::class,
+            UbicacionPermitidaSeeder::class,
+            UsuariosSeeder::class,
             TareaNovedadesSeeder::class,
             TareaIncidentesSeeder::class,
             TareaSeguridadSeeder::class,
@@ -28,6 +32,7 @@ class DatabaseSeeder extends Seeder
             DispositivoPermitidoSeeder::class,
             ReunionesSeeder::class,
             ControlAccesoSeeder::class,
+            DemoDatosOperacionalesSeeder::class,
         ]);
     }
 }

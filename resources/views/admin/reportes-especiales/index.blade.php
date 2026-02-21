@@ -84,130 +84,93 @@
                 </form>
             </div>
 
-            <!-- Estadísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-pink-100 text-sm font-medium">Total Reportes</p>
-                            <h3 class="text-3xl font-bold mt-2">{{ number_format($totalReportes) }}</h3>
-                        </div>
-                        <svg class="w-12 h-12 text-pink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                        </svg>
-                    </div>
+            <!-- Contadores compactos -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="bg-pink-500 rounded-lg shadow p-3 text-white">
+                    <p class="text-pink-100 text-xs font-medium">Total</p>
+                    <p class="text-xl font-bold">{{ number_format($totalReportes) }}</p>
                 </div>
-
                 @if(isset($reportesPorEstado['pendiente']))
-                <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-yellow-100 text-sm font-medium">Pendientes</p>
-                            <h3 class="text-3xl font-bold mt-2">{{ number_format($reportesPorEstado['pendiente']) }}</h3>
-                        </div>
-                        <svg class="w-12 h-12 text-yellow-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
+                <div class="bg-yellow-500 rounded-lg shadow p-3 text-white">
+                    <p class="text-yellow-100 text-xs font-medium">Pendientes</p>
+                    <p class="text-xl font-bold">{{ number_format($reportesPorEstado['pendiente']) }}</p>
                 </div>
                 @endif
-
                 @if(isset($reportesPorEstado['en_revision']))
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-blue-100 text-sm font-medium">En Revisión</p>
-                            <h3 class="text-3xl font-bold mt-2">{{ number_format($reportesPorEstado['en_revision']) }}</h3>
-                        </div>
-                        <svg class="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                    </div>
+                <div class="bg-blue-500 rounded-lg shadow p-3 text-white">
+                    <p class="text-blue-100 text-xs font-medium">En Revisión</p>
+                    <p class="text-xl font-bold">{{ number_format($reportesPorEstado['en_revision']) }}</p>
                 </div>
                 @endif
-
                 @if(isset($reportesPorEstado['completado']))
-                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-green-100 text-sm font-medium">Completados</p>
-                            <h3 class="text-3xl font-bold mt-2">{{ number_format($reportesPorEstado['completado']) }}</h3>
-                        </div>
-                        <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
+                <div class="bg-green-500 rounded-lg shadow p-3 text-white">
+                    <p class="text-green-100 text-xs font-medium">Completados</p>
+                    <p class="text-xl font-bold">{{ number_format($reportesPorEstado['completado']) }}</p>
                 </div>
                 @endif
             </div>
 
-            <!-- Lista de reportes especiales recientes -->
+            <!-- Listado: cards compactas en grid -->
             @if($reportes->count() > 0)
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <svg class="w-6 h-6 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    Listado de Reportes Especiales
-                </h2>
+                <h2 class="text-lg font-bold text-gray-800 mb-3">Listado de Reportes Especiales</h2>
 
-                <div class="space-y-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-4">
                     @foreach($reportes as $reporte)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-                            <div class="flex flex-col md:flex-row">
-                                <div class="
-                                    @if($reporte->tipo == 'incidentes') bg-gradient-to-br from-yellow-500 to-yellow-600
-                                    @elseif($reporte->tipo == 'denuncia') bg-gradient-to-br from-red-500 to-red-600
-                                    @elseif($reporte->tipo == 'detenido') bg-gradient-to-br from-purple-500 to-purple-600
-                                    @else bg-gradient-to-br from-orange-500 to-orange-600
-                                    @endif
-                                    p-6 text-white md:w-48 flex-shrink-0">
-                                    <div class="text-center">
-                                        <p class="text-white text-opacity-80 text-sm">{{ $reporte->dia->format('d/m/Y') }}</p>
-                                        <p class="text-2xl font-bold">{{ \Carbon\Carbon::parse($reporte->hora)->format('H:i') }}</p>
-                                        <div class="mt-3">
-                                            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-xs font-medium">
-                                                {{ $reporte->nombre_tipo }}
-                                            </span>
-                                        </div>
+                        @php
+                            $borderColor = match($reporte->tipo) {
+                                'incidentes' => 'border-yellow-500',
+                                'denuncia' => 'border-red-500',
+                                'detenido' => 'border-purple-500',
+                                default => 'border-orange-500',
+                            };
+                        @endphp
+                        <div class="bg-white rounded-lg shadow border-l-4 {{ $borderColor }} overflow-hidden hover:shadow-md transition">
+                            <div class="p-3">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-gray-700">
+                                            {{ $reporte->dia->format('d/m/Y') }} · {{ \Carbon\Carbon::parse($reporte->hora)->format('H:i') }}
+                                        </p>
+                                        <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded
+                                            @if($reporte->estado == 'pendiente') bg-yellow-100 text-yellow-800
+                                            @elseif($reporte->estado == 'en_revision') bg-blue-100 text-blue-800
+                                            @elseif($reporte->estado == 'completado') bg-green-100 text-green-800
+                                            @else bg-red-100 text-red-800
+                                            @endif">
+                                            {{ ucfirst(str_replace('_', ' ', $reporte->estado)) }}
+                                        </span>
                                     </div>
+                                    <a href="{{ route('admin.reportes-especiales.show', $reporte) }}" class="flex-shrink-0 px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded text-sm whitespace-nowrap">
+                                        Ver detalle
+                                    </a>
                                 </div>
-                                <div class="p-6 flex-1">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <p class="text-gray-600 text-sm">Usuario</p>
-                                            <p class="font-semibold text-gray-800">{{ $reporte->user->nombre_completo }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-gray-600 text-sm">Sucursal</p>
-                                            <p class="font-semibold text-gray-800">{{ $reporte->sucursal->nombre }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-gray-600 text-sm">Estado</p>
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                @if($reporte->estado == 'pendiente') bg-yellow-100 text-yellow-800
-                                                @elseif($reporte->estado == 'en_revision') bg-blue-100 text-blue-800
-                                                @elseif($reporte->estado == 'completado') bg-green-100 text-green-800
-                                                @else bg-red-100 text-red-800
-                                                @endif">
-                                                {{ ucfirst(str_replace('_', ' ', $reporte->estado)) }}
-                                            </span>
-                                        </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Usuario:</span>
+                                        <span class="font-medium text-gray-800 truncate-2lines block">{{ $reporte->user->nombre_completo ?? '—' }}</span>
                                     </div>
-                                    <div class="mt-4 flex justify-end">
-                                        <a href="{{ route('reportes-especiales.show', $reporte) }}" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition text-sm">
-                                            Ver Detalle
-                                        </a>
+                                    <div>
+                                        <span class="text-gray-500">Sucursal:</span>
+                                        <span class="font-medium text-gray-800 truncate-2lines block">{{ $reporte->sucursal?->nombre ?? '—' }}</span>
                                     </div>
+                                    <div class="sm:col-span-2">
+                                        <span class="text-gray-500">Tipo:</span>
+                                        <span class="font-medium text-gray-800">{{ $reporte->nombre_tipo }}</span>
+                                    </div>
+                                    @if(trim($reporte->novedad ?? '') !== '' || trim($reporte->accion ?? '') !== '')
+                                    <div class="sm:col-span-2">
+                                        <span class="text-gray-500">Resumen:</span>
+                                        <p class="text-gray-700 truncate-2lines mt-0.5">{{ Str::limit($reporte->novedad ?: $reporte->accion ?: '—', 80) }}</p>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- Paginación -->
-                <div class="mt-6">
-                    {{ $reportes->appends(request()->query())->links() }}
+                <div class="mt-4">
+                    {{ $reportes->links() }}
                 </div>
             @else
                 <div class="bg-gray-50 border-l-4 border-gray-400 p-6 rounded-lg">
@@ -225,4 +188,13 @@
         </div>
     </div>
 </div>
+<style>
+.truncate-2lines {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+}
+</style>
 @endsection

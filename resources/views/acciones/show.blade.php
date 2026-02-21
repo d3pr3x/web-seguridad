@@ -97,10 +97,10 @@
                         <div class="mb-3">
                             <strong>Imágenes:</strong>
                             <div class="row mt-2">
-                                @foreach($accion->imagenes as $imagen)
+                                @foreach($accion->imagenes as $idx => $imagen)
                                     <div class="col-md-4 mb-3">
-                                        <a href="{{ asset('storage/' . $imagen) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $imagen) }}" 
+                                        <a href="{{ route('archivos-privados.accion', [$accion, $idx]) }}" target="_blank">
+                                            <img src="{{ route('archivos-privados.accion', [$accion, $idx]) }}" 
                                                  alt="Imagen" 
                                                  class="img-fluid img-thumbnail">
                                         </a>
